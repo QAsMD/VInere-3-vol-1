@@ -1,82 +1,70 @@
-#include "kernel.h"
+#include "main.h"
 
 
-//Program
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size, void *m2_nl, void *lc_nl, void *d_nl, void *n_nl);
+/* CLINT-Constant Values */
+__device__ clint __FLINT_API_DATA
+nul_l[] = { 0, 0, 0, 0, 0 };
+__device__ clint __FLINT_API_DATA
+one_l[] = { 1, 1, 0, 0, 0 };
+__device__ clint __FLINT_API_DATA
+two_l[] = { 1, 2, 0, 0, 0 };
+/******************************************************************************/
 
+__device__ static int twotab[] =
+{ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0,
+3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0,
+3, 0, 1, 0, 2, 0, 1, 0, 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0,
+3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0 };
+
+
+__device__ static USHORT oddtab[] =
+{ 0, 1, 1, 3, 1, 5, 3, 7, 1, 9, 5, 11, 3, 13, 7, 15, 1, 17, 9, 19, 5, 21, 11, 23, 3, 25, 13, 27, 7, 29, 15, 31, 1,
+33, 17, 35, 9, 37, 19, 39, 5, 41, 21, 43, 11, 45, 23, 47, 3, 49, 25, 51, 13, 53, 27, 55, 7, 57, 29, 59, 15,
+61, 31, 63, 1, 65, 33, 67, 17, 69, 35, 71, 9, 73, 37, 75, 19, 77, 39, 79, 5, 81, 41, 83, 21, 85, 43, 87, 11,
+89, 45, 91, 23, 93, 47, 95, 3, 97, 49, 99, 25, 101, 51, 103, 13, 105, 53, 107, 27, 109, 55, 111, 7, 113,
+57, 115, 29, 117, 59, 119, 15, 121, 61, 123, 31, 125, 63, 127, 1, 129, 65, 131, 33, 133, 67, 135, 17,
+137, 69, 139, 35, 141, 71, 143, 9, 145, 73, 147, 37, 149, 75, 151, 19, 153, 77, 155, 39, 157, 79, 159,
+5, 161, 81, 163, 41, 165, 83, 167, 21, 169, 85, 171, 43, 173, 87, 175, 11, 177, 89, 179, 45, 181, 91,
+183, 23, 185, 93, 187, 47, 189, 95, 191, 3, 193, 97, 195, 49, 197, 99, 199, 25, 201, 101, 203, 51, 205,
+103, 207, 13, 209, 105, 211, 53, 213, 107, 215, 27, 217, 109, 219, 55, 221, 111, 223, 7, 225, 113,
+227, 57, 229, 115, 231, 29, 233, 117, 235, 59, 237, 119, 239, 15, 241, 121, 243, 61, 245, 123, 247, 31,
+249, 125, 251, 63, 253, 127, 255 };
+
+
+/******************************************************************************/
 //LINT M2 = mexp(LC, potential_D[i], N);
-__global__ void addKernel(int *c, const int *a, const int *b, short *sM2, short *sLC, short *sD, short *sN)
+__global__ void addKernel(short *sM2, short *sLC, short *sD, short *sN)
 {
 	int i = threadIdx.x;
-	c[i] = a[i] + b[i];
+	//c[i] = a[i] + b[i];
 
 	/**********************************************/
-
 	clint* m2_nl = (clint*)sM2;
 	clint* lc_nl = (clint*)sLC;
 	clint* d_nl = (clint*)sD;
 	clint* n_nl = (clint*)sN;
 
+
+
 	CUDALINT M2 = CUDALINT(m2_nl);
 	CUDALINT LC = CUDALINT(lc_nl);
 	CUDALINT D = CUDALINT(d_nl);
 	CUDALINT N = CUDALINT(n_nl);
+
 	M2 = cuda_mexp(LC, D, N);
+	cuda_cpy_l((clint*)sM2, M2.n_l);
 	/**********************************************/
 }
 
-int main()
-{
-    const int arraySize = 5;
-    const int a[arraySize] = { 1, 2, 3, 4, 5 };
-    const int b[arraySize] = { 10, 20, 30, 40, 50 };
-    int c[arraySize] = { 0 };
-
-	//******************************************************//
-	LINT M2, LC, D, N;
-	void* m2_nl;
-	void* lc_nl;
-	void* d_nl;
-	void* n_nl;
-
-	M2 = nextprime(randl(64) + 1, 1);
-	LC = nextprime(M2 + 1, 1);
-	D = nextprime(LC + 1, 1);
-	N = nextprime(D + 1, 1);
-
-	m2_nl = M2.n_l;
-	lc_nl = LC.n_l;
-	d_nl = D.n_l;
-	n_nl = N.n_l;
-	//******************************************************//
-
-    // Add vectors in parallel.
-	cudaError_t cudaStatus = addWithCuda(c, a, b, arraySize, m2_nl, lc_nl, d_nl, n_nl);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "addWithCuda failed!");
-        return 1;
-    }
-
-    printf("{1,2,3,4,5} + {10,20,30,40,50} = {%d,%d,%d,%d,%d}\n",
-        c[0], c[1], c[2], c[3], c[4]);
-
-    // cudaDeviceReset must be called before exiting in order for profiling and
-    // tracing tools such as Nsight and Visual Profiler to show complete traces.
-    cudaStatus = cudaDeviceReset();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceReset failed!");
-        return 1;
-    }
-
-    return 0;
-}
-
 // Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size, void *m2_nl, void *lc_nl, void *d_nl, void *n_nl)
+cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl, void *n_nl)
 {
-    int *dev_a = 0;
-    int *dev_b = 0;
-    int *dev_c = 0;
+    //int *dev_a = 0;
+    //int *dev_b = 0;
+    //int *dev_c = 0;
 
 	//******************************************************//
 	void *m2_dev_arr = 0;
@@ -94,24 +82,24 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size, v
         goto Error;
     }
 
-    // Allocate GPU buffers for three vectors (two input, one output)    .
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+    //// Allocate GPU buffers for three vectors (two input, one output).
+    //cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
+    //if (cudaStatus != cudaSuccess) {
+    //    fprintf(stderr, "cudaMalloc failed!");
+    //    goto Error;
+    //}
 
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+    //cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
+    //if (cudaStatus != cudaSuccess) {
+    //    fprintf(stderr, "cudaMalloc failed!");
+    //    goto Error;
+    //}
 
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+    //cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
+    //if (cudaStatus != cudaSuccess) {
+    //    fprintf(stderr, "cudaMalloc failed!");
+    //    goto Error;
+    //}
 
 	//******************************************************//
 	size_t m2_num_size = 2 * ((short)(*((short*)m2_nl))) + sizeof(short);
@@ -119,27 +107,52 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size, v
 	size_t d_num_size = 2 * ((short)(*((short*)d_nl))) + sizeof(short);
 	size_t n_num_size = 2 * ((short)(*((short*)n_nl))) + sizeof(short);
 
-	cudaStatus = cudaMalloc((void**)(&m2_dev_arr), m2_num_size);
+/// cudaMalloc
+	cudaStatus = cudaMalloc((void**)(&m2_dev_arr), n_num_size);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMalloc failed!");
 		goto Error;
 	}
-	cudaStatus = cudaMalloc((void**)(&lc_dev_arr), lc_num_size);
+	cudaStatus = cudaMalloc((void**)(&lc_dev_arr), n_num_size);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMalloc failed!");
 		goto Error;
 	}
-	cudaStatus = cudaMalloc((void**)(&d_dev_arr), d_num_size);
-	if (cudaStatus != cudaSuccess) {
-		fprintf(stderr, "cudaMalloc failed!");
-		goto Error;
-	}
-	cudaStatus = cudaMalloc((void**)(&n_dev_arr), n_num_size);
+	cudaStatus = cudaMalloc((void**)(&d_dev_arr), n_num_size);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMalloc failed!");
 		goto Error;
 	}
 
+	cudaStatus = cudaMalloc((void**)(&n_dev_arr), n_num_size);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMalloc failed!");
+		goto Error;
+	}
+/// 
+/// cudaMemset
+	cudaStatus = cudaMemset((void*)(m2_dev_arr), 0, n_num_size);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMemset failed!");
+		goto Error;
+	}
+	cudaStatus = cudaMemset((void*)(n_dev_arr), 0, n_num_size);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMemset failed!");
+		goto Error;
+	}
+	cudaStatus = cudaMemset((void*)(lc_dev_arr), 0, n_num_size);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMemset failed!");
+		goto Error;
+	}
+	cudaStatus = cudaMemset((void*)(d_dev_arr), 0, n_num_size);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMemset failed!");
+		goto Error;
+	}
+///
+///	cudaMemcpy
 	cudaStatus = cudaMemcpy(m2_dev_arr, m2_nl, m2_num_size, cudaMemcpyHostToDevice);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemcpy failed!");
@@ -162,22 +175,22 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size, v
 	}
 	//******************************************************//
 
-    // Copy input vectors from host memory to GPU buffers.
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+    //// Copy input vectors from host memory to GPU buffers.
+    //cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
+    //if (cudaStatus != cudaSuccess) {
+    //    fprintf(stderr, "cudaMemcpy failed!");
+    //    goto Error;
+    //}
 
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+    //cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
+    //if (cudaStatus != cudaSuccess) {
+    //    fprintf(stderr, "cudaMemcpy failed!");
+    //    goto Error;
+    //}
 
 
     // Launch a kernel on the GPU with one thread for each element.
-	addKernel << <1, size >> >(dev_c, dev_a, dev_b, (short*)m2_dev_arr, (short*)lc_dev_arr, (short*)d_dev_arr, (short*)n_dev_arr);
+	addKernel << <1, size>> >((short*)m2_dev_arr, (short*)lc_dev_arr, (short*)d_dev_arr, (short*)n_dev_arr);
 
     // Check for any errors launching the kernel
 	cudaStatus = cudaGetLastError();
@@ -195,16 +208,19 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size, v
     }
 
     // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
+	size_t m2_out_num_size = 2 * ((short)(*((short*)n_nl))) + sizeof(short);
+	cudaStatus = cudaMemcpy(m2_nl, m2_dev_arr, m2_out_num_size, cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMemcpy failed!");
         goto Error;
     }
 
+
+
 Error:
-    cudaFree(dev_c);
-    cudaFree(dev_a);
-    cudaFree(dev_b);
+    //cudaFree(dev_c);
+    //cudaFree(dev_a);
+    //cudaFree(dev_b);
 	cudaFree(m2_dev_arr);
 	cudaFree(lc_dev_arr);
 	cudaFree(d_dev_arr);
@@ -356,6 +372,7 @@ cuda_mexp_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 	if (ISODD_L(m_l))              /* Montgomery exponentiation possible */
 	{
 		cuda_mexpkm_l(bas_l, exp_l, p_l, m_l);
+		return E_CLINT_OK;
 	}
 	else
 	{
@@ -580,7 +597,7 @@ cuda_mult(CLINT aa_l, CLINT bb_l, CLINT p_l) /* Allow for double length result  
 /*             E_CLINT_MOD: Modulus even                                      */
 /*                                                                            */
 /******************************************************************************/
-CUDA_CALLABLE_MEMBER int __FLINT_API
+__device__ int __FLINT_API
 cuda_mexpkm_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 {
 	CLINT a_l, a2_l, md_l;
