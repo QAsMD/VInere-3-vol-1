@@ -67,7 +67,7 @@ ERROR_CODE Generalized_Wiener_Attack(
 		void* lc_nl = LC.n_l;
 		void* d_nl = (potential_D[i]).n_l;
 		void* n_nl = N.n_l;
-		size_t arraySize = 2 * (short)(*((short*)d_nl));
+		size_t arraySize = (short)(*((short*)d_nl));
 		cudaError_t cudaStatus = mexpWithCuda(arraySize, m2_nl, lc_nl, d_nl, n_nl);
 		M2 = LINT((clint*)m2_nl);
 		//LINT M2 = mexp(LC, potential_D[i], N);

@@ -13,6 +13,9 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 
 /********************************************/
 //Necessary macros
+//every two bytes content 65536 values
+#define MAGIC_VALUE 65536
+  
 #define PURGEVARS_L(X) (void)0
 #define ISPURGED_L(X) (void)0
 #define Assert(a) (void)0
@@ -91,6 +94,8 @@ class CUDALINT
 public:
 	CUDA_CALLABLE_MEMBER CUDALINT(void);
 	CUDA_CALLABLE_MEMBER CUDALINT(clint*);
+	CUDA_CALLABLE_MEMBER CUDALINT(int i);
+	CUDA_CALLABLE_MEMBER CUDALINT(unsigned short us);
 	CUDA_CALLABLE_MEMBER ~CUDALINT(void);
 	CUDA_CALLABLE_MEMBER const CUDALINT& operator= (const CUDALINT&);
 
@@ -173,3 +178,9 @@ cuda_div_l(CLINT d1_l, CLINT d2_l, CLINT quot_l, CLINT rem_l);
 
 CUDA_CALLABLE_MEMBER int __FLINT_API
 cuda_inc_l(CLINT a_l);
+
+CUDA_CALLABLE_MEMBER void __FLINT_API
+cuda_ul2clint_l(CLINT num_l, ULONG ul);
+
+CUDA_CALLABLE_MEMBER void __FLINT_API
+cuda_partcpy_l(CLINT dest_l, CLINT src_l, int i);

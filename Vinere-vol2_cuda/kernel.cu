@@ -49,13 +49,17 @@ __global__ void addKernel(short *sM2, short *sLC, short *sD, short *sN)
 
 
 
-	CUDALINT M2 = CUDALINT(m2_nl);
+	//CUDALINT M2 = CUDALINT(m2_nl);
 	CUDALINT LC = CUDALINT(lc_nl);
 	CUDALINT D = CUDALINT(d_nl);
+	CUDALINT partD = CUDALINT();
+	cuda_partcpy_l(partD.n_l, D.n_l,i);
 	CUDALINT N = CUDALINT(n_nl);
+	
+	CUDALINT M2 = cuda_mexp(LC, D, N);
 
-	M2 = cuda_mexp(LC, D, N);
-	cuda_cpy_l((clint*)sM2, M2.n_l);
+	cuda_mmul_l(M2.n_l, m2_nl, (clint*)sM2, N.n_l);
+	//cuda_cpy_l((clint*)sM2, M2.n_l);
 	/**********************************************/
 }
 
@@ -277,6 +281,34 @@ CUDA_CALLABLE_MEMBER CUDALINT::CUDALINT(clint* nl)
 	cuda_cpy_l(n_l, nl);
 	status = E_LINT_OK;
 }
+
+//unsigned int constructor
+CUDA_CALLABLE_MEMBER CUDALINT::CUDALINT(int i)
+{
+	unsigned long ul;
+	n_l = new NOTHROW CLINT;
+	if (NULL == n_l)
+	{
+		panic(E_LINT_NHP, "constructor 8", 0, __LINE__);
+	}
+	status = E_LINT_OK;
+	ul = (unsigned)abs(i);
+	cuda_ul2clint_l(n_l, ul);
+}
+
+// Constructor 9
+// LINT is constructed from unsigned short
+CUDA_CALLABLE_MEMBER CUDALINT::CUDALINT(unsigned short us)
+{
+	n_l = new NOTHROW CLINT;
+	if (NULL == n_l)
+	{
+		panic(E_LINT_NHP, "constructor 11", 0, __LINE__);
+	}
+	status = E_LINT_OK;
+	cuda_u2clint_l(n_l, us);
+}
+
 
 //Default Destructor
 CUDA_CALLABLE_MEMBER CUDALINT::~CUDALINT(void)
@@ -1874,4 +1906,56 @@ cuda_inc_l(CLINT a_l)
 	ISPURGED_L((1, sizeof(carry), &carry));
 
 	return OFL;
+}
+
+/******************************************************************************/
+/*                                                                            */
+/*  Function:  Conversion of an ULONG value to CLINT format                   */
+/*  Syntax:    void ul2clint_l (CLINT num_l, USHORT u);                       */
+/*  Input:     ul (Value to be converted)                                     */
+/*  Output:    num_l (CLINT variable with value ul)                           */
+/*  Returns:   -                                                              */
+/*                                                                            */
+/******************************************************************************/
+CUDA_CALLABLE_MEMBER void __FLINT_API
+cuda_ul2clint_l(CLINT num_l, ULONG ul)
+{
+	*LSDPTR_L(num_l) = (USHORT)(ul & 0xffff);
+	*(LSDPTR_L(num_l) + 1) = (USHORT)((ul >> 16) & 0xffff);
+	SETDIGITS_L(num_l, 2);
+	RMLDZRS_L(num_l);
+}
+/******************************************************************************/
+/*					  nl      nl	(OTHER BYTES WILL BE NULLED               */
+/*  Function:   Copy i'th byte of CLINT to CLINT                              */
+/*  Syntax:     void cuda_partcpy_l (CLINT dest_l, CLINT src_l, int i);       */
+/*  Input:      CLINT src_l, int i                                            */
+/*  Output:     CLINT dest_l                                                  */
+/*  Returns:    -                                                             */
+/*                                                                            */
+/******************************************************************************/
+CUDA_CALLABLE_MEMBER void __FLINT_API
+cuda_partcpy_l(CLINT dest_l, CLINT src_l, int i)
+{
+	clint *lastsrc_l = MSDPTR_L(src_l);
+	*dest_l = *src_l;
+
+	while ((*lastsrc_l == 0) && (*dest_l > 0))
+	{
+		--lastsrc_l;
+		--*dest_l;
+	}
+
+	int counter = 0;
+	while (src_l < lastsrc_l)
+	{
+		if (counter == i)
+			*++dest_l = *++src_l;
+		else
+		{
+			*++dest_l = 0;
+			++src_l;
+		}
+		counter++;
+	}
 }
