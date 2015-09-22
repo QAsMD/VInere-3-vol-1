@@ -108,21 +108,21 @@
 
 /* Private register functions */
 static void
-destroy_reg_l (void);
+destroy_reg_l(void);
 static int
-allocate_reg_l (void);
+allocate_reg_l(void);
 /* Integer square roots from ULONG values */
 static ULONG
-ul_iroot (unsigned long n);
+ul_iroot(unsigned long n);
 
 #ifdef FLINT_SECURE
 #define PURGEVARS_L(X) purgevars_l X
 /* Function to purge variables */
-static void purgevars_l (int noofvars, ...);
+static void purgevars_l(int noofvars, ...);
 #ifdef FLINT_DEBUG
 #define ISPURGED_L(X) Assert(ispurged_l X)
 /* Function to check, whether variables have been purged */
-static int ispurged_l (int noofvars, ...);
+static int ispurged_l(int noofvars, ...);
 #else
 #define ISPURGED_L(X) (void)0
 #endif /* FLINT_DEBUG */
@@ -134,11 +134,11 @@ static int ispurged_l (int noofvars, ...);
 
 /* CLINT-Constant Values */
 clint __FLINT_API_DATA
-nul_l[] = {0, 0, 0, 0, 0};
+nul_l[] = { 0, 0, 0, 0, 0 };
 clint __FLINT_API_DATA
-one_l[] = {1, 1, 0, 0, 0};
+one_l[] = { 1, 1, 0, 0, 0 };
 clint __FLINT_API_DATA
-two_l[] = {1, 2, 0, 0, 0};
+two_l[] = { 1, 2, 0, 0, 0 };
 
 
 
@@ -157,17 +157,17 @@ two_l[] = {1, 2, 0, 0, 0};
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-FLINTInit_l (void)
+FLINTInit_l(void)
 {
-  int error;
-  initrand64_lt();
-  initrandBBS_lt();
-  error = create_reg_l();
+	int error;
+	initrand64_lt();
+	initrandBBS_lt();
+	error = create_reg_l();
 
-  if (!error)
-    return E_CLINT_OK;
-  else
-    return -1;
+	if (!error)
+		return E_CLINT_OK;
+	else
+		return -1;
 }
 
 
@@ -182,11 +182,11 @@ FLINTInit_l (void)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-FLINTExit_l (void)
+FLINTExit_l(void)
 {
-  free_reg_l();
+	free_reg_l();
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -200,21 +200,21 @@ FLINTExit_l (void)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-cpy_l (CLINT dest_l, CLINT src_l)
+cpy_l(CLINT dest_l, CLINT src_l)
 {
-  clint *lastsrc_l = MSDPTR_L (src_l);
-  *dest_l = *src_l;
+	clint *lastsrc_l = MSDPTR_L(src_l);
+	*dest_l = *src_l;
 
-  while ((*lastsrc_l == 0) && (*dest_l > 0))
-    {
-      --lastsrc_l;
-      --*dest_l;
-    }
+	while ((*lastsrc_l == 0) && (*dest_l > 0))
+	{
+		--lastsrc_l;
+		--*dest_l;
+	}
 
-  while (src_l < lastsrc_l)
-    {
-      *++dest_l = *++src_l;
-    }
+	while (src_l < lastsrc_l)
+	{
+		*++dest_l = *++src_l;
+	}
 }
 
 
@@ -228,16 +228,16 @@ cpy_l (CLINT dest_l, CLINT src_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-fswap_l (CLINT a_l, CLINT b_l)
+fswap_l(CLINT a_l, CLINT b_l)
 {
-  CLINT tmp_l;
+	CLINT tmp_l;
 
-  cpy_l (tmp_l, a_l);
-  cpy_l (a_l, b_l);
-  cpy_l (b_l, tmp_l);
+	cpy_l(tmp_l, a_l);
+	cpy_l(a_l, b_l);
+	cpy_l(b_l, tmp_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
 }
 
 
@@ -252,54 +252,54 @@ fswap_l (CLINT a_l, CLINT b_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-equ_l (CLINT a_l, CLINT b_l)
+equ_l(CLINT a_l, CLINT b_l)
 {
-  clint *msdptra_l, *msdptrb_l;
-  int la = (int)DIGITS_L (a_l);
-  int lb = (int)DIGITS_L (b_l);
+	clint *msdptra_l, *msdptrb_l;
+	int la = (int)DIGITS_L(a_l);
+	int lb = (int)DIGITS_L(b_l);
 
-  if (la == 0 && lb == 0)
-    {
-      return 1;
-    }
+	if (la == 0 && lb == 0)
+	{
+		return 1;
+	}
 
-  while (a_l[la] == 0 && la > 0)
-    {
-      --la;
-    }
+	while (a_l[la] == 0 && la > 0)
+	{
+		--la;
+	}
 
-  while (b_l[lb] == 0 && lb > 0)
-    {
-      --lb;
-    }
+	while (b_l[lb] == 0 && lb > 0)
+	{
+		--lb;
+	}
 
-  if (la == 0 && lb == 0)
-    {
-      return 1;
-    }
+	if (la == 0 && lb == 0)
+	{
+		return 1;
+	}
 
-  if (la != lb)
-    {
-      return 0;
-    }
+	if (la != lb)
+	{
+		return 0;
+	}
 
-  msdptra_l = a_l + la;
-  msdptrb_l = b_l + lb;
+	msdptra_l = a_l + la;
+	msdptrb_l = b_l + lb;
 
-  while ((*msdptra_l == *msdptrb_l) && (msdptra_l > a_l))
-    {
-      msdptra_l--;
-      msdptrb_l--;
-    }
+	while ((*msdptra_l == *msdptrb_l) && (msdptra_l > a_l))
+	{
+		msdptra_l--;
+		msdptrb_l--;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (la), &la,
-                   sizeof (lb), &lb));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(la), &la,
+		sizeof(lb), &lb));
 
-  ISPURGED_L ((2, sizeof (la), &la,
-                  sizeof (lb), &lb));
+	ISPURGED_L((2, sizeof(la), &la,
+		sizeof(lb), &lb));
 
-  return (msdptra_l > a_l ? 0 : 1);
+	return (msdptra_l > a_l ? 0 : 1);
 }
 
 
@@ -315,25 +315,25 @@ equ_l (CLINT a_l, CLINT b_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mequ_l (CLINT a_l, CLINT b_l, CLINT m_l)
+mequ_l(CLINT a_l, CLINT b_l, CLINT m_l)
 {
-  CLINT r_l;
-  int res;
+	CLINT r_l;
+	int res;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero? */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero? */
+	}
 
-  msub_l (a_l, b_l, r_l, m_l);
+	msub_l(a_l, b_l, r_l, m_l);
 
-  res = (0 == DIGITS_L (r_l))?1:0;
+	res = (0 == DIGITS_L(r_l)) ? 1 : 0;
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (r_l), r_l));
-  ISPURGED_L ((1, sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(r_l), r_l));
+	ISPURGED_L((1, sizeof(r_l), r_l));
 
-  return res;
+	return res;
 }
 
 
@@ -349,77 +349,77 @@ mequ_l (CLINT a_l, CLINT b_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-cmp_l (CLINT a_l, CLINT b_l)
+cmp_l(CLINT a_l, CLINT b_l)
 {
-  clint *msdptra_l, *msdptrb_l;
-  int la = (int)DIGITS_L (a_l);
-  int lb = (int)DIGITS_L (b_l);
+	clint *msdptra_l, *msdptrb_l;
+	int la = (int)DIGITS_L(a_l);
+	int lb = (int)DIGITS_L(b_l);
 
-  if (la == 0 && lb == 0)
-    {
-      return 0;
-    }
+	if (la == 0 && lb == 0)
+	{
+		return 0;
+	}
 
-  while (a_l[la] == 0 && la > 0)
-    {
-      --la;
-    }
+	while (a_l[la] == 0 && la > 0)
+	{
+		--la;
+	}
 
-  while (b_l[lb] == 0 && lb > 0)
-    {
-      --lb;
-    }
+	while (b_l[lb] == 0 && lb > 0)
+	{
+		--lb;
+	}
 
-  if (la == 0 && lb == 0)
-    {
-      return 0;
-    }
+	if (la == 0 && lb == 0)
+	{
+		return 0;
+	}
 
-  if (la > lb)
-    {
-      PURGEVARS_L ((2, sizeof (la), &la,
-                       sizeof (lb), &lb));
-      ISPURGED_L  ((2, sizeof (la), &la,
-                       sizeof (lb), &lb));
-      return 1;
-    }
+	if (la > lb)
+	{
+		PURGEVARS_L((2, sizeof(la), &la,
+			sizeof(lb), &lb));
+		ISPURGED_L((2, sizeof(la), &la,
+			sizeof(lb), &lb));
+		return 1;
+	}
 
-  if (la < lb)
-    {
-      PURGEVARS_L ((2, sizeof (la), &la,
-                       sizeof (lb), &lb));
-      ISPURGED_L  ((2, sizeof (la), &la,
-                       sizeof (lb), &lb));
-      return -1;
-    }
+	if (la < lb)
+	{
+		PURGEVARS_L((2, sizeof(la), &la,
+			sizeof(lb), &lb));
+		ISPURGED_L((2, sizeof(la), &la,
+			sizeof(lb), &lb));
+		return -1;
+	}
 
-  msdptra_l = a_l + la;
-  msdptrb_l = b_l + lb;
+	msdptra_l = a_l + la;
+	msdptrb_l = b_l + lb;
 
-  while ((*msdptra_l == *msdptrb_l) && (msdptra_l > a_l))
-    {
-      msdptra_l--;
-      msdptrb_l--;
-    }
+	while ((*msdptra_l == *msdptrb_l) && (msdptra_l > a_l))
+	{
+		msdptra_l--;
+		msdptrb_l--;
+	}
 
-  PURGEVARS_L ((2, sizeof (la), &la,
-                   sizeof (lb), &lb));
-  ISPURGED_L  ((2, sizeof (la), &la,
-                   sizeof (lb), &lb));
+	PURGEVARS_L((2, sizeof(la), &la,
+		sizeof(lb), &lb));
+	ISPURGED_L((2, sizeof(la), &la,
+		sizeof(lb), &lb));
 
-  if (msdptra_l == a_l)
-    {
-      return 0;
-    }
+	if (msdptra_l == a_l)
+	{
+		return 0;
+	}
 
-  if (*msdptra_l > *msdptrb_l)
-    {
-      return 1;
-    }
-  else
-    {
-      return -1;
-    }
+	if (*msdptra_l > *msdptrb_l)
+	{
+		return 1;
+	}
+	else
+	{
+		return -1;
+	}
 }
 
 
@@ -433,18 +433,18 @@ cmp_l (CLINT a_l, CLINT b_l)
 /*                                                                            */
 /******************************************************************************/
 clint * __FLINT_API
-setmax_l (CLINT a_l)
+setmax_l(CLINT a_l)
 {
-  clint *aptr_l = a_l;
-  clint *msdptra_l = a_l + CLINTMAXDIGIT;
+	clint *aptr_l = a_l;
+	clint *msdptra_l = a_l + CLINTMAXDIGIT;
 
-  while (++aptr_l <= msdptra_l)
-    {
-      *aptr_l = BASEMINONE;
-    }
+	while (++aptr_l <= msdptra_l)
+	{
+		*aptr_l = BASEMINONE;
+	}
 
-  SETDIGITS_L (a_l, CLINTMAXDIGIT);
-  return (clint *)a_l;
+	SETDIGITS_L(a_l, CLINTMAXDIGIT);
+	return (clint *)a_l;
 }
 
 
@@ -459,26 +459,26 @@ setmax_l (CLINT a_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-add_l (CLINT a_l, CLINT b_l, CLINT s_l)
+add_l(CLINT a_l, CLINT b_l, CLINT s_l)
 {
-  clint ss_l[CLINTMAXSHORT + 1];
-  int OFL = 0;
+	clint ss_l[CLINTMAXSHORT + 1];
+	int OFL = 0;
 
-  add (a_l, b_l, ss_l);
+	add(a_l, b_l, ss_l);
 
-  if (DIGITS_L (ss_l) > (USHORT)CLINTMAXDIGIT)       /* Overflow ? */
-    {
-      ANDMAX_L (ss_l);                  /* Reduction modulo Nmax+1 */
-      OFL = E_CLINT_OFL;
-    }
+	if (DIGITS_L(ss_l) > (USHORT)CLINTMAXDIGIT)       /* Overflow ? */
+	{
+		ANDMAX_L(ss_l);                  /* Reduction modulo Nmax+1 */
+		OFL = E_CLINT_OFL;
+	}
 
-  cpy_l (s_l, ss_l);
+	cpy_l(s_l, ss_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (s_l), ss_l));
-  ISPURGED_L  ((1, sizeof (s_l), ss_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(s_l), ss_l));
+	ISPURGED_L((1, sizeof(s_l), ss_l));
 
-  return OFL;
+	return OFL;
 }
 
 
@@ -493,49 +493,49 @@ add_l (CLINT a_l, CLINT b_l, CLINT s_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-sub_l (CLINT aa_l, CLINT bb_l, CLINT d_l)
+sub_l(CLINT aa_l, CLINT bb_l, CLINT d_l)
 {
-  CLINT b_l;
-  clint a_l[CLINTMAXSHORT + 1], t_l[CLINTMAXSHORT + 1], tmp_l[CLINTMAXSHORT + 1];
-  int UFL = 0;
+	CLINT b_l;
+	clint a_l[CLINTMAXSHORT + 1], t_l[CLINTMAXSHORT + 1], tmp_l[CLINTMAXSHORT + 1];
+	int UFL = 0;
 
-  cpy_l (b_l, bb_l);
+	cpy_l(b_l, bb_l);
 
-  if (LT_L (aa_l, b_l))            /* Underflow ? */
-    {
-      setmax_l (a_l);              /* We calculate with Nmax             */
-      cpy_l (t_l, aa_l);           /* aa_l will be needed once again, ...*/
-      UFL = E_CLINT_UFL;           /*  ... will be corrected at the end  */
-    }
-  else
-    {
-      cpy_l (a_l, aa_l);
-    }
+	if (LT_L(aa_l, b_l))            /* Underflow ? */
+	{
+		setmax_l(a_l);              /* We calculate with Nmax             */
+		cpy_l(t_l, aa_l);           /* aa_l will be needed once again, ...*/
+		UFL = E_CLINT_UFL;           /*  ... will be corrected at the end  */
+	}
+	else
+	{
+		cpy_l(a_l, aa_l);
+	}
 
-  sub (a_l, b_l, tmp_l);
+	sub(a_l, b_l, tmp_l);
 
-  if (UFL)
-    {                              /* Underflow ? */
-      add_l (tmp_l, t_l, d_l);     /* Correction needed */
-      inc_l (d_l);                 /* One is missing */
-    }
-  else
-    {
-      cpy_l (d_l, tmp_l);
-    }
+	if (UFL)
+	{                              /* Underflow ? */
+		add_l(tmp_l, t_l, d_l);     /* Correction needed */
+		inc_l(d_l);                 /* One is missing */
+	}
+	else
+	{
+		cpy_l(d_l, tmp_l);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (t_l), t_l,
-                   sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(t_l), t_l,
+		sizeof(tmp_l), tmp_l));
 
-  ISPURGED_L  ((4, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (t_l), t_l,
-                   sizeof (tmp_l), tmp_l));
+	ISPURGED_L((4, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(t_l), t_l,
+		sizeof(tmp_l), tmp_l));
 
-  return UFL;
+	return UFL;
 }
 
 
@@ -550,35 +550,35 @@ sub_l (CLINT aa_l, CLINT bb_l, CLINT d_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-inc_l (CLINT a_l)
+inc_l(CLINT a_l)
 {
-  clint *msdptra_l, *aptr_l = LSDPTR_L (a_l);
-  ULONG carry = BASE;
-  int OFL = 0;
+	clint *msdptra_l, *aptr_l = LSDPTR_L(a_l);
+	ULONG carry = BASE;
+	int OFL = 0;
 
-  msdptra_l = MSDPTR_L (a_l);
-  while ((aptr_l <= msdptra_l) && (carry & BASE))
-    {
-      *aptr_l = (USHORT)(carry = 1UL + (ULONG)(*aptr_l));
-      aptr_l++;
-    }
+	msdptra_l = MSDPTR_L(a_l);
+	while ((aptr_l <= msdptra_l) && (carry & BASE))
+	{
+		*aptr_l = (USHORT)(carry = 1UL + (ULONG)(*aptr_l));
+		aptr_l++;
+	}
 
-  if ((aptr_l > msdptra_l) && (carry & BASE))
-    {
-      *aptr_l = 1;
-      INCDIGITS_L (a_l);
-      if (DIGITS_L (a_l) > (USHORT)CLINTMAXDIGIT)    /* Overflow ? */
-        {
-          SETZERO_L (a_l);              /* Reduction modulo Nmax+1 */
-          OFL = E_CLINT_OFL;
-        }
-    }
+	if ((aptr_l > msdptra_l) && (carry & BASE))
+	{
+		*aptr_l = 1;
+		INCDIGITS_L(a_l);
+		if (DIGITS_L(a_l) > (USHORT)CLINTMAXDIGIT)    /* Overflow ? */
+		{
+			SETZERO_L(a_l);              /* Reduction modulo Nmax+1 */
+			OFL = E_CLINT_OFL;
+		}
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (carry), &carry));
-  ISPURGED_L  ((1, sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(carry), &carry));
+	ISPURGED_L((1, sizeof(carry), &carry));
 
-  return OFL;
+	return OFL;
 }
 
 
@@ -593,30 +593,30 @@ inc_l (CLINT a_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-dec_l (CLINT a_l)
+dec_l(CLINT a_l)
 {
-  clint *msdptra_l, *aptr_l = LSDPTR_L (a_l);
-  ULONG carry = DBASEMINONE;
+	clint *msdptra_l, *aptr_l = LSDPTR_L(a_l);
+	ULONG carry = DBASEMINONE;
 
-  if (DIGITS_L (a_l) == 0)                     /* Underflow ? */
-    {
-      setmax_l (a_l);              /* Reduction modulo Nmax+1 */
-      return E_CLINT_UFL;
-    }
+	if (DIGITS_L(a_l) == 0)                     /* Underflow ? */
+	{
+		setmax_l(a_l);              /* Reduction modulo Nmax+1 */
+		return E_CLINT_UFL;
+	}
 
-  msdptra_l = MSDPTR_L (a_l);
-  while ((aptr_l <= msdptra_l) && (carry & (BASEMINONEL << BITPERDGT)))
-    {
-      *aptr_l = (USHORT)(carry = (ULONG)*aptr_l - 1L);
-      aptr_l++;
-    }
+	msdptra_l = MSDPTR_L(a_l);
+	while ((aptr_l <= msdptra_l) && (carry & (BASEMINONEL << BITPERDGT)))
+	{
+		*aptr_l = (USHORT)(carry = (ULONG)*aptr_l - 1L);
+		aptr_l++;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (carry), &carry));
-  ISPURGED_L  ((1, sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(carry), &carry));
+	ISPURGED_L((1, sizeof(carry), &carry));
 
-  RMLDZRS_L (a_l);
-  return E_CLINT_OK;
+	RMLDZRS_L(a_l);
+	return E_CLINT_OK;
 }
 
 
@@ -631,35 +631,35 @@ dec_l (CLINT a_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mul_l (CLINT f1_l, CLINT f2_l, CLINT pp_l)
+mul_l(CLINT f1_l, CLINT f2_l, CLINT pp_l)
 {
-  CLINT a_l, b_l;
-  CLINTD p_l;
-  int OFL = 0;
+	CLINT a_l, b_l;
+	CLINTD p_l;
+	int OFL = 0;
 
-  cpy_l (a_l, f1_l);
-  cpy_l (b_l, f2_l);
+	cpy_l(a_l, f1_l);
+	cpy_l(b_l, f2_l);
 
-  mult (a_l, b_l, p_l);
+	mult(a_l, b_l, p_l);
 
-  if (DIGITS_L (p_l) > (USHORT)CLINTMAXDIGIT)   /* Overflow ? */
-    {
-      ANDMAX_L (p_l);              /* Reduction modulo Nmax+1 */
-      OFL = E_CLINT_OFL;
-    }
+	if (DIGITS_L(p_l) > (USHORT)CLINTMAXDIGIT)   /* Overflow ? */
+	{
+		ANDMAX_L(p_l);              /* Reduction modulo Nmax+1 */
+		OFL = E_CLINT_OFL;
+	}
 
-  cpy_l (pp_l, p_l);
+	cpy_l(pp_l, p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (p_l), p_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(p_l), p_l));
 
-  ISPURGED_L  ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (p_l), p_l));
+	ISPURGED_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(p_l), p_l));
 
-  return OFL;
+	return OFL;
 }
 
 
@@ -674,32 +674,32 @@ mul_l (CLINT f1_l, CLINT f2_l, CLINT pp_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-sqr_l (CLINT f_l, CLINT pp_l)
+sqr_l(CLINT f_l, CLINT pp_l)
 {
-  CLINT a_l;
-  CLINTD p_l;
-  int OFL = 0;
+	CLINT a_l;
+	CLINTD p_l;
+	int OFL = 0;
 
-  cpy_l (a_l, f_l);
+	cpy_l(a_l, f_l);
 
-  sqr (a_l, p_l);
+	sqr(a_l, p_l);
 
-  if (DIGITS_L (p_l) > (USHORT)CLINTMAXDIGIT)   /* Overflow ? */
-    {
-      ANDMAX_L (p_l);              /* Reduction modulo Nmax+1 */
-      OFL = E_CLINT_OFL;
-    }
+	if (DIGITS_L(p_l) > (USHORT)CLINTMAXDIGIT)   /* Overflow ? */
+	{
+		ANDMAX_L(p_l);              /* Reduction modulo Nmax+1 */
+		OFL = E_CLINT_OFL;
+	}
 
-  cpy_l (pp_l, p_l);
+	cpy_l(pp_l, p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (a_l), a_l,
-                   sizeof (p_l), p_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(a_l), a_l,
+		sizeof(p_l), p_l));
 
-  ISPURGED_L  ((2, sizeof (a_l), a_l,
-                   sizeof (p_l), p_l));
+	ISPURGED_L((2, sizeof(a_l), a_l,
+		sizeof(p_l), p_l));
 
-  return OFL;
+	return OFL;
 }
 
 
@@ -715,291 +715,291 @@ sqr_l (CLINT f_l, CLINT pp_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-div_l (CLINT d1_l, CLINT d2_l, CLINT quot_l, CLINT rem_l)
+div_l(CLINT d1_l, CLINT d2_l, CLINT quot_l, CLINT rem_l)
 {
-  register clint *rptr_l, *bptr_l;
-  CLINT b_l;
-  clint r_l[2 + (CLINTMAXDIGIT << 1)]; /* Allow double long remainder + 1 digit */
-  clint *qptr_l, *msdptrb_l, *msdptrr_l, *lsdptrr_l;
-  USHORT bv, rv, qhat, ri, ri_1, ri_2, bn, bn_1;
-  ULONG right, left, rhat, borrow, carry, sbitsminusd;
-  unsigned int d = 0;
-  int i;
+	register clint *rptr_l, *bptr_l;
+	CLINT b_l;
+	clint r_l[2 + (CLINTMAXDIGIT << 1)]; /* Allow double long remainder + 1 digit */
+	clint *qptr_l, *msdptrb_l, *msdptrr_l, *lsdptrr_l;
+	USHORT bv, rv, qhat, ri, ri_1, ri_2, bn, bn_1;
+	ULONG right, left, rhat, borrow, carry, sbitsminusd;
+	unsigned int d = 0;
+	int i;
 
-  cpy_l (r_l, d1_l);
-  cpy_l (b_l, d2_l);
+	cpy_l(r_l, d1_l);
+	cpy_l(b_l, d2_l);
 
-  if (EQZ_L (b_l))
-    {
-      PURGEVARS_L ((1, sizeof (r_l), r_l));
-      ISPURGED_L  ((1, sizeof (r_l), r_l));
+	if (EQZ_L(b_l))
+	{
+		PURGEVARS_L((1, sizeof(r_l), r_l));
+		ISPURGED_L((1, sizeof(r_l), r_l));
 
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQZ_L (r_l))
-    {
-      SETZERO_L (quot_l);
-      SETZERO_L (rem_l);
+	if (EQZ_L(r_l))
+	{
+		SETZERO_L(quot_l);
+		SETZERO_L(rem_l);
 
-      PURGEVARS_L ((1, sizeof (b_l), b_l));
-      ISPURGED_L  ((1, sizeof (b_l), b_l));
+		PURGEVARS_L((1, sizeof(b_l), b_l));
+		ISPURGED_L((1, sizeof(b_l), b_l));
 
-      return E_CLINT_OK;
-    }
+		return E_CLINT_OK;
+	}
 
-  i = cmp_l (r_l, b_l);
+	i = cmp_l(r_l, b_l);
 
-  if (i == -1)
-    {
-      cpy_l (rem_l, r_l);
-      SETZERO_L (quot_l);
+	if (i == -1)
+	{
+		cpy_l(rem_l, r_l);
+		SETZERO_L(quot_l);
 
-      PURGEVARS_L ((2, sizeof (b_l), b_l,
-                       sizeof (r_l), r_l));
-      ISPURGED_L  ((2, sizeof (b_l), b_l,
-                       sizeof (r_l), r_l));
-      return E_CLINT_OK;
-    }
-  else if (i == 0)
-    {
-      SETONE_L (quot_l);
-      SETZERO_L (rem_l);
+		PURGEVARS_L((2, sizeof(b_l), b_l,
+			sizeof(r_l), r_l));
+		ISPURGED_L((2, sizeof(b_l), b_l,
+			sizeof(r_l), r_l));
+		return E_CLINT_OK;
+	}
+	else if (i == 0)
+	{
+		SETONE_L(quot_l);
+		SETZERO_L(rem_l);
 
-      PURGEVARS_L ((2, sizeof (b_l), b_l,
-                       sizeof (r_l), r_l));
-      ISPURGED_L  ((2, sizeof (b_l), b_l,
-                       sizeof (r_l), r_l));
-      return E_CLINT_OK;
-    }
+		PURGEVARS_L((2, sizeof(b_l), b_l,
+			sizeof(r_l), r_l));
+		ISPURGED_L((2, sizeof(b_l), b_l,
+			sizeof(r_l), r_l));
+		return E_CLINT_OK;
+	}
 
-  if (DIGITS_L (b_l) == 1)
-    {
-      goto shortdiv;
-    }
+	if (DIGITS_L(b_l) == 1)
+	{
+		goto shortdiv;
+	}
 
-  /* Step 1 */
-  msdptrb_l = MSDPTR_L (b_l);
+	/* Step 1 */
+	msdptrb_l = MSDPTR_L(b_l);
 
-  bn = *msdptrb_l;
-  while (bn < BASEDIV2)
-    {
-      d++;
-      bn <<= 1;
-    }
+	bn = *msdptrb_l;
+	while (bn < BASEDIV2)
+	{
+		d++;
+		bn <<= 1;
+	}
 
-  sbitsminusd = (int)BITPERDGT - d;
+	sbitsminusd = (int)BITPERDGT - d;
 
-  if (d > 0)
-    {
-      bn += *(msdptrb_l - 1) >> sbitsminusd;
+	if (d > 0)
+	{
+		bn += *(msdptrb_l - 1) >> sbitsminusd;
 
-      if (DIGITS_L (b_l) > 2)
-        {
-          bn_1 = (USHORT)((*(msdptrb_l - 1) << d) + (*(msdptrb_l - 2) >> sbitsminusd));
-        }
-      else
-        {
-          bn_1 = (USHORT)(*(msdptrb_l - 1) << d);
-        }
-    }
-  else
-    {
-      bn_1 = (USHORT)(*(msdptrb_l - 1));
-    }
+		if (DIGITS_L(b_l) > 2)
+		{
+			bn_1 = (USHORT)((*(msdptrb_l - 1) << d) + (*(msdptrb_l - 2) >> sbitsminusd));
+		}
+		else
+		{
+			bn_1 = (USHORT)(*(msdptrb_l - 1) << d);
+		}
+	}
+	else
+	{
+		bn_1 = (USHORT)(*(msdptrb_l - 1));
+	}
 
-  /* Steps 2 and 3 */
-  msdptrr_l = MSDPTR_L (r_l) + 1;
-  lsdptrr_l = MSDPTR_L (r_l) - DIGITS_L (b_l) + 1;
-  *msdptrr_l = 0;
+	/* Steps 2 and 3 */
+	msdptrr_l = MSDPTR_L(r_l) + 1;
+	lsdptrr_l = MSDPTR_L(r_l) - DIGITS_L(b_l) + 1;
+	*msdptrr_l = 0;
 
-  qptr_l = quot_l + DIGITS_L (r_l) - DIGITS_L (b_l) + 1;
+	qptr_l = quot_l + DIGITS_L(r_l) - DIGITS_L(b_l) + 1;
 
-  /* Step 4 */
-  while (lsdptrr_l >= LSDPTR_L (r_l))
-    {
-      ri = (USHORT)((*msdptrr_l << d) + (*(msdptrr_l - 1) >> sbitsminusd));
+	/* Step 4 */
+	while (lsdptrr_l >= LSDPTR_L(r_l))
+	{
+		ri = (USHORT)((*msdptrr_l << d) + (*(msdptrr_l - 1) >> sbitsminusd));
 
-      ri_1 = (USHORT)((*(msdptrr_l - 1) << d) + (*(msdptrr_l - 2) >> sbitsminusd));
+		ri_1 = (USHORT)((*(msdptrr_l - 1) << d) + (*(msdptrr_l - 2) >> sbitsminusd));
 
-      if (msdptrr_l - 3 > r_l)
-        {
-          ri_2 = (USHORT)((*(msdptrr_l - 2) << d) + (*(msdptrr_l - 3) >> sbitsminusd));
-        }
-      else
-        {
-          ri_2 = (USHORT)(*(msdptrr_l - 2) << d);
-        }
+		if (msdptrr_l - 3 > r_l)
+		{
+			ri_2 = (USHORT)((*(msdptrr_l - 2) << d) + (*(msdptrr_l - 3) >> sbitsminusd));
+		}
+		else
+		{
+			ri_2 = (USHORT)(*(msdptrr_l - 2) << d);
+		}
 
-      if (ri != bn)               /* almost always */
-        {
-          qhat = (USHORT)((rhat = ((ULONG)ri << BITPERDGT) + (ULONG)ri_1) / bn);
-          right = ((rhat = (rhat - (ULONG)bn * qhat)) << BITPERDGT) + ri_2;
+		if (ri != bn)               /* almost always */
+		{
+			qhat = (USHORT)((rhat = ((ULONG)ri << BITPERDGT) + (ULONG)ri_1) / bn);
+			right = ((rhat = (rhat - (ULONG)bn * qhat)) << BITPERDGT) + ri_2;
 
-          /* test qhat */
+			/* test qhat */
 
-          if ((left = (ULONG)bn_1 * qhat) > right)
-            {
-              qhat--;
-              if ((rhat + bn) < BASE)
-                  /* else bn_1 * qhat < rhat * b_l */
-                {
-                  if ((left - bn_1) > (right + ((ULONG)bn << BITPERDGT)))
-                    {
-                      qhat--;
-                    }
-                }
-            }
-        }
-      else                        /* ri == bn, almost never */
-        {
-          qhat = BASEMINONE;
-          right = ((ULONG)(rhat = (ULONG)bn + (ULONG)ri_1) << BITPERDGT) + ri_2;
-          if (rhat < BASE)       /* else bn_1 * qhat < rhat * b_l */
-            {
-              /* test qhat */
+			if ((left = (ULONG)bn_1 * qhat) > right)
+			{
+				qhat--;
+				if ((rhat + bn) < BASE)
+					/* else bn_1 * qhat < rhat * b_l */
+				{
+					if ((left - bn_1) > (right + ((ULONG)bn << BITPERDGT)))
+					{
+						qhat--;
+					}
+				}
+			}
+		}
+		else                        /* ri == bn, almost never */
+		{
+			qhat = BASEMINONE;
+			right = ((ULONG)(rhat = (ULONG)bn + (ULONG)ri_1) << BITPERDGT) + ri_2;
+			if (rhat < BASE)       /* else bn_1 * qhat < rhat * b_l */
+			{
+				/* test qhat */
 
-              if ((left = (ULONG)bn_1 * qhat) > right)
-                {
-                  qhat--;
-                  if ((rhat + bn) < BASE)
-                      /* else bn_1 * qhat < rhat * b_l */
-                    {
-                      if ((left - bn_1) > (right + ((ULONG)bn << BITPERDGT)))
-                        {
-                          qhat--;
-                        }
-                    }
-                }
-            }
-        }
+				if ((left = (ULONG)bn_1 * qhat) > right)
+				{
+					qhat--;
+					if ((rhat + bn) < BASE)
+						/* else bn_1 * qhat < rhat * b_l */
+					{
+						if ((left - bn_1) > (right + ((ULONG)bn << BITPERDGT)))
+						{
+							qhat--;
+						}
+					}
+				}
+			}
+		}
 
-      /* Step 5 */
-      borrow = BASE;
-      carry = 0;
-      for (bptr_l = LSDPTR_L (b_l), rptr_l = lsdptrr_l; bptr_l <= msdptrb_l; bptr_l++, rptr_l++)
-        {
-          if (borrow >= BASE)
-            {
-              *rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASE -
-                         (ULONG)(USHORT)(carry = (ULONG)(*bptr_l) *
-                         qhat + (ULONG)(USHORT)(carry >> BITPERDGT))));
-            }
-          else
-            {
-              *rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASEMINONEL -
-                                (ULONG)(USHORT)(carry = (ULONG)(*bptr_l) *
-                                qhat + (ULONG)(USHORT)(carry >> BITPERDGT))));
-            }
-        }
+		/* Step 5 */
+		borrow = BASE;
+		carry = 0;
+		for (bptr_l = LSDPTR_L(b_l), rptr_l = lsdptrr_l; bptr_l <= msdptrb_l; bptr_l++, rptr_l++)
+		{
+			if (borrow >= BASE)
+			{
+				*rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASE -
+					(ULONG)(USHORT)(carry = (ULONG)(*bptr_l) *
+					qhat + (ULONG)(USHORT)(carry >> BITPERDGT))));
+			}
+			else
+			{
+				*rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASEMINONEL -
+					(ULONG)(USHORT)(carry = (ULONG)(*bptr_l) *
+					qhat + (ULONG)(USHORT)(carry >> BITPERDGT))));
+			}
+		}
 
-      if (borrow >= BASE)
-        {
-          *rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASE -
-                             (ULONG)(USHORT)(carry >> BITPERDGT)));
-        }
-      else
-        {
-          *rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASEMINONEL -
-                                    (ULONG)(USHORT)(carry >> BITPERDGT)));
-        }
+		if (borrow >= BASE)
+		{
+			*rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASE -
+				(ULONG)(USHORT)(carry >> BITPERDGT)));
+		}
+		else
+		{
+			*rptr_l = (USHORT)(borrow = ((ULONG)(*rptr_l) + BASEMINONEL -
+				(ULONG)(USHORT)(carry >> BITPERDGT)));
+		}
 
-      /* Step 6 */
-      *qptr_l = qhat;
+		/* Step 6 */
+		*qptr_l = qhat;
 
-      if (borrow < BASE)
-        {
-          carry = 0;
-          for (bptr_l = LSDPTR_L (b_l), rptr_l = lsdptrr_l; bptr_l <= msdptrb_l; bptr_l++, rptr_l++)
-            {
-              *rptr_l = (USHORT)(carry = ((ULONG)(*rptr_l) + (ULONG)(*bptr_l) +
-                                          (ULONG)(USHORT)(carry >> BITPERDGT)));
-            }
-          *rptr_l += (USHORT)(carry >> BITPERDGT);
-          (*qptr_l)--;
-        }
+		if (borrow < BASE)
+		{
+			carry = 0;
+			for (bptr_l = LSDPTR_L(b_l), rptr_l = lsdptrr_l; bptr_l <= msdptrb_l; bptr_l++, rptr_l++)
+			{
+				*rptr_l = (USHORT)(carry = ((ULONG)(*rptr_l) + (ULONG)(*bptr_l) +
+					(ULONG)(USHORT)(carry >> BITPERDGT)));
+			}
+			*rptr_l += (USHORT)(carry >> BITPERDGT);
+			(*qptr_l)--;
+		}
 
-      /* Step 7 */
-      msdptrr_l--;
-      lsdptrr_l--;
-      qptr_l--;
-    }
+		/* Step 7 */
+		msdptrr_l--;
+		lsdptrr_l--;
+		qptr_l--;
+	}
 
-  /* Step 8 */
-  SETDIGITS_L (quot_l, DIGITS_L (r_l) - DIGITS_L (b_l) + 1);
-  RMLDZRS_L (quot_l);
+	/* Step 8 */
+	SETDIGITS_L(quot_l, DIGITS_L(r_l) - DIGITS_L(b_l) + 1);
+	RMLDZRS_L(quot_l);
 
-  SETDIGITS_L (r_l, DIGITS_L (b_l));
-  cpy_l (rem_l, r_l);
+	SETDIGITS_L(r_l, DIGITS_L(b_l));
+	cpy_l(rem_l, r_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((17, sizeof (bv), &bv,
-                    sizeof (rv), &rv,
-                    sizeof (qhat), &qhat,
-                    sizeof (ri), &ri,
-                    sizeof (ri_1), &ri_1,
-                    sizeof (ri_2), &ri_2,
-                    sizeof (bn), &bn,
-                    sizeof (bn_1), &bn_1,
-                    sizeof (right), &right,
-                    sizeof (left), &left,
-                    sizeof (rhat), &rhat,
-                    sizeof (borrow), &borrow,
-                    sizeof (carry), &carry,
-                    sizeof (sbitsminusd), &sbitsminusd,
-                    sizeof (d), &d,
-                    sizeof (b_l), b_l,
-                    sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((17, sizeof(bv), &bv,
+		sizeof(rv), &rv,
+		sizeof(qhat), &qhat,
+		sizeof(ri), &ri,
+		sizeof(ri_1), &ri_1,
+		sizeof(ri_2), &ri_2,
+		sizeof(bn), &bn,
+		sizeof(bn_1), &bn_1,
+		sizeof(right), &right,
+		sizeof(left), &left,
+		sizeof(rhat), &rhat,
+		sizeof(borrow), &borrow,
+		sizeof(carry), &carry,
+		sizeof(sbitsminusd), &sbitsminusd,
+		sizeof(d), &d,
+		sizeof(b_l), b_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((17, sizeof (bv), &bv,
-                    sizeof (rv), &rv,
-                    sizeof (qhat), &qhat,
-                    sizeof (ri), &ri,
-                    sizeof (ri_1), &ri_1,
-                    sizeof (ri_2), &ri_2,
-                    sizeof (bn), &bn,
-                    sizeof (bn_1), &bn_1,
-                    sizeof (right), &right,
-                    sizeof (left), &left,
-                    sizeof (rhat), &rhat,
-                    sizeof (borrow), &borrow,
-                    sizeof (carry), &carry,
-                    sizeof (sbitsminusd), &sbitsminusd,
-                    sizeof (d), &d,
-                    sizeof (b_l), b_l,
-                    sizeof (r_l), r_l));
+	ISPURGED_L((17, sizeof(bv), &bv,
+		sizeof(rv), &rv,
+		sizeof(qhat), &qhat,
+		sizeof(ri), &ri,
+		sizeof(ri_1), &ri_1,
+		sizeof(ri_2), &ri_2,
+		sizeof(bn), &bn,
+		sizeof(bn_1), &bn_1,
+		sizeof(right), &right,
+		sizeof(left), &left,
+		sizeof(rhat), &rhat,
+		sizeof(borrow), &borrow,
+		sizeof(carry), &carry,
+		sizeof(sbitsminusd), &sbitsminusd,
+		sizeof(d), &d,
+		sizeof(b_l), b_l,
+		sizeof(r_l), r_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 
-  /* Division by divisor with one-digit */
-  shortdiv:
+	/* Division by divisor with one-digit */
+shortdiv:
 
-  rv = 0;
-  bv = *LSDPTR_L (b_l);
-  for (rptr_l = MSDPTR_L (r_l), qptr_l = quot_l + DIGITS_L (r_l); rptr_l >= LSDPTR_L (r_l); rptr_l--, qptr_l--)
-    {
-      *qptr_l = (USHORT)((rhat = ((((ULONG)rv) << BITPERDGT) +
-                                          (ULONG)*rptr_l)) / bv);
-      rv = (USHORT)(rhat - (ULONG)bv * (ULONG)*qptr_l);
-    }
+	rv = 0;
+	bv = *LSDPTR_L(b_l);
+	for (rptr_l = MSDPTR_L(r_l), qptr_l = quot_l + DIGITS_L(r_l); rptr_l >= LSDPTR_L(r_l); rptr_l--, qptr_l--)
+	{
+		*qptr_l = (USHORT)((rhat = ((((ULONG)rv) << BITPERDGT) +
+			(ULONG)*rptr_l)) / bv);
+		rv = (USHORT)(rhat - (ULONG)bv * (ULONG)*qptr_l);
+	}
 
-  SETDIGITS_L (quot_l, DIGITS_L (r_l));
+	SETDIGITS_L(quot_l, DIGITS_L(r_l));
 
-  RMLDZRS_L (quot_l);
-  u2clint_l (rem_l, rv);
+	RMLDZRS_L(quot_l);
+	u2clint_l(rem_l, rv);
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (rv), &rv,
-                   sizeof (bv), &bv,
-                   sizeof (b_l), b_l,
-                   sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(rv), &rv,
+		sizeof(bv), &bv,
+		sizeof(b_l), b_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((4, sizeof (rv), &rv,
-                   sizeof (bv), &bv,
-                   sizeof (b_l), b_l,
-                   sizeof (r_l), r_l));
+	ISPURGED_L((4, sizeof(rv), &rv,
+		sizeof(bv), &bv,
+		sizeof(b_l), b_l,
+		sizeof(r_l), r_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 #endif /* FLINT_ASM */
 
@@ -1015,33 +1015,33 @@ div_l (CLINT d1_l, CLINT d2_l, CLINT quot_l, CLINT rem_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-shr_l (CLINT a_l)
+shr_l(CLINT a_l)
 {
-  clint *ap_l;
-  USHORT help, carry = 0;
+	clint *ap_l;
+	USHORT help, carry = 0;
 
-  if (DIGITS_L (a_l) == 0)
-    {
-      return E_CLINT_UFL;          /* Underflow */
-    }
+	if (DIGITS_L(a_l) == 0)
+	{
+		return E_CLINT_UFL;          /* Underflow */
+	}
 
-  for (ap_l = MSDPTR_L (a_l); ap_l > a_l; ap_l--)
-    {
-      help = (USHORT)((USHORT)(*ap_l >> 1) | (USHORT)(carry << (BITPERDGT - 1)));
-      carry = (USHORT)(*ap_l & 1U);
-      *ap_l = help;
-    }
+	for (ap_l = MSDPTR_L(a_l); ap_l > a_l; ap_l--)
+	{
+		help = (USHORT)((USHORT)(*ap_l >> 1) | (USHORT)(carry << (BITPERDGT - 1)));
+		carry = (USHORT)(*ap_l & 1U);
+		*ap_l = help;
+	}
 
-  RMLDZRS_L (a_l);
+	RMLDZRS_L(a_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (help), &help,
-                   sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(help), &help,
+		sizeof(carry), &carry));
 
-  ISPURGED_L  ((2, sizeof (help), &help,
-                   sizeof (carry), &carry));
+	ISPURGED_L((2, sizeof(help), &help,
+		sizeof(carry), &carry));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -1056,46 +1056,46 @@ shr_l (CLINT a_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-shl_l (CLINT a_l)
+shl_l(CLINT a_l)
 {
-  clint *ap_l, *msdptra_l;
-  ULONG carry = 0L;
-  int error = E_CLINT_OK;
+	clint *ap_l, *msdptra_l;
+	ULONG carry = 0L;
+	int error = E_CLINT_OK;
 
-  RMLDZRS_L (a_l);
-  if (ld_l (a_l) >= (USHORT)CLINTMAXBIT)
-    {
-      SETDIGITS_L (a_l, CLINTMAXDIGIT);
-      error = E_CLINT_OFL;         /* Overflow */
-    }
+	RMLDZRS_L(a_l);
+	if (ld_l(a_l) >= (USHORT)CLINTMAXBIT)
+	{
+		SETDIGITS_L(a_l, CLINTMAXDIGIT);
+		error = E_CLINT_OFL;         /* Overflow */
+	}
 
-  msdptra_l = MSDPTR_L (a_l);
-  for (ap_l = LSDPTR_L (a_l); ap_l <= msdptra_l; ap_l++)
-    {
-      *ap_l = (USHORT)(carry = ((ULONG)(*ap_l) << 1) | (carry >> BITPERDGT));
-    }
+	msdptra_l = MSDPTR_L(a_l);
+	for (ap_l = LSDPTR_L(a_l); ap_l <= msdptra_l; ap_l++)
+	{
+		*ap_l = (USHORT)(carry = ((ULONG)(*ap_l) << 1) | (carry >> BITPERDGT));
+	}
 
-  if (carry >> BITPERDGT)
-    {
-      if (DIGITS_L (a_l) < CLINTMAXDIGIT)
-        {
-          *ap_l = 1;
-          INCDIGITS_L (a_l);
-          error = E_CLINT_OK;
-        }
-      else
-        {
-          error = E_CLINT_OFL;
-        }
-    }
+	if (carry >> BITPERDGT)
+	{
+		if (DIGITS_L(a_l) < CLINTMAXDIGIT)
+		{
+			*ap_l = 1;
+			INCDIGITS_L(a_l);
+			error = E_CLINT_OK;
+		}
+		else
+		{
+			error = E_CLINT_OFL;
+		}
+	}
 
-  RMLDZRS_L (a_l);
+	RMLDZRS_L(a_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (carry), &carry));
-  ISPURGED_L  ((1, sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(carry), &carry));
+	ISPURGED_L((1, sizeof(carry), &carry));
 
-  return error;
+	return error;
 }
 
 
@@ -1114,99 +1114,99 @@ shl_l (CLINT a_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-shift_l (CLINT n_l, long int noofbits)
+shift_l(CLINT n_l, long int noofbits)
 {
-  USHORT shorts = (USHORT)((ULONG)(noofbits < 0 ? -noofbits : noofbits) / BITPERDGT);
-  USHORT bits = (USHORT)((ULONG)(noofbits < 0 ? -noofbits : noofbits) % BITPERDGT);
-  long int resl;
-  USHORT i;
-  int error = E_CLINT_OK;
+	USHORT shorts = (USHORT)((ULONG)(noofbits < 0 ? -noofbits : noofbits) / BITPERDGT);
+	USHORT bits = (USHORT)((ULONG)(noofbits < 0 ? -noofbits : noofbits) % BITPERDGT);
+	long int resl;
+	USHORT i;
+	int error = E_CLINT_OK;
 
-  clint *nptr_l;
-  clint *msdptrn_l;
+	clint *nptr_l;
+	clint *msdptrn_l;
 
-  RMLDZRS_L (n_l);
-  resl = (int)ld_l (n_l) + noofbits;
+	RMLDZRS_L(n_l);
+	resl = (int)ld_l(n_l) + noofbits;
 
-  if (DIGITS_L (n_l) == 0)
-    {
-      shorts = bits = 0;
-      return ((resl < 0) ? E_CLINT_UFL : E_CLINT_OK);
-    }
+	if (DIGITS_L(n_l) == 0)
+	{
+		shorts = bits = 0;
+		return ((resl < 0) ? E_CLINT_UFL : E_CLINT_OK);
+	}
 
-  if (noofbits == 0)
-    {
-      return E_CLINT_OK;
-    }
+	if (noofbits == 0)
+	{
+		return E_CLINT_OK;
+	}
 
-  if ((resl < 0) || (resl > (long)CLINTMAXBIT))
-    {
-      error = ((resl < 0) ? E_CLINT_UFL : E_CLINT_OFL);   /* Under-/Overflow */
-    }
+	if ((resl < 0) || (resl >(long)CLINTMAXBIT))
+	{
+		error = ((resl < 0) ? E_CLINT_UFL : E_CLINT_OFL);   /* Under-/Overflow */
+	}
 
-  SETDIGITS_L (n_l, MIN (DIGITS_L (n_l), CLINTMAXDIGIT));
+	SETDIGITS_L(n_l, MIN(DIGITS_L(n_l), CLINTMAXDIGIT));
 
-  if (noofbits < 0)
-    {
+	if (noofbits < 0)
+	{
 
-      /* Shift Right */
+		/* Shift Right */
 
-      shorts = (USHORT)MIN (DIGITS_L (n_l), shorts);
-      msdptrn_l = MSDPTR_L (n_l) - shorts;
-      for (nptr_l = LSDPTR_L (n_l); nptr_l <= msdptrn_l; nptr_l++)
-        {
-          *nptr_l = *(nptr_l + shorts);
-        }
-      SETDIGITS_L (n_l, DIGITS_L (n_l) - shorts);
+		shorts = (USHORT)MIN(DIGITS_L(n_l), shorts);
+		msdptrn_l = MSDPTR_L(n_l) - shorts;
+		for (nptr_l = LSDPTR_L(n_l); nptr_l <= msdptrn_l; nptr_l++)
+		{
+			*nptr_l = *(nptr_l + shorts);
+		}
+		SETDIGITS_L(n_l, DIGITS_L(n_l) - shorts);
 
-      for (i = 0; i < bits; i++)
-        {
-          shr_l (n_l);
-        }
-    }
-  else
-    {
+		for (i = 0; i < bits; i++)
+		{
+			shr_l(n_l);
+		}
+	}
+	else
+	{
 
-      /* Shift Left   */
+		/* Shift Left   */
 
-      if (shorts < CLINTMAXDIGIT)
-        {
-          SETDIGITS_L (n_l, MIN ((USHORT)(DIGITS_L (n_l) + shorts), CLINTMAXDIGIT));
-          nptr_l = n_l + DIGITS_L (n_l);
-          msdptrn_l = n_l + shorts;
-          while (nptr_l > msdptrn_l)
-            {
-              *nptr_l = *(nptr_l - shorts);
-              --nptr_l;
-            }
+		if (shorts < CLINTMAXDIGIT)
+		{
+			SETDIGITS_L(n_l, MIN((USHORT)(DIGITS_L(n_l) + shorts), CLINTMAXDIGIT));
+			nptr_l = n_l + DIGITS_L(n_l);
+			msdptrn_l = n_l + shorts;
+			while (nptr_l > msdptrn_l)
+			{
+				*nptr_l = *(nptr_l - shorts);
+				--nptr_l;
+			}
 
-          while (nptr_l > n_l)
-            {
-              *nptr_l-- = 0;
-            }
+			while (nptr_l > n_l)
+			{
+				*nptr_l-- = 0;
+			}
 
-          RMLDZRS_L (n_l);
-          for (i = 0; i < bits; i++)
-            {
-              shl_l (n_l);
-            }
-        }
-      else
-        {
-          SETZERO_L (n_l);
-        }
-    }
+			RMLDZRS_L(n_l);
+			for (i = 0; i < bits; i++)
+			{
+				shl_l(n_l);
+			}
+		}
+		else
+		{
+			SETZERO_L(n_l);
+		}
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (resl), &resl,
-                   sizeof (shorts), &shorts,
-                   sizeof (bits), &bits));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(resl), &resl,
+		sizeof(shorts), &shorts,
+		sizeof(bits), &bits));
 
-  ISPURGED_L  ((3, sizeof (resl), &resl,
-                   sizeof (shorts), &shorts,
-                   sizeof (bits), &bits));
+	ISPURGED_L((3, sizeof(resl), &resl,
+		sizeof(shorts), &shorts,
+		sizeof(bits), &bits));
 
-  return error;
+	return error;
 }
 
 
@@ -1221,18 +1221,18 @@ shift_l (CLINT n_l, long int noofbits)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mod_l (CLINT dv_l, CLINT ds_l, CLINT r_l)
+mod_l(CLINT dv_l, CLINT ds_l, CLINT r_l)
 {
-  CLINTD junk_l;
-  int err;
+	CLINTD junk_l;
+	int err;
 
-  err = div_l (dv_l, ds_l, junk_l, r_l);
+	err = div_l(dv_l, ds_l, junk_l, r_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (junk_l), junk_l));
-  ISPURGED_L  ((1, sizeof (junk_l), junk_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(junk_l), junk_l));
+	ISPURGED_L((1, sizeof(junk_l), junk_l));
 
-  return err;
+	return err;
 }
 
 
@@ -1247,29 +1247,29 @@ mod_l (CLINT dv_l, CLINT ds_l, CLINT r_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mod2_l (CLINT d_l, ULONG k, CLINT r_l)
+mod2_l(CLINT d_l, ULONG k, CLINT r_l)
 {
-  int i;
+	int i;
 
-  cpy_l (r_l, d_l);
+	cpy_l(r_l, d_l);
 
-  if (k > CLINTMAXBIT)
-    {
-      return E_CLINT_OK;
-    }
+	if (k > CLINTMAXBIT)
+	{
+		return E_CLINT_OK;
+	}
 
-  i = 1 + (k >> LDBITPERDGT);
+	i = 1 + (k >> LDBITPERDGT);
 
-  if (i > (int)DIGITS_L (r_l))
-    {
-      return E_CLINT_OK;
-    }
+	if (i > (int)DIGITS_L(r_l))
+	{
+		return E_CLINT_OK;
+	}
 
-  r_l[i] &= (1U << (k & (BITPERDGT - 1UL))) - 1U;
-  SETDIGITS_L (r_l, i);            /* r_l[i] = 2^(k mod BITPERDGT) - 1 */
+	r_l[i] &= (1U << (k & (BITPERDGT - 1UL))) - 1U;
+	SETDIGITS_L(r_l, i);            /* r_l[i] = 2^(k mod BITPERDGT) - 1 */
 
-  RMLDZRS_L (r_l);
-  return E_CLINT_OK;
+	RMLDZRS_L(r_l);
+	return E_CLINT_OK;
 }
 
 
@@ -1284,46 +1284,46 @@ mod2_l (CLINT d_l, ULONG k, CLINT r_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-madd_l (CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
+madd_l(CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
 {
-  CLINT a_l, b_l;
-  clint tmp_l[CLINTMAXSHORT + 1];
+	CLINT a_l, b_l;
+	clint tmp_l[CLINTMAXSHORT + 1];
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  cpy_l (a_l, aa_l);
-  cpy_l (b_l, bb_l);
+	cpy_l(a_l, aa_l);
+	cpy_l(b_l, bb_l);
 
-  if (GE_L (a_l, m_l) || GE_L (b_l, m_l))
-    {
-      add (a_l, b_l, tmp_l);
-      mod_l (tmp_l, m_l, c_l);
-    }
-  else
-    {
-      add (a_l, b_l, tmp_l);
-      if (GE_L (tmp_l, m_l))
-        {
-          sub_l (tmp_l, m_l, tmp_l);    /* Underflow prevented */
-        }
-      cpy_l (c_l, tmp_l);
-    }
+	if (GE_L(a_l, m_l) || GE_L(b_l, m_l))
+	{
+		add(a_l, b_l, tmp_l);
+		mod_l(tmp_l, m_l, c_l);
+	}
+	else
+	{
+		add(a_l, b_l, tmp_l);
+		if (GE_L(tmp_l, m_l))
+		{
+			sub_l(tmp_l, m_l, tmp_l);    /* Underflow prevented */
+		}
+		cpy_l(c_l, tmp_l);
+	}
 
-  Assert(DIGITS_L (c_l) <= CLINTMAXDIGIT);
+	Assert(DIGITS_L(c_l) <= CLINTMAXDIGIT);
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  ISPURGED_L  ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	ISPURGED_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -1338,47 +1338,47 @@ madd_l (CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-msub_l (CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
+msub_l(CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
 {
-  CLINT a_l, b_l, tmp_l;
+	CLINT a_l, b_l, tmp_l;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  cpy_l (a_l, aa_l);
-  cpy_l (b_l, bb_l);
+	cpy_l(a_l, aa_l);
+	cpy_l(b_l, bb_l);
 
-  if (GE_L (a_l, b_l))
-    {
-      sub (a_l, b_l, tmp_l);
-      mod_l (tmp_l, m_l, c_l);
-    }
-  else
-    {
-      sub (b_l, a_l, tmp_l);       /* Sign tmp_l = -1 */
-      mod_l (tmp_l, m_l, tmp_l);
-      if (GTZ_L (tmp_l))
-        {
-          sub (m_l, tmp_l, c_l);
-        }
-      else
-        {
-          SETZERO_L (c_l);
-        }
-    }
+	if (GE_L(a_l, b_l))
+	{
+		sub(a_l, b_l, tmp_l);
+		mod_l(tmp_l, m_l, c_l);
+	}
+	else
+	{
+		sub(b_l, a_l, tmp_l);       /* Sign tmp_l = -1 */
+		mod_l(tmp_l, m_l, tmp_l);
+		if (GTZ_L(tmp_l))
+		{
+			sub(m_l, tmp_l, c_l);
+		}
+		else
+		{
+			SETZERO_L(c_l);
+		}
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  ISPURGED_L  ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	ISPURGED_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -1393,32 +1393,32 @@ msub_l (CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mmul_l (CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
+mmul_l(CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
 {
-  CLINT a_l, b_l;
-  CLINTD tmp_l;
+	CLINT a_l, b_l;
+	CLINTD tmp_l;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  cpy_l (a_l, aa_l);
-  cpy_l (b_l, bb_l);
+	cpy_l(a_l, aa_l);
+	cpy_l(b_l, bb_l);
 
-  mult (a_l, b_l, tmp_l);
-  mod_l (tmp_l, m_l, c_l);
+	mult(a_l, b_l, tmp_l);
+	mod_l(tmp_l, m_l, c_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  ISPURGED_L  ((3, sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	ISPURGED_L((3, sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -1433,29 +1433,29 @@ mmul_l (CLINT aa_l, CLINT bb_l, CLINT c_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-msqr_l (CLINT aa_l, CLINT c_l, CLINT m_l)
+msqr_l(CLINT aa_l, CLINT c_l, CLINT m_l)
 {
-  CLINT a_l;
-  CLINTD tmp_l;
+	CLINT a_l;
+	CLINTD tmp_l;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  cpy_l (a_l, aa_l);
+	cpy_l(a_l, aa_l);
 
-  sqr (a_l, tmp_l);
-  mod_l (tmp_l, m_l, c_l);
+	sqr(a_l, tmp_l);
+	mod_l(tmp_l, m_l, c_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (a_l), a_l,
-                   sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(a_l), a_l,
+		sizeof(tmp_l), tmp_l));
 
-  ISPURGED_L  ((2, sizeof (a_l), a_l,
-                   sizeof (tmp_l), tmp_l));
+	ISPURGED_L((2, sizeof(a_l), a_l,
+		sizeof(tmp_l), tmp_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -1477,76 +1477,76 @@ msqr_l (CLINT aa_l, CLINT c_l, CLINT m_l)
 void __FLINT_API
 mulmon_l(CLINT a_l, CLINT b_l, CLINT n_l, USHORT nprime, USHORT logB_r, CLINT p_l)
 {
-  clint t_l[2 + (CLINTMAXDIGIT << 1)];
-  clint *tptr_l, *nptr_l, *tiptr_l, *lasttnptr, *lastnptr;
-  ULONG carry;
-  USHORT mi;
-  int i;
+	clint t_l[2 + (CLINTMAXDIGIT << 1)];
+	clint *tptr_l, *nptr_l, *tiptr_l, *lasttnptr, *lastnptr;
+	ULONG carry;
+	USHORT mi;
+	int i;
 
-  mult (a_l, b_l, t_l);
-  Assert (DIGITS_L (t_l) <= (1 + (CLINTMAXDIGIT << 1)));
+	mult(a_l, b_l, t_l);
+	Assert(DIGITS_L(t_l) <= (1 + (CLINTMAXDIGIT << 1)));
 
-  lasttnptr = t_l + DIGITS_L (n_l);
-  lastnptr = MSDPTR_L (n_l);
+	lasttnptr = t_l + DIGITS_L(n_l);
+	lastnptr = MSDPTR_L(n_l);
 
-  for (i = (int)DIGITS_L (t_l) + 1; i <= (int)(DIGITS_L (n_l) << 1); i++)
-    {
-      Assert (i < sizeof (t_l));
-      t_l[i] = 0;
-    }
+	for (i = (int)DIGITS_L(t_l) + 1; i <= (int)(DIGITS_L(n_l) << 1); i++)
+	{
+		Assert(i < sizeof(t_l));
+		t_l[i] = 0;
+	}
 
-  SETDIGITS_L (t_l, MAX(DIGITS_L (t_l), DIGITS_L (n_l) << 1));
+	SETDIGITS_L(t_l, MAX(DIGITS_L(t_l), DIGITS_L(n_l) << 1));
 
-  Assert (DIGITS_L (t_l) <= (CLINTMAXDIGIT << 1));
+	Assert(DIGITS_L(t_l) <= (CLINTMAXDIGIT << 1));
 
-  for (tptr_l = LSDPTR_L (t_l); tptr_l <= lasttnptr; tptr_l++)
-    {
-      carry = 0;
-      mi = (USHORT)((ULONG)nprime * (ULONG)*tptr_l);
-      for (nptr_l = LSDPTR_L (n_l), tiptr_l = tptr_l; nptr_l <= lastnptr; nptr_l++, tiptr_l++)
-        {
-          Assert (tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
-          *tiptr_l = (USHORT)(carry = (ULONG)mi * (ULONG)*nptr_l +
-                     (ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-        }
+	for (tptr_l = LSDPTR_L(t_l); tptr_l <= lasttnptr; tptr_l++)
+	{
+		carry = 0;
+		mi = (USHORT)((ULONG)nprime * (ULONG)*tptr_l);
+		for (nptr_l = LSDPTR_L(n_l), tiptr_l = tptr_l; nptr_l <= lastnptr; nptr_l++, tiptr_l++)
+		{
+			Assert(tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
+			*tiptr_l = (USHORT)(carry = (ULONG)mi * (ULONG)*nptr_l +
+				(ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		}
 
-      for (; ((carry >> BITPERDGT) > 0) && tiptr_l <= MSDPTR_L (t_l); tiptr_l++)
-        {
-          Assert (tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
-          *tiptr_l = (USHORT)(carry = (ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-        }
+		for (; ((carry >> BITPERDGT) > 0) && tiptr_l <= MSDPTR_L(t_l); tiptr_l++)
+		{
+			Assert(tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
+			*tiptr_l = (USHORT)(carry = (ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		}
 
-      if (((carry >> BITPERDGT) > 0))
-        {
-          Assert (tiptr_l <= t_l + 1 + (CLINTMAXDIGIT << 1));
-          *tiptr_l = (USHORT)(carry >> BITPERDGT);
-          INCDIGITS_L (t_l);
-        }
-    }
+		if (((carry >> BITPERDGT) > 0))
+		{
+			Assert(tiptr_l <= t_l + 1 + (CLINTMAXDIGIT << 1));
+			*tiptr_l = (USHORT)(carry >> BITPERDGT);
+			INCDIGITS_L(t_l);
+		}
+	}
 
-  tptr_l = t_l + logB_r;
-  SETDIGITS_L (tptr_l, DIGITS_L (t_l) - logB_r);
-  Assert (DIGITS_L (tptr_l) <= (CLINTMAXDIGIT + 1));
+	tptr_l = t_l + logB_r;
+	SETDIGITS_L(tptr_l, DIGITS_L(t_l) - logB_r);
+	Assert(DIGITS_L(tptr_l) <= (CLINTMAXDIGIT + 1));
 
-  if (GE_L (tptr_l, n_l))
-    {
-      sub_l (tptr_l, n_l, p_l);
-    }
-  else
-    {
-      cpy_l (p_l, tptr_l);
-    }
+	if (GE_L(tptr_l, n_l))
+	{
+		sub_l(tptr_l, n_l, p_l);
+	}
+	else
+	{
+		cpy_l(p_l, tptr_l);
+	}
 
-  Assert (DIGITS_L (p_l) <= CLINTMAXDIGIT);
+	Assert(DIGITS_L(p_l) <= CLINTMAXDIGIT);
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (mi), &mi,
-                   sizeof (carry), &carry,
-                   sizeof (t_l), t_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(mi), &mi,
+		sizeof(carry), &carry,
+		sizeof(t_l), t_l));
 
-  ISPURGED_L  ((3, sizeof (mi), &mi,
-                   sizeof (carry), &carry,
-                   sizeof (t_l), t_l));
+	ISPURGED_L((3, sizeof(mi), &mi,
+		sizeof(carry), &carry,
+		sizeof(t_l), t_l));
 }
 
 
@@ -1567,71 +1567,71 @@ mulmon_l(CLINT a_l, CLINT b_l, CLINT n_l, USHORT nprime, USHORT logB_r, CLINT p_
 void __FLINT_API
 sqrmon_l(CLINT a_l, CLINT n_l, USHORT nprime, USHORT logB_r, CLINT p_l)
 {
-  clint t_l[2 + (CLINTMAXDIGIT << 1)];
-  clint *tptr_l, *nptr_l, *tiptr_l, *lasttnptr, *lastnptr;
-  ULONG carry;
-  USHORT mi;
-  int i;
+	clint t_l[2 + (CLINTMAXDIGIT << 1)];
+	clint *tptr_l, *nptr_l, *tiptr_l, *lasttnptr, *lastnptr;
+	ULONG carry;
+	USHORT mi;
+	int i;
 
-  sqr (a_l, t_l);
+	sqr(a_l, t_l);
 
-  lasttnptr = t_l + DIGITS_L (n_l);
-  lastnptr = MSDPTR_L (n_l);
+	lasttnptr = t_l + DIGITS_L(n_l);
+	lastnptr = MSDPTR_L(n_l);
 
-  for (i = (int)DIGITS_L (t_l) + 1; i <= (int)(DIGITS_L (n_l) << 1); i++)
-    {
-      t_l[i] = 0;
-    }
+	for (i = (int)DIGITS_L(t_l) + 1; i <= (int)(DIGITS_L(n_l) << 1); i++)
+	{
+		t_l[i] = 0;
+	}
 
-  SETDIGITS_L (t_l, MAX(DIGITS_L (t_l), DIGITS_L (n_l) << 1));
+	SETDIGITS_L(t_l, MAX(DIGITS_L(t_l), DIGITS_L(n_l) << 1));
 
-  for (tptr_l = LSDPTR_L (t_l); tptr_l <= lasttnptr; tptr_l++)
-    {
-      carry = 0;
-      mi = (USHORT)((ULONG)nprime * (ULONG)*tptr_l);
-      for (nptr_l = LSDPTR_L (n_l), tiptr_l = tptr_l; nptr_l <= lastnptr; nptr_l++, tiptr_l++)
-        {
-          Assert (tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
-          *tiptr_l = (USHORT)(carry = (ULONG)mi * (ULONG)*nptr_l +
-                     (ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-        }
+	for (tptr_l = LSDPTR_L(t_l); tptr_l <= lasttnptr; tptr_l++)
+	{
+		carry = 0;
+		mi = (USHORT)((ULONG)nprime * (ULONG)*tptr_l);
+		for (nptr_l = LSDPTR_L(n_l), tiptr_l = tptr_l; nptr_l <= lastnptr; nptr_l++, tiptr_l++)
+		{
+			Assert(tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
+			*tiptr_l = (USHORT)(carry = (ULONG)mi * (ULONG)*nptr_l +
+				(ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		}
 
-      for (; ((carry >> BITPERDGT) > 0) && tiptr_l <= MSDPTR_L (t_l); tiptr_l++)
-        {
-          Assert (tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
-          *tiptr_l = (USHORT)(carry = (ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-        }
+		for (; ((carry >> BITPERDGT) > 0) && tiptr_l <= MSDPTR_L(t_l); tiptr_l++)
+		{
+			Assert(tiptr_l <= t_l + (CLINTMAXDIGIT << 1));
+			*tiptr_l = (USHORT)(carry = (ULONG)*tiptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		}
 
-      if (((carry >> BITPERDGT) > 0) && tiptr_l > MSDPTR_L (t_l))
-        {
-          Assert (tiptr_l <= t_l + 1 + (CLINTMAXDIGIT << 1));
-          *tiptr_l = (USHORT)(carry >> BITPERDGT);
-          INCDIGITS_L (t_l);
-        }
-    }
+		if (((carry >> BITPERDGT) > 0) && tiptr_l > MSDPTR_L(t_l))
+		{
+			Assert(tiptr_l <= t_l + 1 + (CLINTMAXDIGIT << 1));
+			*tiptr_l = (USHORT)(carry >> BITPERDGT);
+			INCDIGITS_L(t_l);
+		}
+	}
 
-  tptr_l = t_l + logB_r;
-  SETDIGITS_L (tptr_l, DIGITS_L (t_l) - logB_r);
+	tptr_l = t_l + logB_r;
+	SETDIGITS_L(tptr_l, DIGITS_L(t_l) - logB_r);
 
-  if (GE_L (tptr_l, n_l))
-    {
-      sub_l (tptr_l, n_l, p_l);
-    }
-  else
-    {
-      cpy_l (p_l, tptr_l);
-    }
+	if (GE_L(tptr_l, n_l))
+	{
+		sub_l(tptr_l, n_l, p_l);
+	}
+	else
+	{
+		cpy_l(p_l, tptr_l);
+	}
 
-  Assert (DIGITS_L (p_l) <= CLINTMAXDIGIT);
+	Assert(DIGITS_L(p_l) <= CLINTMAXDIGIT);
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (mi), &mi,
-                   sizeof (carry), &carry,
-                   sizeof (t_l), t_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(mi), &mi,
+		sizeof(carry), &carry,
+		sizeof(t_l), t_l));
 
-  ISPURGED_L ((3,  sizeof (mi), &mi,
-                   sizeof (carry), &carry,
-                   sizeof (t_l), t_l));
+	ISPURGED_L((3, sizeof(mi), &mi,
+		sizeof(carry), &carry,
+		sizeof(t_l), t_l));
 }
 
 
@@ -1645,52 +1645,52 @@ sqrmon_l(CLINT a_l, CLINT n_l, USHORT nprime, USHORT logB_r, CLINT p_l)
 /*                                                                            */
 /******************************************************************************/
 USHORT __FLINT_API
-invmon_l (CLINT n_l)
+invmon_l(CLINT n_l)
 {
-  unsigned int i;
-  ULONG x = 2, y = 1;
+	unsigned int i;
+	ULONG x = 2, y = 1;
 
-  if (ISEVEN_L (n_l))
-    {
-      return (USHORT)E_CLINT_MOD;
-    }
+	if (ISEVEN_L(n_l))
+	{
+		return (USHORT)E_CLINT_MOD;
+	}
 
-  for (i = 2; i <= BITPERDGT; i++, x <<= 1)
-    {
-      if (x < (((ULONG)((ULONG)(*LSDPTR_L (n_l)) * (ULONG)y)) & ((x << 1) - 1)))
-        {
-          y += x;
-        }
-    }
+	for (i = 2; i <= BITPERDGT; i++, x <<= 1)
+	{
+		if (x < (((ULONG)((ULONG)(*LSDPTR_L(n_l)) * (ULONG)y)) & ((x << 1) - 1)))
+		{
+			y += x;
+		}
+	}
 
-  return (USHORT)(x - y);
+	return (USHORT)(x - y);
 }
 
 
 /******************************************************************************/
 
 static int twotab[] =
-{0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0,
- 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
- 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0,
- 3, 0, 1, 0, 2, 0, 1, 0, 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
- 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0,
- 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
- 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
+{ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0,
+3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0,
+3, 0, 1, 0, 2, 0, 1, 0, 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0,
+3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0 };
 
 
 static USHORT oddtab[] =
-{0, 1, 1, 3, 1, 5, 3, 7, 1, 9, 5, 11, 3, 13, 7, 15, 1, 17, 9, 19, 5, 21, 11, 23, 3, 25, 13, 27, 7, 29, 15, 31, 1,
- 33, 17, 35, 9, 37, 19, 39, 5, 41, 21, 43, 11, 45, 23, 47, 3, 49, 25, 51, 13, 53, 27, 55, 7, 57, 29, 59, 15,
- 61, 31, 63, 1, 65, 33, 67, 17, 69, 35, 71, 9, 73, 37, 75, 19, 77, 39, 79, 5, 81, 41, 83, 21, 85, 43, 87, 11,
- 89, 45, 91, 23, 93, 47, 95, 3, 97, 49, 99, 25, 101, 51, 103, 13, 105, 53, 107, 27, 109, 55, 111, 7, 113,
- 57, 115, 29, 117, 59, 119, 15, 121, 61, 123, 31, 125, 63, 127, 1, 129, 65, 131, 33, 133, 67, 135, 17,
- 137, 69, 139, 35, 141, 71, 143, 9, 145, 73, 147, 37, 149, 75, 151, 19, 153, 77, 155, 39, 157, 79, 159,
- 5, 161, 81, 163, 41, 165, 83, 167, 21, 169, 85, 171, 43, 173, 87, 175, 11, 177, 89, 179, 45, 181, 91,
- 183, 23, 185, 93, 187, 47, 189, 95, 191, 3, 193, 97, 195, 49, 197, 99, 199, 25, 201, 101, 203, 51, 205,
- 103, 207, 13, 209, 105, 211, 53, 213, 107, 215, 27, 217, 109, 219, 55, 221, 111, 223, 7, 225, 113,
- 227, 57, 229, 115, 231, 29, 233, 117, 235, 59, 237, 119, 239, 15, 241, 121, 243, 61, 245, 123, 247, 31,
- 249, 125, 251, 63, 253, 127, 255};
+{ 0, 1, 1, 3, 1, 5, 3, 7, 1, 9, 5, 11, 3, 13, 7, 15, 1, 17, 9, 19, 5, 21, 11, 23, 3, 25, 13, 27, 7, 29, 15, 31, 1,
+33, 17, 35, 9, 37, 19, 39, 5, 41, 21, 43, 11, 45, 23, 47, 3, 49, 25, 51, 13, 53, 27, 55, 7, 57, 29, 59, 15,
+61, 31, 63, 1, 65, 33, 67, 17, 69, 35, 71, 9, 73, 37, 75, 19, 77, 39, 79, 5, 81, 41, 83, 21, 85, 43, 87, 11,
+89, 45, 91, 23, 93, 47, 95, 3, 97, 49, 99, 25, 101, 51, 103, 13, 105, 53, 107, 27, 109, 55, 111, 7, 113,
+57, 115, 29, 117, 59, 119, 15, 121, 61, 123, 31, 125, 63, 127, 1, 129, 65, 131, 33, 133, 67, 135, 17,
+137, 69, 139, 35, 141, 71, 143, 9, 145, 73, 147, 37, 149, 75, 151, 19, 153, 77, 155, 39, 157, 79, 159,
+5, 161, 81, 163, 41, 165, 83, 167, 21, 169, 85, 171, 43, 173, 87, 175, 11, 177, 89, 179, 45, 181, 91,
+183, 23, 185, 93, 187, 47, 189, 95, 191, 3, 193, 97, 195, 49, 197, 99, 199, 25, 201, 101, 203, 51, 205,
+103, 207, 13, 209, 105, 211, 53, 213, 107, 215, 27, 217, 109, 219, 55, 221, 111, 223, 7, 225, 113,
+227, 57, 229, 115, 231, 29, 233, 117, 235, 59, 237, 119, 239, 15, 241, 121, 243, 61, 245, 123, 247, 31,
+249, 125, 251, 63, 253, 127, 255 };
 
 
 /******************************************************************************/
@@ -1706,16 +1706,16 @@ static USHORT oddtab[] =
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mexp_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
+mexp_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 {
-  if (ISODD_L (m_l))              /* Montgomery exponentiation possible */
-    {
-      return mexpkm_l (bas_l, exp_l, p_l, m_l);
-    }
-  else
-    {
-      return mexpk_l (bas_l, exp_l, p_l, m_l);
-    }
+	if (ISODD_L(m_l))              /* Montgomery exponentiation possible */
+	{
+		return mexpkm_l(bas_l, exp_l, p_l, m_l);
+	}
+	else
+	{
+		return mexpk_l(bas_l, exp_l, p_l, m_l);
+	}
 }
 
 
@@ -1731,193 +1731,193 @@ mexp_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mexp5_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
+mexp5_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 {
-  CLINT a_l;
-  clint e_l[CLINTMAXSHORT + 1];
-  CLINTD acc_l;
-  CLINT a2_l, a3_l, a5_l, a7_l, a9_l, a11_l, a13_l, a15_l, a17_l, a19_l,
-      a21_l, a23_l, a25_l, a27_l, a29_l, a31_l;
-  clint *aptr_l[32];
-  int i, noofdigits, s, t;
-  unsigned int bit, digit, f5, word;
+	CLINT a_l;
+	clint e_l[CLINTMAXSHORT + 1];
+	CLINTD acc_l;
+	CLINT a2_l, a3_l, a5_l, a7_l, a9_l, a11_l, a13_l, a15_l, a17_l, a19_l,
+		a21_l, a23_l, a25_l, a27_l, a29_l, a31_l;
+	clint *aptr_l[32];
+	int i, noofdigits, s, t;
+	unsigned int bit, digit, f5, word;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (p_l);             /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(p_l);             /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  cpy_l (a_l, bas_l);
-  cpy_l (e_l, exp_l);
+	cpy_l(a_l, bas_l);
+	cpy_l(e_l, exp_l);
 
-  if (DIGITS_L (e_l) == 0)
-    {
-      SETONE_L (p_l);
+	if (DIGITS_L(e_l) == 0)
+	{
+		SETONE_L(p_l);
 
-      PURGEVARS_L ((1, sizeof (a_l), a_l));
-      ISPURGED_L ((1, sizeof (a_l), a_l));
+		PURGEVARS_L((1, sizeof(a_l), a_l));
+		ISPURGED_L((1, sizeof(a_l), a_l));
 
-      return E_CLINT_OK;
-    }
+		return E_CLINT_OK;
+	}
 
-  if (DIGITS_L (a_l) == 0)
-    {
-      SETZERO_L (p_l);
+	if (DIGITS_L(a_l) == 0)
+	{
+		SETZERO_L(p_l);
 
-      PURGEVARS_L ((1, sizeof (e_l), e_l));
-      ISPURGED_L ((1, sizeof (e_l), e_l));
+		PURGEVARS_L((1, sizeof(e_l), e_l));
+		ISPURGED_L((1, sizeof(e_l), e_l));
 
-      return E_CLINT_OK;
-    }
+		return E_CLINT_OK;
+	}
 
-  mod_l (a_l, m_l, a_l);
+	mod_l(a_l, m_l, a_l);
 
-  aptr_l[1] = a_l;
-  aptr_l[3] = a3_l;
-  aptr_l[5] = a5_l;
-  aptr_l[7] = a7_l;
-  aptr_l[9] = a9_l;
-  aptr_l[11] = a11_l;
-  aptr_l[13] = a13_l;
-  aptr_l[15] = a15_l;
-  aptr_l[17] = a17_l;
-  aptr_l[19] = a19_l;
-  aptr_l[21] = a21_l;
-  aptr_l[23] = a23_l;
-  aptr_l[25] = a25_l;
-  aptr_l[27] = a27_l;
-  aptr_l[29] = a29_l;
-  aptr_l[31] = a31_l;
+	aptr_l[1] = a_l;
+	aptr_l[3] = a3_l;
+	aptr_l[5] = a5_l;
+	aptr_l[7] = a7_l;
+	aptr_l[9] = a9_l;
+	aptr_l[11] = a11_l;
+	aptr_l[13] = a13_l;
+	aptr_l[15] = a15_l;
+	aptr_l[17] = a17_l;
+	aptr_l[19] = a19_l;
+	aptr_l[21] = a21_l;
+	aptr_l[23] = a23_l;
+	aptr_l[25] = a25_l;
+	aptr_l[27] = a27_l;
+	aptr_l[29] = a29_l;
+	aptr_l[31] = a31_l;
 
-  msqr_l (a_l, a2_l, m_l);
-  for (i = 3; i <= 31; i += 2)
-    {
-      mmul_l (a2_l, aptr_l[i - 2], aptr_l[i], m_l);
-    }
+	msqr_l(a_l, a2_l, m_l);
+	for (i = 3; i <= 31; i += 2)
+	{
+		mmul_l(a2_l, aptr_l[i - 2], aptr_l[i], m_l);
+	}
 
-  *(MSDPTR_L (e_l) + 1) = 0;    /* Zero follows most significant digit of e_l */
+	*(MSDPTR_L(e_l) + 1) = 0;    /* Zero follows most significant digit of e_l */
 
-  noofdigits = (ld_l (e_l) - 1)/5;                               /*lint !e713 */
-  f5 = (unsigned)(noofdigits * 5);      /* >>loss of precision<< not critical */
+	noofdigits = (ld_l(e_l) - 1) / 5;                               /*lint !e713 */
+	f5 = (unsigned)(noofdigits * 5);      /* >>loss of precision<< not critical */
 
-      word = (unsigned int)(f5 >> LDBITPERDGT);     /* f5 div 16 */
-      bit = (unsigned int)(f5 & (BITPERDGT - 1U));  /* f5 mod 16 */
+	word = (unsigned int)(f5 >> LDBITPERDGT);     /* f5 div 16 */
+	bit = (unsigned int)(f5 & (BITPERDGT - 1U));  /* f5 mod 16 */
 
-      digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
+	digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
 
-  if (digit != 0)                  /* 5-digit > 0 */
-    {
-      cpy_l (acc_l, aptr_l[oddtab[digit]]);
+	if (digit != 0)                  /* 5-digit > 0 */
+	{
+		cpy_l(acc_l, aptr_l[oddtab[digit]]);
 
-      t = twotab[digit];
-      for (; t > 0; t--)
-        {
-          msqr_l (acc_l, acc_l, m_l);
-        }
-    }
-  else
-    {
-      SETONE_L (acc_l);
-    }
+		t = twotab[digit];
+		for (; t > 0; t--)
+		{
+			msqr_l(acc_l, acc_l, m_l);
+		}
+	}
+	else
+	{
+		SETONE_L(acc_l);
+	}
 
-  for (noofdigits--, f5 -= 5; noofdigits >= 0; noofdigits--, f5 -= 5)
-    {
-      word = (unsigned int)f5 >> LDBITPERDGT;    /* f5 div 16 */
-      bit = f5 & (BITPERDGT - 1UL);              /* f5 mod 16 */
+	for (noofdigits--, f5 -= 5; noofdigits >= 0; noofdigits--, f5 -= 5)
+	{
+		word = (unsigned int)f5 >> LDBITPERDGT;    /* f5 div 16 */
+		bit = f5 & (BITPERDGT - 1UL);              /* f5 mod 16 */
 
-      digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
+		digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
 
-      if (digit != 0)             /* 5-digit > 0 */
-        {
-          t = twotab[digit];
+		if (digit != 0)             /* 5-digit > 0 */
+		{
+			t = twotab[digit];
 
-          for (s = 5 - t; s > 0; s--)
-            {
-              msqr_l (acc_l, acc_l, m_l);
-            }
+			for (s = 5 - t; s > 0; s--)
+			{
+				msqr_l(acc_l, acc_l, m_l);
+			}
 
-          mmul_l (acc_l, aptr_l[oddtab[digit]], acc_l, m_l);
+			mmul_l(acc_l, aptr_l[oddtab[digit]], acc_l, m_l);
 
-          for (; t > 0; t--)
-            {
-              msqr_l (acc_l, acc_l, m_l);
-            }
-        }
-      else                        /* 5-digit > 0 */
-        {
-          for (s = 5; s > 0; s--)
-            {
-              msqr_l (acc_l, acc_l, m_l);
-            }
-        }
-    }
+			for (; t > 0; t--)
+			{
+				msqr_l(acc_l, acc_l, m_l);
+			}
+		}
+		else                        /* 5-digit > 0 */
+		{
+			for (s = 5; s > 0; s--)
+			{
+				msqr_l(acc_l, acc_l, m_l);
+			}
+		}
+	}
 
-  cpy_l (p_l, acc_l);
+	cpy_l(p_l, acc_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((8,  sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (f5), &f5,
-                    sizeof (word), &word));
-  PURGEVARS_L ((19, sizeof (acc_l), acc_l,
-                    sizeof (a_l), a_l,
-                    sizeof (e_l), e_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (a3_l), a3_l,
-                    sizeof (a5_l), a5_l,
-                    sizeof (a7_l), a7_l,
-                    sizeof (a9_l), a9_l,
-                    sizeof (a11_l), a11_l,
-                    sizeof (a13_l), a13_l,
-                    sizeof (a15_l), a15_l,
-                    sizeof (a17_l), a17_l,
-                    sizeof (a19_l), a19_l,
-                    sizeof (a21_l), a21_l,
-                    sizeof (a23_l), a23_l,
-                    sizeof (a25_l), a25_l,
-                    sizeof (a27_l), a27_l,
-                    sizeof (a29_l), a29_l,
-                    sizeof (a31_l), a31_l));
+	/* Purging of variables */
+	PURGEVARS_L((8, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(f5), &f5,
+		sizeof(word), &word));
+	PURGEVARS_L((19, sizeof(acc_l), acc_l,
+		sizeof(a_l), a_l,
+		sizeof(e_l), e_l,
+		sizeof(a2_l), a2_l,
+		sizeof(a3_l), a3_l,
+		sizeof(a5_l), a5_l,
+		sizeof(a7_l), a7_l,
+		sizeof(a9_l), a9_l,
+		sizeof(a11_l), a11_l,
+		sizeof(a13_l), a13_l,
+		sizeof(a15_l), a15_l,
+		sizeof(a17_l), a17_l,
+		sizeof(a19_l), a19_l,
+		sizeof(a21_l), a21_l,
+		sizeof(a23_l), a23_l,
+		sizeof(a25_l), a25_l,
+		sizeof(a27_l), a27_l,
+		sizeof(a29_l), a29_l,
+		sizeof(a31_l), a31_l));
 
-  ISPURGED_L  ((8,  sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (f5), &f5,
-		    sizeof (word), &word));
-ISPURGED_L  ((19,   sizeof (acc_l), acc_l,
-                    sizeof (a_l), a_l,
-                    sizeof (e_l), e_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (a3_l), a3_l,
-                    sizeof (a5_l), a5_l,
-                    sizeof (a7_l), a7_l,
-                    sizeof (a9_l), a9_l,
-                    sizeof (a11_l), a11_l,
-                    sizeof (a13_l), a13_l,
-                    sizeof (a15_l), a15_l,
-                    sizeof (a17_l), a17_l,
-                    sizeof (a19_l), a19_l,
-                    sizeof (a21_l), a21_l,
-                    sizeof (a23_l), a23_l,
-                    sizeof (a25_l), a25_l,
-                    sizeof (a27_l), a27_l,
-                    sizeof (a29_l), a29_l,
-                    sizeof (a31_l), a31_l));
+	ISPURGED_L((8, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(f5), &f5,
+		sizeof(word), &word));
+	ISPURGED_L((19, sizeof(acc_l), acc_l,
+		sizeof(a_l), a_l,
+		sizeof(e_l), e_l,
+		sizeof(a2_l), a2_l,
+		sizeof(a3_l), a3_l,
+		sizeof(a5_l), a5_l,
+		sizeof(a7_l), a7_l,
+		sizeof(a9_l), a9_l,
+		sizeof(a11_l), a11_l,
+		sizeof(a13_l), a13_l,
+		sizeof(a15_l), a15_l,
+		sizeof(a17_l), a17_l,
+		sizeof(a19_l), a19_l,
+		sizeof(a21_l), a21_l,
+		sizeof(a23_l), a23_l,
+		sizeof(a25_l), a25_l,
+		sizeof(a27_l), a27_l,
+		sizeof(a29_l), a29_l,
+		sizeof(a31_l), a31_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -1934,231 +1934,231 @@ ISPURGED_L  ((19,   sizeof (acc_l), acc_l,
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mexpk_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
+mexpk_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 {
-  CLINT a_l, a2_l;
-  clint e_l[CLINTMAXSHORT + 1];
-  CLINTD acc_l;
-  clint **aptr_l, *ptr_l = NULL;
-  int noofdigits, s, t, i;
-  unsigned int k, lge, bit, digit, fk, word, pow2k, k_mask;
+	CLINT a_l, a2_l;
+	clint e_l[CLINTMAXSHORT + 1];
+	CLINTD acc_l;
+	clint **aptr_l, *ptr_l = NULL;
+	int noofdigits, s, t, i;
+	unsigned int k, lge, bit, digit, fk, word, pow2k, k_mask;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (p_l);             /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(p_l);             /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  cpy_l (a_l, bas_l);
-  cpy_l (e_l, exp_l);
+	cpy_l(a_l, bas_l);
+	cpy_l(e_l, exp_l);
 
-  if (DIGITS_L (e_l) == 0)
-    {
-      SETONE_L (p_l);
+	if (DIGITS_L(e_l) == 0)
+	{
+		SETONE_L(p_l);
 
-      PURGEVARS_L ((1, sizeof (a_l), a_l));
-      ISPURGED_L  ((1, sizeof (a_l), a_l));
+		PURGEVARS_L((1, sizeof(a_l), a_l));
+		ISPURGED_L((1, sizeof(a_l), a_l));
 
-      return E_CLINT_OK;
-    }
+		return E_CLINT_OK;
+	}
 
-  if (DIGITS_L (a_l) == 0)
-    {
-      SETZERO_L (p_l);
+	if (DIGITS_L(a_l) == 0)
+	{
+		SETZERO_L(p_l);
 
-      PURGEVARS_L ((1, sizeof (e_l), e_l));
-      ISPURGED_L  ((1, sizeof (e_l), e_l));
+		PURGEVARS_L((1, sizeof(e_l), e_l));
+		ISPURGED_L((1, sizeof(e_l), e_l));
 
-      return E_CLINT_OK;
-    }
+		return E_CLINT_OK;
+	}
 
-  lge = ld_l (e_l);
+	lge = ld_l(e_l);
 
-  k = 8;
+	k = 8;
 
-  while (k > 1 && ((k - 1) * (k << ((k - 1) << 1)) / ((1 << k) - k - 1)) >= lge - 1)
-    {
-      --k;
-    }
+	while (k > 1 && ((k - 1) * (k << ((k - 1) << 1)) / ((1 << k) - k - 1)) >= lge - 1)
+	{
+		--k;
+	}
 
-  pow2k = 1U << k;                 /*lint !e644*/
+	pow2k = 1U << k;                 /*lint !e644*/
 
 #if defined FLINT_DEBUG && defined FLINT_VERBOSE
-  printf ("ld(e) = %d, k = %ld, pow2k = %u\n", lge, k, pow2k);
+	printf("ld(e) = %d, k = %ld, pow2k = %u\n", lge, k, pow2k);
 #endif
 
-  k_mask = pow2k - 1U;
+	k_mask = pow2k - 1U;
 
-  if ((aptr_l = (clint **)malloc (sizeof (clint *) * pow2k)) == NULL)
-    {
-      PURGEVARS_L ((2, sizeof (a_l), a_l,
-                       sizeof (e_l), e_l));
-      ISPURGED_L  ((2, sizeof (a_l), a_l,
-                       sizeof (e_l), e_l));
-      return E_CLINT_MAL;
-    }
+	if ((aptr_l = (clint **)malloc(sizeof(clint *) * pow2k)) == NULL)
+	{
+		PURGEVARS_L((2, sizeof(a_l), a_l,
+			sizeof(e_l), e_l));
+		ISPURGED_L((2, sizeof(a_l), a_l,
+			sizeof(e_l), e_l));
+		return E_CLINT_MAL;
+	}
 
-  mod_l (a_l, m_l, a_l);
-  aptr_l[1] = a_l;
+	mod_l(a_l, m_l, a_l);
+	aptr_l[1] = a_l;
 
-  if (k > 1)
-    {
-      if ((ptr_l = (clint *)malloc (sizeof (CLINT) * ((pow2k >> 1) - 1))) == NULL)
-        {
-          free (aptr_l);
-          PURGEVARS_L ((2, sizeof (a_l), a_l,
-                           sizeof (e_l), e_l));
-          ISPURGED_L  ((2, sizeof (a_l), a_l,
-                           sizeof (e_l), e_l));
-          return E_CLINT_MAL;
-        }
-      aptr_l[2] = a2_l;
-      msqr_l (a_l, aptr_l[2], m_l);
+	if (k > 1)
+	{
+		if ((ptr_l = (clint *)malloc(sizeof(CLINT) * ((pow2k >> 1) - 1))) == NULL)
+		{
+			free(aptr_l);
+			PURGEVARS_L((2, sizeof(a_l), a_l,
+				sizeof(e_l), e_l));
+			ISPURGED_L((2, sizeof(a_l), a_l,
+				sizeof(e_l), e_l));
+			return E_CLINT_MAL;
+		}
+		aptr_l[2] = a2_l;
+		msqr_l(a_l, aptr_l[2], m_l);
 
-      for (aptr_l[3] = ptr_l, i = 5; i < (int)pow2k; i += 2)
-        {
-          aptr_l[i] = aptr_l[i - 2] + CLINTMAXSHORT;   /*lint !e661 !e662 */
-        }
+		for (aptr_l[3] = ptr_l, i = 5; i < (int)pow2k; i += 2)
+		{
+			aptr_l[i] = aptr_l[i - 2] + CLINTMAXSHORT;   /*lint !e661 !e662 */
+		}
 
-      for (i = 3; i < (int)pow2k; i += 2)
-        {
-          mmul_l (aptr_l[2], aptr_l[i - 2], aptr_l[i], m_l);
-        }
-    }
+		for (i = 3; i < (int)pow2k; i += 2)
+		{
+			mmul_l(aptr_l[2], aptr_l[i - 2], aptr_l[i], m_l);
+		}
+	}
 
-  *(MSDPTR_L (e_l) + 1) = 0;    /* 0 follows most significant digit of e_l */
+	*(MSDPTR_L(e_l) + 1) = 0;    /* 0 follows most significant digit of e_l */
 
-  noofdigits = (lge - 1)/k;                                   /*lint !e713 */
-  fk = noofdigits * k;              /*  >>loss of precision<< not critical */
+	noofdigits = (lge - 1) / k;                                   /*lint !e713 */
+	fk = noofdigits * k;              /*  >>loss of precision<< not critical */
 
-  word = (unsigned int)(fk >> LDBITPERDGT);         /* fk div 16 */
-  bit = (unsigned int)(fk & (BITPERDGT - 1UL));     /* fk mod 16 */
+	word = (unsigned int)(fk >> LDBITPERDGT);         /* fk div 16 */
+	bit = (unsigned int)(fk & (BITPERDGT - 1UL));     /* fk mod 16 */
 
-  switch (k)
-    {
-      case 1:
-      case 2:
-      case 4:
-      case 8:
-        digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
-        break;
-      default:
-        digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
-                                 << BITPERDGT)) >> bit) & k_mask;
-    }
+	switch (k)
+	{
+	case 1:
+	case 2:
+	case 4:
+	case 8:
+		digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
+		break;
+	default:
+		digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
+			<< BITPERDGT)) >> bit) & k_mask;
+	}
 
-  if (digit != 0)                  /* k-digit > 0 */
-    {
-      cpy_l (acc_l, aptr_l[oddtab[digit]]);
+	if (digit != 0)                  /* k-digit > 0 */
+	{
+		cpy_l(acc_l, aptr_l[oddtab[digit]]);
 
-      t = twotab[digit];
-      for (; t > 0; t--)
-        {
-          msqr_l (acc_l, acc_l, m_l);
-        }
-    }
-  else
-    {
-      SETONE_L (acc_l);
-    }
+		t = twotab[digit];
+		for (; t > 0; t--)
+		{
+			msqr_l(acc_l, acc_l, m_l);
+		}
+	}
+	else
+	{
+		SETONE_L(acc_l);
+	}
 
-  for (noofdigits--, fk -= k; noofdigits >= 0; noofdigits--, fk -= k)
-    {
-      word = (unsigned int)(fk >> LDBITPERDGT);       /* fk div 16 */
-      bit = (unsigned int)(fk & (BITPERDGT - 1UL));   /* fk mod 16 */
+	for (noofdigits--, fk -= k; noofdigits >= 0; noofdigits--, fk -= k)
+	{
+		word = (unsigned int)(fk >> LDBITPERDGT);       /* fk div 16 */
+		bit = (unsigned int)(fk & (BITPERDGT - 1UL));   /* fk mod 16 */
 
-      switch (k)
-        {
-          case 1:
-          case 2:
-          case 4:
-          case 8:
-            digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
-            break;
-          default:
-            digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
-                                     << BITPERDGT)) >> bit) & k_mask;
-        }
+		switch (k)
+		{
+		case 1:
+		case 2:
+		case 4:
+		case 8:
+			digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
+			break;
+		default:
+			digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
+				<< BITPERDGT)) >> bit) & k_mask;
+		}
 
-      if (digit != 0)              /* k-digit > 0 */
-        {
-          t = twotab[digit];
+		if (digit != 0)              /* k-digit > 0 */
+		{
+			t = twotab[digit];
 
-          for (s = (int)(k - t); s > 0; s--)
-            {
-              msqr_l (acc_l, acc_l, m_l);
-            }
+			for (s = (int)(k - t); s > 0; s--)
+			{
+				msqr_l(acc_l, acc_l, m_l);
+			}
 
-          mmul_l (acc_l, aptr_l[oddtab[digit]], acc_l, m_l);
+			mmul_l(acc_l, aptr_l[oddtab[digit]], acc_l, m_l);
 
-          for (; t > 0; t--)
-            {
-              msqr_l (acc_l, acc_l, m_l);
-            }
-        }
-      else                         /* k-digit == 0 */
-        {
-          for (s = (int)k; s > 0; s--)
-            {
-              msqr_l (acc_l, acc_l, m_l);
-            }
-        }
-    }
+			for (; t > 0; t--)
+			{
+				msqr_l(acc_l, acc_l, m_l);
+			}
+		}
+		else                         /* k-digit == 0 */
+		{
+			for (s = (int)k; s > 0; s--)
+			{
+				msqr_l(acc_l, acc_l, m_l);
+			}
+		}
+	}
 
-  cpy_l (p_l, acc_l);
+	cpy_l(p_l, acc_l);
 
-  free (aptr_l);
-  if (ptr_l != NULL)
-    {
+	free(aptr_l);
+	if (ptr_l != NULL)
+	{
 
 #ifdef FLINT_SECURE
-      memset (ptr_l, 0, sizeof (CLINT) * ((pow2k >> 1) - 1));   /*lint !e668*/
+		memset(ptr_l, 0, sizeof(CLINT) * ((pow2k >> 1) - 1));   /*lint !e668*/
 #endif
 
-      free (ptr_l);                /*lint !e644 */
-    }
+		free(ptr_l);                /*lint !e644 */
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((12, sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (k), &k,
-                    sizeof (lge), &lge,
-                    sizeof (fk), &fk,
-                    sizeof (word), &word,
-                    sizeof (pow2k), &pow2k,
-                    sizeof (k_mask), &k_mask));
-  PURGEVARS_L ((4,  sizeof (a_l), a_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (e_l), e_l,
-                    sizeof (acc_l), acc_l));
+	/* Purging of variables */
+	PURGEVARS_L((12, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(k), &k,
+		sizeof(lge), &lge,
+		sizeof(fk), &fk,
+		sizeof(word), &word,
+		sizeof(pow2k), &pow2k,
+		sizeof(k_mask), &k_mask));
+	PURGEVARS_L((4, sizeof(a_l), a_l,
+		sizeof(a2_l), a2_l,
+		sizeof(e_l), e_l,
+		sizeof(acc_l), acc_l));
 
-  ISPURGED_L  ((16, sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (k), &k,
-                    sizeof (lge), &lge,
-                    sizeof (fk), &fk,
-                    sizeof (word), &word,
-                    sizeof (pow2k), &pow2k,
-                    sizeof (k_mask), &k_mask,
-                    sizeof (a_l), a_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (e_l), e_l,
-                    sizeof (acc_l), acc_l));
+	ISPURGED_L((16, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(k), &k,
+		sizeof(lge), &lge,
+		sizeof(fk), &fk,
+		sizeof(word), &word,
+		sizeof(pow2k), &pow2k,
+		sizeof(k_mask), &k_mask,
+		sizeof(a_l), a_l,
+		sizeof(a2_l), a2_l,
+		sizeof(e_l), e_l,
+		sizeof(acc_l), acc_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -2176,216 +2176,216 @@ mexpk_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mexp5m_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
+mexp5m_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 {
-  CLINT a_l, md_l;
-  clint e_l[CLINTMAXSHORT + 1];
-  clint r_l[CLINTMAXSHORT + 1];
-  CLINTD acc_l;
-  CLINT a2_l, a3_l, a5_l, a7_l, a9_l, a11_l, a13_l, a15_l, a17_l, a19_l,
-      a21_l, a23_l, a25_l, a27_l, a29_l, a31_l;
-  clint *aptr_l[32];
-  int i, noofdigits, s, t;
-  unsigned int bit, digit, f5, word;
-  USHORT logB_r, mprime;
+	CLINT a_l, md_l;
+	clint e_l[CLINTMAXSHORT + 1];
+	clint r_l[CLINTMAXSHORT + 1];
+	CLINTD acc_l;
+	CLINT a2_l, a3_l, a5_l, a7_l, a9_l, a11_l, a13_l, a15_l, a17_l, a19_l,
+		a21_l, a23_l, a25_l, a27_l, a29_l, a31_l;
+	clint *aptr_l[32];
+	int i, noofdigits, s, t;
+	unsigned int bit, digit, f5, word;
+	USHORT logB_r, mprime;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (ISEVEN_L (m_l))
-    {
-      return E_CLINT_MOD;          /* Modulus is even */
-    }
+	if (ISEVEN_L(m_l))
+	{
+		return E_CLINT_MOD;          /* Modulus is even */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (p_l);             /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(p_l);             /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  cpy_l (a_l, bas_l);
-  cpy_l (e_l, exp_l);
-  cpy_l (md_l, m_l);
+	cpy_l(a_l, bas_l);
+	cpy_l(e_l, exp_l);
+	cpy_l(md_l, m_l);
 
-  if (DIGITS_L (e_l) == 0)
-    {
-      SETONE_L (p_l);
+	if (DIGITS_L(e_l) == 0)
+	{
+		SETONE_L(p_l);
 
-      PURGEVARS_L ((2, sizeof (a_l), a_l,
-                       sizeof (md_l), md_l));
-      ISPURGED_L  ((2, sizeof (a_l), a_l,
-                       sizeof (md_l), md_l));
-      return E_CLINT_OK;
-    }
+		PURGEVARS_L((2, sizeof(a_l), a_l,
+			sizeof(md_l), md_l));
+		ISPURGED_L((2, sizeof(a_l), a_l,
+			sizeof(md_l), md_l));
+		return E_CLINT_OK;
+	}
 
-  if (DIGITS_L (a_l) == 0)
-    {
-      SETZERO_L (p_l);
+	if (DIGITS_L(a_l) == 0)
+	{
+		SETZERO_L(p_l);
 
-      PURGEVARS_L ((2, sizeof (e_l), e_l,
-                       sizeof (md_l), md_l));
-      ISPURGED_L  ((2, sizeof (e_l), e_l,
-                       sizeof (md_l), md_l));
-      return E_CLINT_OK;
-    }
+		PURGEVARS_L((2, sizeof(e_l), e_l,
+			sizeof(md_l), md_l));
+		ISPURGED_L((2, sizeof(e_l), e_l,
+			sizeof(md_l), md_l));
+		return E_CLINT_OK;
+	}
 
-  aptr_l[1] = a_l;
-  aptr_l[3] = a3_l;
-  aptr_l[5] = a5_l;
-  aptr_l[7] = a7_l;
-  aptr_l[9] = a9_l;
-  aptr_l[11] = a11_l;
-  aptr_l[13] = a13_l;
-  aptr_l[15] = a15_l;
-  aptr_l[17] = a17_l;
-  aptr_l[19] = a19_l;
-  aptr_l[21] = a21_l;
-  aptr_l[23] = a23_l;
-  aptr_l[25] = a25_l;
-  aptr_l[27] = a27_l;
-  aptr_l[29] = a29_l;
-  aptr_l[31] = a31_l;
+	aptr_l[1] = a_l;
+	aptr_l[3] = a3_l;
+	aptr_l[5] = a5_l;
+	aptr_l[7] = a7_l;
+	aptr_l[9] = a9_l;
+	aptr_l[11] = a11_l;
+	aptr_l[13] = a13_l;
+	aptr_l[15] = a15_l;
+	aptr_l[17] = a17_l;
+	aptr_l[19] = a19_l;
+	aptr_l[21] = a21_l;
+	aptr_l[23] = a23_l;
+	aptr_l[25] = a25_l;
+	aptr_l[27] = a27_l;
+	aptr_l[29] = a29_l;
+	aptr_l[31] = a31_l;
 
-  SETZERO_L (r_l);
-  logB_r = DIGITS_L (md_l);
-  setbit_l (r_l, logB_r << LDBITPERDGT);
-  if (DIGITS_L (r_l) > CLINTMAXDIGIT)
-    {
-      mod_l (r_l, md_l, r_l);
-    }
+	SETZERO_L(r_l);
+	logB_r = DIGITS_L(md_l);
+	setbit_l(r_l, logB_r << LDBITPERDGT);
+	if (DIGITS_L(r_l) > CLINTMAXDIGIT)
+	{
+		mod_l(r_l, md_l, r_l);
+	}
 
-  mprime = invmon_l (md_l);
+	mprime = invmon_l(md_l);
 
-  mmul_l (a_l, r_l, a_l, md_l);
+	mmul_l(a_l, r_l, a_l, md_l);
 
-  sqrmon_l (a_l, md_l, mprime, logB_r, a2_l);
+	sqrmon_l(a_l, md_l, mprime, logB_r, a2_l);
 
-  for (i = 3; i <= 31; i += 2)
-    {
-      mulmon_l (a2_l, aptr_l[i - 2], md_l, mprime, logB_r, aptr_l[i]);
-    }
+	for (i = 3; i <= 31; i += 2)
+	{
+		mulmon_l(a2_l, aptr_l[i - 2], md_l, mprime, logB_r, aptr_l[i]);
+	}
 
-  *(MSDPTR_L (e_l) + 1) = 0;     /* 0 follows most significant digit of e_l */
+	*(MSDPTR_L(e_l) + 1) = 0;     /* 0 follows most significant digit of e_l */
 
-  noofdigits = (ld_l (e_l) - 1)/5;                             /*lint !e713 */
-  f5 = (unsigned)(noofdigits * 5);    /* >>loss of precision<< not critical */
+	noofdigits = (ld_l(e_l) - 1) / 5;                             /*lint !e713 */
+	f5 = (unsigned)(noofdigits * 5);    /* >>loss of precision<< not critical */
 
-  word = (unsigned int)(f5 >> LDBITPERDGT);         /* f5 div 16 */
-  bit = (unsigned int)(f5 & (BITPERDGT - 1UL));     /* f5 mod 16 */
+	word = (unsigned int)(f5 >> LDBITPERDGT);         /* f5 div 16 */
+	bit = (unsigned int)(f5 & (BITPERDGT - 1UL));     /* f5 mod 16 */
 
-  digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
+	digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
 
-  if (digit != 0)                  /* 5-digit > 0 */
-    {
-      cpy_l (acc_l, aptr_l[oddtab[digit]]);
+	if (digit != 0)                  /* 5-digit > 0 */
+	{
+		cpy_l(acc_l, aptr_l[oddtab[digit]]);
 
-      t = twotab[digit];
-      for (; t > 0; t--)
-        {
-          sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-        }
-    }
-  else
-    {
-      mod_l (r_l, md_l, acc_l);
-    }
+		t = twotab[digit];
+		for (; t > 0; t--)
+		{
+			sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+		}
+	}
+	else
+	{
+		mod_l(r_l, md_l, acc_l);
+	}
 
-  for (noofdigits--, f5 -= 5; noofdigits >= 0; noofdigits--, f5 -= 5)
-    {
-      word = (unsigned int)f5 >> LDBITPERDGT;       /* f5 div 16 */
-      bit = (unsigned int)f5 & (BITPERDGT - 1UL);   /* f5 mod 16 */
+	for (noofdigits--, f5 -= 5; noofdigits >= 0; noofdigits--, f5 -= 5)
+	{
+		word = (unsigned int)f5 >> LDBITPERDGT;       /* f5 div 16 */
+		bit = (unsigned int)f5 & (BITPERDGT - 1UL);   /* f5 mod 16 */
 
-      digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
+		digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2] << BITPERDGT)) >> bit) & 0x1f;
 
-      if (digit != 0)              /* 5-digit == 0 */
-        {
-          t = twotab[digit];
-          for (s = 5 - t; s > 0; s--)
-            {
-              sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-            }
+		if (digit != 0)              /* 5-digit == 0 */
+		{
+			t = twotab[digit];
+			for (s = 5 - t; s > 0; s--)
+			{
+				sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+			}
 
-          mulmon_l (acc_l, aptr_l[oddtab[digit]], md_l, mprime, logB_r, acc_l);
+			mulmon_l(acc_l, aptr_l[oddtab[digit]], md_l, mprime, logB_r, acc_l);
 
-          for (; t > 0; t--)
-            {
-              sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-            }
-        }
-      else                         /* 5-digit == 0 */
-        {
-          for (s = 5; s > 0; s--)
-            {
-              sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-            }
-        }
-    }
+			for (; t > 0; t--)
+			{
+				sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+			}
+		}
+		else                         /* 5-digit == 0 */
+		{
+			for (s = 5; s > 0; s--)
+			{
+				sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+			}
+		}
+	}
 
-  mulmon_l (acc_l, one_l, md_l, mprime, logB_r, p_l);
+	mulmon_l(acc_l, one_l, md_l, mprime, logB_r, p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((8,  sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (f5), &f5,
-                    sizeof (word), &word));
-  PURGEVARS_L ((21, sizeof (acc_l), acc_l,
-                    sizeof (a_l), a_l,
-                    sizeof (md_l), md_l,
-                    sizeof (e_l), e_l,
-                    sizeof (r_l), r_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (a3_l), a3_l,
-                    sizeof (a5_l), a5_l,
-                    sizeof (a7_l), a7_l,
-                    sizeof (a9_l), a9_l,
-                    sizeof (a11_l), a11_l,
-                    sizeof (a13_l), a13_l,
-                    sizeof (a15_l), a15_l,
-                    sizeof (a17_l), a17_l,
-                    sizeof (a19_l), a19_l,
-                    sizeof (a21_l), a21_l,
-                    sizeof (a23_l), a23_l,
-                    sizeof (a25_l), a25_l,
-                    sizeof (a27_l), a27_l,
-                    sizeof (a29_l), a29_l,
-                    sizeof (a31_l), a31_l));
+	/* Purging of variables */
+	PURGEVARS_L((8, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(f5), &f5,
+		sizeof(word), &word));
+	PURGEVARS_L((21, sizeof(acc_l), acc_l,
+		sizeof(a_l), a_l,
+		sizeof(md_l), md_l,
+		sizeof(e_l), e_l,
+		sizeof(r_l), r_l,
+		sizeof(a2_l), a2_l,
+		sizeof(a3_l), a3_l,
+		sizeof(a5_l), a5_l,
+		sizeof(a7_l), a7_l,
+		sizeof(a9_l), a9_l,
+		sizeof(a11_l), a11_l,
+		sizeof(a13_l), a13_l,
+		sizeof(a15_l), a15_l,
+		sizeof(a17_l), a17_l,
+		sizeof(a19_l), a19_l,
+		sizeof(a21_l), a21_l,
+		sizeof(a23_l), a23_l,
+		sizeof(a25_l), a25_l,
+		sizeof(a27_l), a27_l,
+		sizeof(a29_l), a29_l,
+		sizeof(a31_l), a31_l));
 
-  ISPURGED_L  ((8,  sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (f5), &f5,
-		    sizeof (word), &word));
-  ISPURGED_L  ((21, sizeof (acc_l), acc_l,
-                    sizeof (a_l), a_l,
-                    sizeof (md_l), md_l,
-                    sizeof (e_l), e_l,
-                    sizeof (r_l), r_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (a3_l), a3_l,
-                    sizeof (a5_l), a5_l,
-                    sizeof (a7_l), a7_l,
-                    sizeof (a9_l), a9_l,
-                    sizeof (a11_l), a11_l,
-                    sizeof (a13_l), a13_l,
-                    sizeof (a15_l), a15_l,
-                    sizeof (a17_l), a17_l,
-                    sizeof (a19_l), a19_l,
-                    sizeof (a21_l), a21_l,
-                    sizeof (a23_l), a23_l,
-                    sizeof (a25_l), a25_l,
-                    sizeof (a27_l), a27_l,
-                    sizeof (a29_l), a29_l,
-                    sizeof (a31_l), a31_l));
-  return E_CLINT_OK;
+	ISPURGED_L((8, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(f5), &f5,
+		sizeof(word), &word));
+	ISPURGED_L((21, sizeof(acc_l), acc_l,
+		sizeof(a_l), a_l,
+		sizeof(md_l), md_l,
+		sizeof(e_l), e_l,
+		sizeof(r_l), r_l,
+		sizeof(a2_l), a2_l,
+		sizeof(a3_l), a3_l,
+		sizeof(a5_l), a5_l,
+		sizeof(a7_l), a7_l,
+		sizeof(a9_l), a9_l,
+		sizeof(a11_l), a11_l,
+		sizeof(a13_l), a13_l,
+		sizeof(a15_l), a15_l,
+		sizeof(a17_l), a17_l,
+		sizeof(a19_l), a19_l,
+		sizeof(a21_l), a21_l,
+		sizeof(a23_l), a23_l,
+		sizeof(a25_l), a25_l,
+		sizeof(a27_l), a27_l,
+		sizeof(a29_l), a29_l,
+		sizeof(a31_l), a31_l));
+	return E_CLINT_OK;
 }
 
 
@@ -2402,286 +2402,286 @@ mexp5m_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mexpkm_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
+mexpkm_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 {
-  CLINT a_l, a2_l, md_l;
-  clint e_l[CLINTMAXSHORT + 1];
-  clint r_l[CLINTMAXSHORT + 1];
-  CLINTD acc_l;
-  clint **aptr_l, *ptr_l = NULL;
-  int noofdigits, s, t, i;
-  unsigned int k, lge, bit, digit, fk, word, pow2k, k_mask;
-  USHORT logB_r, mprime;
+	CLINT a_l, a2_l, md_l;
+	clint e_l[CLINTMAXSHORT + 1];
+	clint r_l[CLINTMAXSHORT + 1];
+	CLINTD acc_l;
+	clint **aptr_l, *ptr_l = NULL;
+	int noofdigits, s, t, i;
+	unsigned int k, lge, bit, digit, fk, word, pow2k, k_mask;
+	USHORT logB_r, mprime;
 
 #ifdef FLINT_DEBUG
-  int sign_rmin1, sign_mprime;
-  CLINTD d_l, mprime_l, rmin1_l;
+	int sign_rmin1, sign_mprime;
+	CLINTD d_l, mprime_l, rmin1_l;
 #endif
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (ISEVEN_L (m_l))
-    {
-      return E_CLINT_MOD;          /* Modulus even */
-    }
+	if (ISEVEN_L(m_l))
+	{
+		return E_CLINT_MOD;          /* Modulus even */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (p_l);             /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(p_l);             /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  cpy_l (a_l, bas_l);
-  cpy_l (e_l, exp_l);
-  cpy_l (md_l, m_l);
+	cpy_l(a_l, bas_l);
+	cpy_l(e_l, exp_l);
+	cpy_l(md_l, m_l);
 
-  if (DIGITS_L (e_l) == 0)
-    {
-      SETONE_L (p_l);
-      PURGEVARS_L ((2, sizeof (a_l), a_l,
-                       sizeof (md_l), md_l));
-      ISPURGED_L  ((2, sizeof (a_l), a_l,
-                       sizeof (md_l), md_l));
-      return E_CLINT_OK;
-    }
+	if (DIGITS_L(e_l) == 0)
+	{
+		SETONE_L(p_l);
+		PURGEVARS_L((2, sizeof(a_l), a_l,
+			sizeof(md_l), md_l));
+		ISPURGED_L((2, sizeof(a_l), a_l,
+			sizeof(md_l), md_l));
+		return E_CLINT_OK;
+	}
 
-  if (DIGITS_L (a_l) == 0)
-    {
-      SETZERO_L (p_l);
+	if (DIGITS_L(a_l) == 0)
+	{
+		SETZERO_L(p_l);
 
-      PURGEVARS_L ((2, sizeof (e_l), e_l,
-                       sizeof (md_l), md_l));
-      ISPURGED_L  ((2, sizeof (e_l), e_l,
-                       sizeof (md_l), md_l));
-      return E_CLINT_OK;
-    }
+		PURGEVARS_L((2, sizeof(e_l), e_l,
+			sizeof(md_l), md_l));
+		ISPURGED_L((2, sizeof(e_l), e_l,
+			sizeof(md_l), md_l));
+		return E_CLINT_OK;
+	}
 
-  lge = ld_l (e_l);
+	lge = ld_l(e_l);
 
-  k = 8;
+	k = 8;
 
-  while (k > 1 && ((k - 1) * (k << ((k - 1) << 1)) / ((1 << k) - k - 1)) >= lge - 1)
-    {
-      --k;
-    }
+	while (k > 1 && ((k - 1) * (k << ((k - 1) << 1)) / ((1 << k) - k - 1)) >= lge - 1)
+	{
+		--k;
+	}
 
-  pow2k = 1U << k;                 /*lint !e644 */
+	pow2k = 1U << k;                 /*lint !e644 */
 
 #if defined FLINT_DEBUG && defined FLINT_VERBOSE
-  printf ("ld(e) = %d, k = %ld, pow2k = %u\n", lge, k, pow2k);
+	printf("ld(e) = %d, k = %ld, pow2k = %u\n", lge, k, pow2k);
 #endif
 
-  k_mask = pow2k - 1;
+	k_mask = pow2k - 1;
 
-  if ((aptr_l = (clint **)malloc (sizeof (clint *) * pow2k)) == NULL)
-    {
-      PURGEVARS_L ((3, sizeof (a_l), a_l,
-                       sizeof (e_l), e_l,
-                       sizeof (md_l), md_l));
-      ISPURGED_L  ((3, sizeof (a_l), a_l,
-                       sizeof (e_l), e_l,
-                       sizeof (md_l), md_l));
-      return E_CLINT_MAL;
-    }
+	if ((aptr_l = (clint **)malloc(sizeof(clint *) * pow2k)) == NULL)
+	{
+		PURGEVARS_L((3, sizeof(a_l), a_l,
+			sizeof(e_l), e_l,
+			sizeof(md_l), md_l));
+		ISPURGED_L((3, sizeof(a_l), a_l,
+			sizeof(e_l), e_l,
+			sizeof(md_l), md_l));
+		return E_CLINT_MAL;
+	}
 
-  aptr_l[1] = a_l;
-  SETZERO_L (r_l);
-  logB_r = DIGITS_L (md_l);
-  setbit_l (r_l, logB_r << LDBITPERDGT);
-  if (DIGITS_L (r_l) > CLINTMAXDIGIT)
-    {
-      mod_l (r_l, md_l, r_l);
-    }
+	aptr_l[1] = a_l;
+	SETZERO_L(r_l);
+	logB_r = DIGITS_L(md_l);
+	setbit_l(r_l, logB_r << LDBITPERDGT);
+	if (DIGITS_L(r_l) > CLINTMAXDIGIT)
+	{
+		mod_l(r_l, md_l, r_l);
+	}
 
-  mprime = invmon_l (md_l);
+	mprime = invmon_l(md_l);
 
 #ifdef FLINT_DEBUG
-  if (logB_r < CLINTMAXDIGIT)
-    {
-      xgcd_l (r_l, md_l, d_l, rmin1_l, &sign_rmin1, mprime_l, &sign_mprime);
-      if (sign_mprime > 0)
-      {
-        msub_l (r_l, mprime_l, mprime_l, r_l);
-      }
+	if (logB_r < CLINTMAXDIGIT)
+	{
+		xgcd_l(r_l, md_l, d_l, rmin1_l, &sign_rmin1, mprime_l, &sign_mprime);
+		if (sign_mprime > 0)
+		{
+			msub_l(r_l, mprime_l, mprime_l, r_l);
+		}
 
-      Assert(EQONE_L (d_l));
-      Assert(*LSDPTR_L (mprime_l) == mprime);
-    }
+		Assert(EQONE_L(d_l));
+		Assert(*LSDPTR_L(mprime_l) == mprime);
+	}
 #endif /* FLINT_DEBUG */
 
-  mmul_l (a_l, r_l, a_l, md_l);
+	mmul_l(a_l, r_l, a_l, md_l);
 
-  if (k > 1)
-    {
-      if ((ptr_l = (clint *)malloc (sizeof (CLINT) * ((pow2k >> 1) - 1))) == NULL)
-        {
-          free (aptr_l);
-          PURGEVARS_L ((3, sizeof (a_l), a_l,
-                           sizeof (e_l), e_l,
-                           sizeof (md_l), md_l));
-          ISPURGED_L  ((3, sizeof (a_l), a_l,
-                           sizeof (e_l), e_l,
-                           sizeof (md_l), md_l));
-          return E_CLINT_MAL;
-        }
+	if (k > 1)
+	{
+		if ((ptr_l = (clint *)malloc(sizeof(CLINT) * ((pow2k >> 1) - 1))) == NULL)
+		{
+			free(aptr_l);
+			PURGEVARS_L((3, sizeof(a_l), a_l,
+				sizeof(e_l), e_l,
+				sizeof(md_l), md_l));
+			ISPURGED_L((3, sizeof(a_l), a_l,
+				sizeof(e_l), e_l,
+				sizeof(md_l), md_l));
+			return E_CLINT_MAL;
+		}
 
-      aptr_l[2] = a2_l;
-      sqrmon_l (a_l, md_l, mprime, logB_r, aptr_l[2]);
+		aptr_l[2] = a2_l;
+		sqrmon_l(a_l, md_l, mprime, logB_r, aptr_l[2]);
 
-      for (aptr_l[3] = ptr_l, i = 5; i < (int)pow2k; i += 2)
-        {
-          aptr_l[i] = aptr_l[i - 2] + CLINTMAXSHORT;   /*lint !e661 !e662 */
-        }
+		for (aptr_l[3] = ptr_l, i = 5; i < (int)pow2k; i += 2)
+		{
+			aptr_l[i] = aptr_l[i - 2] + CLINTMAXSHORT;   /*lint !e661 !e662 */
+		}
 
-      for (i = 3; i < (int)pow2k; i += 2)
-        {
-          mulmon_l (aptr_l[2], aptr_l[i - 2], md_l, mprime, logB_r, aptr_l[i]);
-        }
-    }
+		for (i = 3; i < (int)pow2k; i += 2)
+		{
+			mulmon_l(aptr_l[2], aptr_l[i - 2], md_l, mprime, logB_r, aptr_l[i]);
+		}
+	}
 
-  *(MSDPTR_L (e_l) + 1) = 0;     /* 0 follows most significant digit of e_l */
+	*(MSDPTR_L(e_l) + 1) = 0;     /* 0 follows most significant digit of e_l */
 
-  noofdigits = (lge - 1)/k;                                    /*lint !e713 */
-  fk = noofdigits * k;                /* >>loss of precision<< not critical */
+	noofdigits = (lge - 1) / k;                                    /*lint !e713 */
+	fk = noofdigits * k;                /* >>loss of precision<< not critical */
 
-  word = (unsigned int)(fk >> LDBITPERDGT);        /* fk div 16 */
-  bit = (unsigned int)(fk & (BITPERDGT - 1UL));    /* fk mod 16 */
+	word = (unsigned int)(fk >> LDBITPERDGT);        /* fk div 16 */
+	bit = (unsigned int)(fk & (BITPERDGT - 1UL));    /* fk mod 16 */
 
-  switch (k)
-    {
-      case 1:
-      case 2:
-      case 4:
-      case 8:
-        digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
-        break;
-      default:
-        digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
-                                 << BITPERDGT)) >> bit) & k_mask;
-    }
+	switch (k)
+	{
+	case 1:
+	case 2:
+	case 4:
+	case 8:
+		digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
+		break;
+	default:
+		digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
+			<< BITPERDGT)) >> bit) & k_mask;
+	}
 
-  if (digit != 0)                  /* k-digit > 0 */
-    {
-      cpy_l (acc_l, aptr_l[oddtab[digit]]);
+	if (digit != 0)                  /* k-digit > 0 */
+	{
+		cpy_l(acc_l, aptr_l[oddtab[digit]]);
 
-      t = twotab[digit];
-      for (; t > 0; t--)
-        {
-          sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-        }
-    }
-  else
-    {
-      mod_l (r_l, md_l, acc_l);
-    }
+		t = twotab[digit];
+		for (; t > 0; t--)
+		{
+			sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+		}
+	}
+	else
+	{
+		mod_l(r_l, md_l, acc_l);
+	}
 
-  for (noofdigits--, fk -= k; noofdigits >= 0; noofdigits--, fk -= k)
-    {
-      word = (unsigned int)fk >> LDBITPERDGT;       /* fk div 16 */
-      bit = (unsigned int)fk & (BITPERDGT - 1UL);   /* fk mod 16 */
+	for (noofdigits--, fk -= k; noofdigits >= 0; noofdigits--, fk -= k)
+	{
+		word = (unsigned int)fk >> LDBITPERDGT;       /* fk div 16 */
+		bit = (unsigned int)fk & (BITPERDGT - 1UL);   /* fk mod 16 */
 
-      switch (k)
-        {
-          case 1:
-          case 2:
-          case 4:
-          case 8:
-            digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
-            break;
-          default:
-            digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
-                                     << BITPERDGT)) >> bit) & k_mask;
-        }
+		switch (k)
+		{
+		case 1:
+		case 2:
+		case 4:
+		case 8:
+			digit = ((ULONG)(e_l[word + 1]) >> bit) & k_mask;
+			break;
+		default:
+			digit = ((ULONG)(e_l[word + 1] | ((ULONG)e_l[word + 2]
+				<< BITPERDGT)) >> bit) & k_mask;
+		}
 
-      if (digit != 0)              /* k-digit > 0 */
-        {
-          t = twotab[digit];
+		if (digit != 0)              /* k-digit > 0 */
+		{
+			t = twotab[digit];
 
-          for (s = (int)(k - t); s > 0; s--)
-            {
-              sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-            }
+			for (s = (int)(k - t); s > 0; s--)
+			{
+				sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+			}
 
-          mulmon_l (acc_l, aptr_l[oddtab[digit]], md_l, mprime, logB_r, acc_l);
+			mulmon_l(acc_l, aptr_l[oddtab[digit]], md_l, mprime, logB_r, acc_l);
 
-          for (; t > 0; t--)
-            {
-              sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-            }
-        }
-      else                         /* k-digit == 0 */
-        {
-          for (s = (int)k; s > 0; s--)
-            {
-              sqrmon_l (acc_l, md_l, mprime, logB_r, acc_l);
-            }
-        }
-    }
+			for (; t > 0; t--)
+			{
+				sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+			}
+		}
+		else                         /* k-digit == 0 */
+		{
+			for (s = (int)k; s > 0; s--)
+			{
+				sqrmon_l(acc_l, md_l, mprime, logB_r, acc_l);
+			}
+		}
+	}
 
-  mulmon_l (acc_l, one_l, md_l, mprime, logB_r, p_l);
-
-#ifdef FLINT_SECURE
-  memset (aptr_l, 0, sizeof (clint *) * pow2k);
-#endif
-
-  free (aptr_l);
-  if (ptr_l != NULL)
-    {
+	mulmon_l(acc_l, one_l, md_l, mprime, logB_r, p_l);
 
 #ifdef FLINT_SECURE
-      memset (ptr_l, 0, sizeof (CLINT) * ((pow2k >> 1) - 1));   /*lint !e668*/
+	memset(aptr_l, 0, sizeof(clint *) * pow2k);
 #endif
 
-      free (ptr_l);                /*lint !e644 */
-    }
+	free(aptr_l);
+	if (ptr_l != NULL)
+	{
 
-  /* Purging of variables */
-  PURGEVARS_L ((14, sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (k), &k,
-                    sizeof (lge), &lge,
-                    sizeof (fk), &fk,
-                    sizeof (word), &word,
-                    sizeof (pow2k), &pow2k,
-                    sizeof (k_mask), &k_mask,
-                    sizeof (logB_r), &logB_r,
-                    sizeof (mprime), &mprime));
-  PURGEVARS_L ((6,  sizeof (a_l), a_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (e_l), e_l,
-                    sizeof (r_l), r_l,
-                    sizeof (acc_l), acc_l,
-                    sizeof (md_l), md_l));
+#ifdef FLINT_SECURE
+		memset(ptr_l, 0, sizeof(CLINT) * ((pow2k >> 1) - 1));   /*lint !e668*/
+#endif
 
-  ISPURGED_L  ((20, sizeof (i), &i,
-                    sizeof (noofdigits), &noofdigits,
-                    sizeof (s), &s,
-                    sizeof (t), &t,
-                    sizeof (bit), &bit,
-                    sizeof (digit), &digit,
-                    sizeof (k), &k,
-                    sizeof (lge), &lge,
-                    sizeof (fk), &fk,
-                    sizeof (word), &word,
-                    sizeof (pow2k), &pow2k,
-                    sizeof (k_mask), &k_mask,
-                    sizeof (logB_r), &logB_r,
-                    sizeof (mprime), &mprime,
-                    sizeof (a_l), a_l,
-                    sizeof (a2_l), a2_l,
-                    sizeof (e_l), e_l,
-                    sizeof (r_l), r_l,
-                    sizeof (acc_l), acc_l,
-                    sizeof (md_l), md_l));
+		free(ptr_l);                /*lint !e644 */
+	}
 
-  return E_CLINT_OK;
+	/* Purging of variables */
+	PURGEVARS_L((14, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(k), &k,
+		sizeof(lge), &lge,
+		sizeof(fk), &fk,
+		sizeof(word), &word,
+		sizeof(pow2k), &pow2k,
+		sizeof(k_mask), &k_mask,
+		sizeof(logB_r), &logB_r,
+		sizeof(mprime), &mprime));
+	PURGEVARS_L((6, sizeof(a_l), a_l,
+		sizeof(a2_l), a2_l,
+		sizeof(e_l), e_l,
+		sizeof(r_l), r_l,
+		sizeof(acc_l), acc_l,
+		sizeof(md_l), md_l));
+
+	ISPURGED_L((20, sizeof(i), &i,
+		sizeof(noofdigits), &noofdigits,
+		sizeof(s), &s,
+		sizeof(t), &t,
+		sizeof(bit), &bit,
+		sizeof(digit), &digit,
+		sizeof(k), &k,
+		sizeof(lge), &lge,
+		sizeof(fk), &fk,
+		sizeof(word), &word,
+		sizeof(pow2k), &pow2k,
+		sizeof(k_mask), &k_mask,
+		sizeof(logB_r), &logB_r,
+		sizeof(mprime), &mprime,
+		sizeof(a_l), a_l,
+		sizeof(a2_l), a2_l,
+		sizeof(e_l), e_l,
+		sizeof(r_l), r_l,
+		sizeof(acc_l), acc_l,
+		sizeof(md_l), md_l));
+
+	return E_CLINT_OK;
 }
 
 
@@ -2697,39 +2697,39 @@ mexpkm_l (CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-mexp2_l (CLINT a_l, USHORT k, CLINT p_l, CLINT m_l)
+mexp2_l(CLINT a_l, USHORT k, CLINT p_l, CLINT m_l)
 {
-  CLINT tmp_l;
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	CLINT tmp_l;
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (p_l);             /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(p_l);             /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  if (k > 0)
-    {
-      cpy_l (tmp_l, a_l);
-      while (k-- > 0)
-        {
-          msqr_l (tmp_l, tmp_l, m_l);
-        }
-      cpy_l (p_l, tmp_l);
-    }
-  else
-    {
-      mod_l (a_l, m_l, p_l);
-    }
+	if (k > 0)
+	{
+		cpy_l(tmp_l, a_l);
+		while (k-- > 0)
+		{
+			msqr_l(tmp_l, tmp_l, m_l);
+		}
+		cpy_l(p_l, tmp_l);
+	}
+	else
+	{
+		mod_l(a_l, m_l, p_l);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
-  ISPURGED_L  ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
+	ISPURGED_L((1, sizeof(tmp_l), tmp_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -2762,19 +2762,19 @@ mexp2_l (CLINT a_l, USHORT k, CLINT p_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-uadd_l (CLINT a_l, USHORT b, CLINT s_l)
+uadd_l(CLINT a_l, USHORT b, CLINT s_l)
 {
-  int err;
-  CLINT tmp_l;
+	int err;
+	CLINT tmp_l;
 
-  u2clint_l (tmp_l, b);
-  err = add_l (a_l, tmp_l, s_l);
+	u2clint_l(tmp_l, b);
+	err = add_l(a_l, tmp_l, s_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
-  ISPURGED_L  ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
+	ISPURGED_L((1, sizeof(tmp_l), tmp_l));
 
-  return err;
+	return err;
 }
 
 
@@ -2789,19 +2789,19 @@ uadd_l (CLINT a_l, USHORT b, CLINT s_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-umadd_l (CLINT a_l, USHORT b, CLINT s_l, CLINT m_l)
+umadd_l(CLINT a_l, USHORT b, CLINT s_l, CLINT m_l)
 {
-  int err;
-  CLINT tmp_l;
+	int err;
+	CLINT tmp_l;
 
-  u2clint_l (tmp_l, b);
-  err = madd_l (a_l, tmp_l, s_l, m_l);
+	u2clint_l(tmp_l, b);
+	err = madd_l(a_l, tmp_l, s_l, m_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
-  ISPURGED_L  ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
+	ISPURGED_L((1, sizeof(tmp_l), tmp_l));
 
-  return err;
+	return err;
 }
 
 
@@ -2816,19 +2816,19 @@ umadd_l (CLINT a_l, USHORT b, CLINT s_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-usub_l (CLINT a_l, USHORT b, CLINT d_l)
+usub_l(CLINT a_l, USHORT b, CLINT d_l)
 {
-  int err;
-  CLINT tmp_l;
+	int err;
+	CLINT tmp_l;
 
-  u2clint_l (tmp_l, b);
-  err = sub_l (a_l, tmp_l, d_l);
+	u2clint_l(tmp_l, b);
+	err = sub_l(a_l, tmp_l, d_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
-  ISPURGED_L  ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
+	ISPURGED_L((1, sizeof(tmp_l), tmp_l));
 
-  return err;
+	return err;
 }
 
 
@@ -2843,19 +2843,19 @@ usub_l (CLINT a_l, USHORT b, CLINT d_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-umsub_l (CLINT a_l, USHORT b, CLINT d_l, CLINT m_l)
+umsub_l(CLINT a_l, USHORT b, CLINT d_l, CLINT m_l)
 {
-  int err;
-  CLINT tmp_l;
+	int err;
+	CLINT tmp_l;
 
-  u2clint_l (tmp_l, b);
-  err = msub_l (a_l, tmp_l, d_l, m_l);
+	u2clint_l(tmp_l, b);
+	err = msub_l(a_l, tmp_l, d_l, m_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
-  ISPURGED_L  ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
+	ISPURGED_L((1, sizeof(tmp_l), tmp_l));
 
-  return err;
+	return err;
 }
 
 
@@ -2870,31 +2870,31 @@ umsub_l (CLINT a_l, USHORT b, CLINT d_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-umul_l (CLINT aa_l, USHORT b, CLINT pp_l)
+umul_l(CLINT aa_l, USHORT b, CLINT pp_l)
 {
-  CLINT a_l;
-  clint p_l[CLINTMAXSHORT + 1];
-  int OFL = 0;
+	CLINT a_l;
+	clint p_l[CLINTMAXSHORT + 1];
+	int OFL = 0;
 
-  cpy_l (a_l, aa_l);
+	cpy_l(a_l, aa_l);
 
-  umul (a_l, b, p_l);
+	umul(a_l, b, p_l);
 
-  if (DIGITS_L (p_l) > (USHORT)CLINTMAXDIGIT)        /* Overflow ? */
-    {
-      ANDMAX_L (p_l);                   /* Reduction modulo Nmax+1 */
-      OFL = E_CLINT_OFL;
-    }
+	if (DIGITS_L(p_l) > (USHORT)CLINTMAXDIGIT)        /* Overflow ? */
+	{
+		ANDMAX_L(p_l);                   /* Reduction modulo Nmax+1 */
+		OFL = E_CLINT_OFL;
+	}
 
-  cpy_l (pp_l, p_l);
+	cpy_l(pp_l, p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (a_l), a_l,
-                   sizeof (p_l), p_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(a_l), a_l,
+		sizeof(p_l), p_l));
 
-  ISPURGED_L  ((2, sizeof (a_l), a_l,
-                   sizeof (p_l), p_l));
-  return OFL;
+	ISPURGED_L((2, sizeof(a_l), a_l,
+		sizeof(p_l), p_l));
+	return OFL;
 }
 
 
@@ -2909,19 +2909,19 @@ umul_l (CLINT aa_l, USHORT b, CLINT pp_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-ummul_l (CLINT a_l, USHORT b, CLINT c_l, CLINT m_l)
+ummul_l(CLINT a_l, USHORT b, CLINT c_l, CLINT m_l)
 {
-  CLINTD tmp_l;
-  int err;
+	CLINTD tmp_l;
+	int err;
 
-  umul (a_l, b, tmp_l);
-  err = mod_l (tmp_l, m_l, c_l);
+	umul(a_l, b, tmp_l);
+	err = mod_l(tmp_l, m_l, c_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (tmp_l), tmp_l));
-  ISPURGED_L  ((1, sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(tmp_l), tmp_l));
+	ISPURGED_L((1, sizeof(tmp_l), tmp_l));
 
-  return err;
+	return err;
 }
 
 
@@ -2936,76 +2936,76 @@ ummul_l (CLINT a_l, USHORT b, CLINT c_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-wmexp_l (USHORT bas, CLINT  e_l, CLINT rem_l, CLINT m_l)
+wmexp_l(USHORT bas, CLINT  e_l, CLINT rem_l, CLINT m_l)
 {
-  CLINT p_l, z_l;
-  USHORT k, b, w;
+	CLINT p_l, z_l;
+	USHORT k, b, w;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (rem_l);           /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(rem_l);           /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  if (EQZ_L (e_l))
-    {
-      SETONE_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(e_l))
+	{
+		SETONE_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  if (0 == bas)
-    {
-      SETZERO_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (0 == bas)
+	{
+		SETZERO_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  cpy_l (z_l, e_l);
-  SETONE_L (p_l);
+	cpy_l(z_l, e_l);
+	SETONE_L(p_l);
 
-  b = 1 << ((ld_l (z_l) - 1) & (BITPERDGT - 1UL));
-  w = *MSDPTR_L (z_l);
+	b = 1 << ((ld_l(z_l) - 1) & (BITPERDGT - 1UL));
+	w = *MSDPTR_L(z_l);
 
-  for (; b > 0; b >>= 1)
-    {
-      msqr_l (p_l, p_l, m_l);
-      if ((w & b) > 0)
-        {
-          ummul_l (p_l, bas, p_l, m_l);
-        }
-    }
+	for (; b > 0; b >>= 1)
+	{
+		msqr_l(p_l, p_l, m_l);
+		if ((w & b) > 0)
+		{
+			ummul_l(p_l, bas, p_l, m_l);
+		}
+	}
 
-  for (k = DIGITS_L (z_l) - 1; k > 0; k--)
-    {
-      w = z_l[k];
-      for (b = BASEDIV2; b > 0; b >>= 1)
-        {
-          msqr_l (p_l, p_l, m_l);
-          if ((w & b) > 0)
-            {
-              ummul_l (p_l, bas, p_l, m_l);
-            }
-        }
-    }
+	for (k = DIGITS_L(z_l) - 1; k > 0; k--)
+	{
+		w = z_l[k];
+		for (b = BASEDIV2; b > 0; b >>= 1)
+		{
+			msqr_l(p_l, p_l, m_l);
+			if ((w & b) > 0)
+			{
+				ummul_l(p_l, bas, p_l, m_l);
+			}
+		}
+	}
 
-  cpy_l (rem_l, p_l);
+	cpy_l(rem_l, p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (b), &b,
-                   sizeof (w), &w,
-                   sizeof (p_l), p_l,
-                   sizeof (z_l), z_l));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(b), &b,
+		sizeof(w), &w,
+		sizeof(p_l), p_l,
+		sizeof(z_l), z_l));
 
-  ISPURGED_L  ((4, sizeof (b), &b,
-                   sizeof (w), &w,
-                   sizeof (p_l), p_l,
-                   sizeof (z_l), z_l));
+	ISPURGED_L((4, sizeof(b), &b,
+		sizeof(w), &w,
+		sizeof(p_l), p_l,
+		sizeof(z_l), z_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -3022,118 +3022,118 @@ wmexp_l (USHORT bas, CLINT  e_l, CLINT rem_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-wmexpm_l (USHORT bas, CLINT  e_l, CLINT rem_l, CLINT m_l)
+wmexpm_l(USHORT bas, CLINT  e_l, CLINT rem_l, CLINT m_l)
 {
-  CLINT p_l, z_l, md_l;
-  clint r_l[CLINTMAXSHORT + 1];
-  USHORT k, b, w, logB_r, mprime;
+	CLINT p_l, z_l, md_l;
+	clint r_l[CLINTMAXSHORT + 1];
+	USHORT k, b, w, logB_r, mprime;
 
 #ifdef FLINT_DEBUG
-  int sign_rmin1, sign_mprime;
-  CLINTD d_l, mprime_l, rmin1_l;
+	int sign_rmin1, sign_mprime;
+	CLINTD d_l, mprime_l, rmin1_l;
 #endif
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (ISEVEN_L (m_l))
-    {
-      return E_CLINT_MOD;          /* Modulus not odd */
-    }
+	if (ISEVEN_L(m_l))
+	{
+		return E_CLINT_MOD;          /* Modulus not odd */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (rem_l);           /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(rem_l);           /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  if (EQZ_L (e_l))
-    {
-      SETONE_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(e_l))
+	{
+		SETONE_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  if (0 == bas)
-    {
-      SETZERO_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (0 == bas)
+	{
+		SETZERO_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  cpy_l (md_l, m_l);
-  cpy_l (z_l, e_l);
+	cpy_l(md_l, m_l);
+	cpy_l(z_l, e_l);
 
-  SETZERO_L (r_l);
-  logB_r = DIGITS_L (md_l);
-  setbit_l (r_l, logB_r << LDBITPERDGT);
+	SETZERO_L(r_l);
+	logB_r = DIGITS_L(md_l);
+	setbit_l(r_l, logB_r << LDBITPERDGT);
 
-  mprime = invmon_l (md_l);
+	mprime = invmon_l(md_l);
 
 #ifdef FLINT_DEBUG
-  if (logB_r < CLINTMAXDIGIT)
-    {
-      xgcd_l (r_l, md_l, d_l, rmin1_l, &sign_rmin1, mprime_l, &sign_mprime);
-      if (sign_mprime > 0)
-        {
-          msub_l (r_l, mprime_l, mprime_l, r_l);
-        }
+	if (logB_r < CLINTMAXDIGIT)
+	{
+		xgcd_l(r_l, md_l, d_l, rmin1_l, &sign_rmin1, mprime_l, &sign_mprime);
+		if (sign_mprime > 0)
+		{
+			msub_l(r_l, mprime_l, mprime_l, r_l);
+		}
 
-      Assert(EQONE_L (d_l));
-      Assert(*LSDPTR_L (mprime_l) == mprime);
-    }
+		Assert(EQONE_L(d_l));
+		Assert(*LSDPTR_L(mprime_l) == mprime);
+	}
 #endif /* FLINT_DEBUG */
 
-  mod_l (r_l, md_l, p_l);
+	mod_l(r_l, md_l, p_l);
 
-  b = 1 << ((ld_l (z_l) - 1) & (BITPERDGT - 1UL));
-  w = *MSDPTR_L (z_l);
+	b = 1 << ((ld_l(z_l) - 1) & (BITPERDGT - 1UL));
+	w = *MSDPTR_L(z_l);
 
-  for (; b > 0; b >>= 1)
-    {
-      sqrmon_l (p_l, md_l, mprime, logB_r, p_l);
+	for (; b > 0; b >>= 1)
+	{
+		sqrmon_l(p_l, md_l, mprime, logB_r, p_l);
 
-      if ((w & b) > 0)
-        {
-          ummul_l (p_l, bas, p_l, md_l);
-        }
-    }
+		if ((w & b) > 0)
+		{
+			ummul_l(p_l, bas, p_l, md_l);
+		}
+	}
 
-  for (k = DIGITS_L (z_l) - 1; k > 0; k--)
-    {
-      w = z_l[k];
-      for (b = BASEDIV2; b > 0; b >>= 1)
-        {
-          sqrmon_l (p_l, md_l, mprime, logB_r, p_l);
-          if ((w & b) > 0)
-            {
-              ummul_l (p_l, bas, p_l, md_l);
-            }
-        }
-    }
+	for (k = DIGITS_L(z_l) - 1; k > 0; k--)
+	{
+		w = z_l[k];
+		for (b = BASEDIV2; b > 0; b >>= 1)
+		{
+			sqrmon_l(p_l, md_l, mprime, logB_r, p_l);
+			if ((w & b) > 0)
+			{
+				ummul_l(p_l, bas, p_l, md_l);
+			}
+		}
+	}
 
-  mulmon_l (p_l, one_l, md_l, mprime, logB_r, rem_l);
+	mulmon_l(p_l, one_l, md_l, mprime, logB_r, rem_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((8, sizeof (b), &b,
-                   sizeof (w), &w,
-                   sizeof (logB_r), &logB_r,
-                   sizeof (mprime), &mprime,
-                   sizeof (p_l), p_l,
-                   sizeof (z_l), z_l,
-                   sizeof (r_l), r_l,
-                   sizeof (md_l), md_l));
+	/* Purging of variables */
+	PURGEVARS_L((8, sizeof(b), &b,
+		sizeof(w), &w,
+		sizeof(logB_r), &logB_r,
+		sizeof(mprime), &mprime,
+		sizeof(p_l), p_l,
+		sizeof(z_l), z_l,
+		sizeof(r_l), r_l,
+		sizeof(md_l), md_l));
 
-  ISPURGED_L  ((8, sizeof (b), &b,
-                   sizeof (w), &w,
-                   sizeof (logB_r), &logB_r,
-                   sizeof (mprime), &mprime,
-                   sizeof (p_l), p_l,
-                   sizeof (z_l), z_l,
-                   sizeof (r_l), r_l,
-                   sizeof (md_l), md_l));
+	ISPURGED_L((8, sizeof(b), &b,
+		sizeof(w), &w,
+		sizeof(logB_r), &logB_r,
+		sizeof(mprime), &mprime,
+		sizeof(p_l), p_l,
+		sizeof(z_l), z_l,
+		sizeof(r_l), r_l,
+		sizeof(md_l), md_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -3149,64 +3149,64 @@ wmexpm_l (USHORT bas, CLINT  e_l, CLINT rem_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-umexp_l (CLINT bas_l, USHORT e, CLINT rem_l, CLINT m_l)
+umexp_l(CLINT bas_l, USHORT e, CLINT rem_l, CLINT m_l)
 {
-  CLINT tmp_l, tmpbas_l;
-  USHORT k = BASEDIV2;
-  int err = E_CLINT_OK;
+	CLINT tmp_l, tmpbas_l;
+	USHORT k = BASEDIV2;
+	int err = E_CLINT_OK;
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (rem_l);           /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(rem_l);           /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  if (e == 0)
-    {
-      SETONE_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (e == 0)
+	{
+		SETONE_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  if (EQZ_L (bas_l))
-    {
-      SETZERO_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(bas_l))
+	{
+		SETZERO_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  mod_l (bas_l, m_l, tmp_l);
-  cpy_l (tmpbas_l, tmp_l);
-  while ((e & k) == 0)
-    {
-      k >>= 1;
-    }
+	mod_l(bas_l, m_l, tmp_l);
+	cpy_l(tmpbas_l, tmp_l);
+	while ((e & k) == 0)
+	{
+		k >>= 1;
+	}
 
-  k >>= 1;
+	k >>= 1;
 
-  while (k != 0)
-    {
-      msqr_l (tmp_l, tmp_l, m_l);
-      if (e & k)
-        {
-          mmul_l (tmp_l, tmpbas_l, tmp_l, m_l);
-        }
-      k >>= 1;
-    }
+	while (k != 0)
+	{
+		msqr_l(tmp_l, tmp_l, m_l);
+		if (e & k)
+		{
+			mmul_l(tmp_l, tmpbas_l, tmp_l, m_l);
+		}
+		k >>= 1;
+	}
 
-  cpy_l (rem_l, tmp_l);
+	cpy_l(rem_l, tmp_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (tmp_l), tmp_l,
-                   sizeof (tmpbas_l), tmpbas_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(tmp_l), tmp_l,
+		sizeof(tmpbas_l), tmpbas_l));
 
-  ISPURGED_L  ((2, sizeof (tmp_l), tmp_l,
-                   sizeof (tmpbas_l), tmpbas_l));
+	ISPURGED_L((2, sizeof(tmp_l), tmp_l,
+		sizeof(tmpbas_l), tmpbas_l));
 
-  return err;
+	return err;
 }
 
 
@@ -3221,117 +3221,117 @@ umexp_l (CLINT bas_l, USHORT e, CLINT rem_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-umexpm_l (CLINT bas_l, USHORT e, CLINT rem_l, CLINT m_l)
+umexpm_l(CLINT bas_l, USHORT e, CLINT rem_l, CLINT m_l)
 {
-  CLINT a_l, p_l, md_l;
-  clint r_l[CLINTMAXSHORT + 1];
-  USHORT k, logB_r, mprime;
-  int err = E_CLINT_OK;
+	CLINT a_l, p_l, md_l;
+	clint r_l[CLINTMAXSHORT + 1];
+	USHORT k, logB_r, mprime;
+	int err = E_CLINT_OK;
 
 #ifdef FLINT_DEBUG
-  int sign_rmin1, sign_mprime;
-  CLINTD d_l, mprime_l, rmin1_l;
+	int sign_rmin1, sign_mprime;
+	CLINTD d_l, mprime_l, rmin1_l;
 #endif
 
-  if (EQZ_L (m_l))
-    {
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+	if (EQZ_L(m_l))
+	{
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (ISEVEN_L (m_l))
-    {
-      return E_CLINT_MOD;          /* Modulus not odd */
-    }
+	if (ISEVEN_L(m_l))
+	{
+		return E_CLINT_MOD;          /* Modulus not odd */
+	}
 
-  if (EQONE_L (m_l))
-    {
-      SETZERO_L (rem_l);           /* Modulus = 1 ==> Remainder = 0 */
-      return E_CLINT_OK;
-    }
+	if (EQONE_L(m_l))
+	{
+		SETZERO_L(rem_l);           /* Modulus = 1 ==> Remainder = 0 */
+		return E_CLINT_OK;
+	}
 
-  if (e == 0)
-    {
-      SETONE_L (rem_l);
-      return E_CLINT_OK;
-    }
+	if (e == 0)
+	{
+		SETONE_L(rem_l);
+		return E_CLINT_OK;
+	}
 
-  if (EQZ_L (bas_l))
-    {
-      cpy_l (rem_l, bas_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(bas_l))
+	{
+		cpy_l(rem_l, bas_l);
+		return E_CLINT_OK;
+	}
 
-  if (DIGITS_L (bas_l) > (USHORT)CLINTMAXDIGIT)
-    {
-      err = E_CLINT_OFL;
-    }
+	if (DIGITS_L(bas_l) > (USHORT)CLINTMAXDIGIT)
+	{
+		err = E_CLINT_OFL;
+	}
 
-  cpy_l (md_l, m_l);
+	cpy_l(md_l, m_l);
 
-  SETZERO_L (r_l);
-  logB_r = DIGITS_L (md_l);
-  setbit_l (r_l, logB_r << LDBITPERDGT);
-  if (DIGITS_L (r_l) > CLINTMAXDIGIT)
-    {
-      mod_l (r_l, md_l, r_l);
-    }
+	SETZERO_L(r_l);
+	logB_r = DIGITS_L(md_l);
+	setbit_l(r_l, logB_r << LDBITPERDGT);
+	if (DIGITS_L(r_l) > CLINTMAXDIGIT)
+	{
+		mod_l(r_l, md_l, r_l);
+	}
 
-  mprime = invmon_l (md_l);
+	mprime = invmon_l(md_l);
 
 #ifdef FLINT_DEBUG
-  if (logB_r < CLINTMAXDIGIT)
-    {
-      xgcd_l (r_l, md_l, d_l, rmin1_l, &sign_rmin1, mprime_l, &sign_mprime);
-      if (sign_mprime > 0)
-       {
-          msub_l (r_l, mprime_l, mprime_l, r_l);
-        }
+	if (logB_r < CLINTMAXDIGIT)
+	{
+		xgcd_l(r_l, md_l, d_l, rmin1_l, &sign_rmin1, mprime_l, &sign_mprime);
+		if (sign_mprime > 0)
+		{
+			msub_l(r_l, mprime_l, mprime_l, r_l);
+		}
 
-      Assert(EQONE_L (d_l));
-      Assert(*LSDPTR_L (mprime_l) == mprime);
-    }
+		Assert(EQONE_L(d_l));
+		Assert(*LSDPTR_L(mprime_l) == mprime);
+	}
 #endif /* FLINT_DEBUG */
 
-  mmul_l (bas_l, r_l, p_l, md_l);
-  cpy_l (a_l, p_l);
+	mmul_l(bas_l, r_l, p_l, md_l);
+	cpy_l(a_l, p_l);
 
-  k = BASEDIV2;
+	k = BASEDIV2;
 
-  while ((e & k) == 0)
-    {
-      k >>= 1;
-    }
+	while ((e & k) == 0)
+	{
+		k >>= 1;
+	}
 
-  k >>= 1;
+	k >>= 1;
 
-  while (k != 0)
-    {
-      sqrmon_l (p_l, md_l, mprime, logB_r, p_l);
+	while (k != 0)
+	{
+		sqrmon_l(p_l, md_l, mprime, logB_r, p_l);
 
-      if (e & k)
-        {
-          mulmon_l (p_l, a_l, md_l, mprime, logB_r, p_l);
-        }
+		if (e & k)
+		{
+			mulmon_l(p_l, a_l, md_l, mprime, logB_r, p_l);
+		}
 
-      k >>= 1;
-    }
+		k >>= 1;
+	}
 
-  mulmon_l (p_l, one_l, md_l, mprime, logB_r, rem_l);
+	mulmon_l(p_l, one_l, md_l, mprime, logB_r, rem_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((5, sizeof (logB_r), &logB_r,
-                   sizeof (mprime), &mprime,
-                   sizeof (a_l), a_l,
-                   sizeof (p_l), p_l,
-                   sizeof (md_l), md_l));
+	/* Purging of variables */
+	PURGEVARS_L((5, sizeof(logB_r), &logB_r,
+		sizeof(mprime), &mprime,
+		sizeof(a_l), a_l,
+		sizeof(p_l), p_l,
+		sizeof(md_l), md_l));
 
-  ISPURGED_L  ((5, sizeof (logB_r), &logB_r,
-                   sizeof (mprime), &mprime,
-                   sizeof (a_l), a_l,
-                   sizeof (p_l), p_l,
-                   sizeof (md_l), md_l));
+	ISPURGED_L((5, sizeof(logB_r), &logB_r,
+		sizeof(mprime), &mprime,
+		sizeof(a_l), a_l,
+		sizeof(p_l), p_l,
+		sizeof(md_l), md_l));
 
-  return err;
+	return err;
 }
 
 
@@ -3346,87 +3346,87 @@ umexpm_l (CLINT bas_l, USHORT e, CLINT rem_l, CLINT m_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-udiv_l (CLINT dv_l, USHORT uds, CLINT q_l, CLINT r_l)
+udiv_l(CLINT dv_l, USHORT uds, CLINT q_l, CLINT r_l)
 {
-  register clint *aptr_l;
-  CLINTD a_l;                      /* Allow for dividend of double length */
-  clint *qptr_l, *msdptra_l;
-  ULONG rhat;
-  USHORT rv;
+	register clint *aptr_l;
+	CLINTD a_l;                      /* Allow for dividend of double length */
+	clint *qptr_l, *msdptra_l;
+	ULONG rhat;
+	USHORT rv;
 
-  cpy_l (a_l, dv_l);
+	cpy_l(a_l, dv_l);
 
-  if (0 == uds)
-    {
-      PURGEVARS_L ((1, sizeof (a_l), a_l));
-      ISPURGED_L  ((1, sizeof (a_l), a_l));
+	if (0 == uds)
+	{
+		PURGEVARS_L((1, sizeof(a_l), a_l));
+		ISPURGED_L((1, sizeof(a_l), a_l));
 
-      return E_CLINT_DBZ;          /* Division by Zero */
-    }
+		return E_CLINT_DBZ;          /* Division by Zero */
+	}
 
-  if (EQZ_L (a_l))
-    {
-      SETZERO_L (q_l);
-      SETZERO_L (r_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(a_l))
+	{
+		SETZERO_L(q_l);
+		SETZERO_L(r_l);
+		return E_CLINT_OK;
+	}
 
-  if (1 == DIGITS_L (a_l))
-    {
-      if (*LSDPTR_L (a_l) < uds)
-        {
-          cpy_l (r_l, a_l);
-          SETZERO_L (q_l);
-        }
-      else if (*LSDPTR_L (a_l) == uds)
-        {
-          SETONE_L (q_l);
-          SETZERO_L (r_l);
-        }
-      else
-        {
-          u2clint_l (q_l, (USHORT)(*LSDPTR_L (a_l) / uds));
-          u2clint_l (r_l, (USHORT)(*LSDPTR_L (a_l) % uds));
-        }
+	if (1 == DIGITS_L(a_l))
+	{
+		if (*LSDPTR_L(a_l) < uds)
+		{
+			cpy_l(r_l, a_l);
+			SETZERO_L(q_l);
+		}
+		else if (*LSDPTR_L(a_l) == uds)
+		{
+			SETONE_L(q_l);
+			SETZERO_L(r_l);
+		}
+		else
+		{
+			u2clint_l(q_l, (USHORT)(*LSDPTR_L(a_l) / uds));
+			u2clint_l(r_l, (USHORT)(*LSDPTR_L(a_l) % uds));
+		}
 
-      PURGEVARS_L ((1, sizeof (a_l), a_l));
-      ISPURGED_L  ((1, sizeof (a_l), a_l));
+		PURGEVARS_L((1, sizeof(a_l), a_l));
+		ISPURGED_L((1, sizeof(a_l), a_l));
 
-      return E_CLINT_OK;
-    }
+		return E_CLINT_OK;
+	}
 
-  msdptra_l = MSDPTR_L (a_l);
+	msdptra_l = MSDPTR_L(a_l);
 
-  rv = 0;
-  for (aptr_l = msdptra_l, qptr_l = q_l + DIGITS_L (a_l); aptr_l >= LSDPTR_L (a_l); aptr_l--, qptr_l--)
-    {
-      *qptr_l = (USHORT)((rhat = ((((ULONG)rv) << BITPERDGT) +
-                                          (ULONG)*aptr_l)) / uds);
-      rv = (USHORT)(rhat - (ULONG)uds * (ULONG)*qptr_l);
-    }
-  SETDIGITS_L (q_l, DIGITS_L (a_l));
+	rv = 0;
+	for (aptr_l = msdptra_l, qptr_l = q_l + DIGITS_L(a_l); aptr_l >= LSDPTR_L(a_l); aptr_l--, qptr_l--)
+	{
+		*qptr_l = (USHORT)((rhat = ((((ULONG)rv) << BITPERDGT) +
+			(ULONG)*aptr_l)) / uds);
+		rv = (USHORT)(rhat - (ULONG)uds * (ULONG)*qptr_l);
+	}
+	SETDIGITS_L(q_l, DIGITS_L(a_l));
 
-  RMLDZRS_L (q_l);
+	RMLDZRS_L(q_l);
 
-  if (rv == 0)
-    {
-      SETZERO_L (r_l);
-    }
-  else
-    {
-      u2clint_l (r_l, rv);
-    }
+	if (rv == 0)
+	{
+		SETZERO_L(r_l);
+	}
+	else
+	{
+		u2clint_l(r_l, rv);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (rhat), &rhat,
-                   sizeof (rv), &rv,
-                   sizeof (a_l), a_l));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(rhat), &rhat,
+		sizeof(rv), &rv,
+		sizeof(a_l), a_l));
 
-  ISPURGED_L  ((3, sizeof (rhat), &rhat,
-                   sizeof (rv), &rv,
-                   sizeof (a_l), a_l));
+	ISPURGED_L((3, sizeof(rhat), &rhat,
+		sizeof(rv), &rv,
+		sizeof(a_l), a_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -3441,34 +3441,34 @@ udiv_l (CLINT dv_l, USHORT uds, CLINT q_l, CLINT r_l)
 /*                                                                            */
 /******************************************************************************/
 USHORT __FLINT_API
-umod_l (CLINT dv_l, USHORT uds)
+umod_l(CLINT dv_l, USHORT uds)
 {
-  CLINT q_l, r_l;
-  USHORT rem;
+	CLINT q_l, r_l;
+	USHORT rem;
 
-  if (0 == uds)
-    {
-      return 0xffff;
-    }
+	if (0 == uds)
+	{
+		return 0xffff;
+	}
 
-  udiv_l (dv_l, uds, q_l, r_l);
-  switch (DIGITS_L (r_l))
-    {
-      case 1:
-         rem = *LSDPTR_L (r_l);
-        break;
-      default:
-        rem = 0;
-    }
+	udiv_l(dv_l, uds, q_l, r_l);
+	switch (DIGITS_L(r_l))
+	{
+	case 1:
+		rem = *LSDPTR_L(r_l);
+		break;
+	default:
+		rem = 0;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (q_l), q_l,
-                   sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(q_l), q_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((2, sizeof (q_l), q_l,
-                   sizeof (r_l), r_l));
+	ISPURGED_L((2, sizeof(q_l), q_l,
+		sizeof(r_l), r_l));
 
-  return rem;
+	return rem;
 }
 
 /*** Mixed functions finished here ********************************************/
@@ -3485,36 +3485,36 @@ umod_l (CLINT dv_l, USHORT uds)
 /*                                                                            */
 /******************************************************************************/
 unsigned int __FLINT_API
-ld_l (CLINT n_l)
+ld_l(CLINT n_l)
 {
-  unsigned int l;
-  USHORT test;
+	unsigned int l;
+	USHORT test;
 
-  l = (unsigned int)DIGITS_L (n_l);
-  while (n_l[l] == 0 && l > 0)
-    {
-      --l;
-    }
+	l = (unsigned int)DIGITS_L(n_l);
+	while (n_l[l] == 0 && l > 0)
+	{
+		--l;
+	}
 
-  if (l == 0)
-    {
-      return 0;
-    }
+	if (l == 0)
+	{
+		return 0;
+	}
 
-  test = n_l[l];
-  l <<= LDBITPERDGT;
+	test = n_l[l];
+	l <<= LDBITPERDGT;
 
-  while ((test & BASEDIV2) == 0)
-    {
-      test <<= 1;
-      --l;
-    }
+	while ((test & BASEDIV2) == 0)
+	{
+		test <<= 1;
+		--l;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (test), &test));
-  ISPURGED_L  ((1, sizeof (test), &test));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(test), &test));
+	ISPURGED_L((1, sizeof(test), &test));
 
-  return l;
+	return l;
 }
 
 
@@ -3531,52 +3531,52 @@ ld_l (CLINT n_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-setbit_l (CLINT a_l, unsigned int pos)
+setbit_l(CLINT a_l, unsigned int pos)
 {
-  int res = 0;
-  unsigned int i;
-  USHORT shortpos = (USHORT)(pos >> LDBITPERDGT);
-  USHORT bitpos = (USHORT)(pos & (BITPERDGT - 1));
-  USHORT m = (USHORT)(1U << bitpos);
+	int res = 0;
+	unsigned int i;
+	USHORT shortpos = (USHORT)(pos >> LDBITPERDGT);
+	USHORT bitpos = (USHORT)(pos & (BITPERDGT - 1));
+	USHORT m = (USHORT)(1U << bitpos);
 
-  if (pos > CLINTMAXBIT)
-    {
-      return E_CLINT_OFL;
-    }
+	if (pos > CLINTMAXBIT)
+	{
+		return E_CLINT_OFL;
+	}
 
-  if (shortpos >= DIGITS_L (a_l))
-    {
-      /* Fill up with 0 to the requested bitposition */
-      for (i = DIGITS_L (a_l) + 1; i <= shortpos + 1U; i++)
-        {
-          a_l[i] = 0;
-        }
+	if (shortpos >= DIGITS_L(a_l))
+	{
+		/* Fill up with 0 to the requested bitposition */
+		for (i = DIGITS_L(a_l) + 1; i <= shortpos + 1U; i++)
+		{
+			a_l[i] = 0;
+		}
 
-      /* Set new length */
-      SETDIGITS_L (a_l, shortpos + 1);
-    }
+		/* Set new length */
+		SETDIGITS_L(a_l, shortpos + 1);
+	}
 
-  /* Test bit */
-  if (a_l[shortpos + 1] & m)
-    {
-      res = 1;
-    }
+	/* Test bit */
+	if (a_l[shortpos + 1] & m)
+	{
+		res = 1;
+	}
 
-  /* Set bit */
-  a_l[shortpos + 1] |= m;
+	/* Set bit */
+	a_l[shortpos + 1] |= m;
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (i), &i,
-                   sizeof (shortpos), &shortpos,
-                   sizeof (bitpos), &bitpos,
-                   sizeof (m), &m));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(i), &i,
+		sizeof(shortpos), &shortpos,
+		sizeof(bitpos), &bitpos,
+		sizeof(m), &m));
 
-  ISPURGED_L  ((4, sizeof (i), &i,
-                   sizeof (shortpos), &shortpos,
-                   sizeof (bitpos), &bitpos,
-                   sizeof (m), &m));
+	ISPURGED_L((4, sizeof(i), &i,
+		sizeof(shortpos), &shortpos,
+		sizeof(bitpos), &bitpos,
+		sizeof(m), &m));
 
-  return res;
+	return res;
 }
 
 
@@ -3592,27 +3592,27 @@ setbit_l (CLINT a_l, unsigned int pos)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-testbit_l (CLINT a_l, unsigned int pos)
+testbit_l(CLINT a_l, unsigned int pos)
 {
-  int res = 0;
-  USHORT shortpos = (USHORT)(pos >> LDBITPERDGT);
-  USHORT bitpos = (USHORT)(pos & (BITPERDGT - 1));
-  if (shortpos < DIGITS_L (a_l))
-    {
-      if (a_l[shortpos + 1] & (USHORT)(1U << bitpos))
-        {
-          res = 1;
-        }
-    }
+	int res = 0;
+	USHORT shortpos = (USHORT)(pos >> LDBITPERDGT);
+	USHORT bitpos = (USHORT)(pos & (BITPERDGT - 1));
+	if (shortpos < DIGITS_L(a_l))
+	{
+		if (a_l[shortpos + 1] & (USHORT)(1U << bitpos))
+		{
+			res = 1;
+		}
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (shortpos), &shortpos,
-                   sizeof (bitpos), &bitpos));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(shortpos), &shortpos,
+		sizeof(bitpos), &bitpos));
 
-  ISPURGED_L  ((2, sizeof (shortpos), &shortpos,
-                   sizeof (bitpos), &bitpos));
+	ISPURGED_L((2, sizeof(shortpos), &shortpos,
+		sizeof(bitpos), &bitpos));
 
-  return res;
+	return res;
 }
 
 
@@ -3628,33 +3628,33 @@ testbit_l (CLINT a_l, unsigned int pos)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-clearbit_l (CLINT a_l, unsigned int pos)
+clearbit_l(CLINT a_l, unsigned int pos)
 {
-  int res = 0;
-  USHORT shortpos = (USHORT)(pos >> LDBITPERDGT);
-  USHORT bitpos = (USHORT)(pos & (BITPERDGT - 1));
-  USHORT m = (USHORT)(1U << bitpos);
+	int res = 0;
+	USHORT shortpos = (USHORT)(pos >> LDBITPERDGT);
+	USHORT bitpos = (USHORT)(pos & (BITPERDGT - 1));
+	USHORT m = (USHORT)(1U << bitpos);
 
-  if (shortpos < DIGITS_L (a_l))
-    {
-      if (a_l[shortpos + 1] & m)
-        {
-          res = 1;
-        }
-      a_l[shortpos + 1] &= (USHORT)(~m);
-      RMLDZRS_L (a_l);
-    }
+	if (shortpos < DIGITS_L(a_l))
+	{
+		if (a_l[shortpos + 1] & m)
+		{
+			res = 1;
+		}
+		a_l[shortpos + 1] &= (USHORT)(~m);
+		RMLDZRS_L(a_l);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((3, sizeof (shortpos), &shortpos,
-                   sizeof (bitpos), &bitpos,
-                   sizeof (m), &m));
+	/* Purging of variables */
+	PURGEVARS_L((3, sizeof(shortpos), &shortpos,
+		sizeof(bitpos), &bitpos,
+		sizeof(m), &m));
 
-  ISPURGED_L  ((3, sizeof (shortpos), &shortpos,
-                   sizeof (bitpos), &bitpos,
-                   sizeof (m), &m));
+	ISPURGED_L((3, sizeof(shortpos), &shortpos,
+		sizeof(bitpos), &bitpos,
+		sizeof(m), &m));
 
-  return res;
+	return res;
 }
 
 
@@ -3668,47 +3668,47 @@ clearbit_l (CLINT a_l, unsigned int pos)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-xor_l (CLINT a_l, CLINT b_l, CLINT c_l)
+xor_l(CLINT a_l, CLINT b_l, CLINT c_l)
 {
-  CLINT d_l;
-  clint *r_l, *s_l, *t_l;
-  clint *msdptrr_l;
-  clint *msdptrs_l;
+	CLINT d_l;
+	clint *r_l, *s_l, *t_l;
+	clint *msdptrr_l;
+	clint *msdptrs_l;
 
-  if (DIGITS_L (a_l) < DIGITS_L (b_l))
-    {
-      r_l = LSDPTR_L (b_l);
-      s_l = LSDPTR_L (a_l);
-      msdptrr_l = MSDPTR_L (b_l);
-      msdptrs_l = MSDPTR_L (a_l);
-    }
-  else
-    {
-      r_l = LSDPTR_L (a_l);
-      s_l = LSDPTR_L (b_l);
-      msdptrr_l = MSDPTR_L (a_l);
-      msdptrs_l = MSDPTR_L (b_l);
-    }
+	if (DIGITS_L(a_l) < DIGITS_L(b_l))
+	{
+		r_l = LSDPTR_L(b_l);
+		s_l = LSDPTR_L(a_l);
+		msdptrr_l = MSDPTR_L(b_l);
+		msdptrs_l = MSDPTR_L(a_l);
+	}
+	else
+	{
+		r_l = LSDPTR_L(a_l);
+		s_l = LSDPTR_L(b_l);
+		msdptrr_l = MSDPTR_L(a_l);
+		msdptrs_l = MSDPTR_L(b_l);
+	}
 
-  t_l = LSDPTR_L (d_l);
-  SETDIGITS_L (d_l, DIGITS_L (r_l - 1));
+	t_l = LSDPTR_L(d_l);
+	SETDIGITS_L(d_l, DIGITS_L(r_l - 1));
 
-  while (s_l <= msdptrs_l)
-    {
-      *t_l++ = *r_l++ ^ *s_l++;
-    }
+	while (s_l <= msdptrs_l)
+	{
+		*t_l++ = *r_l++ ^ *s_l++;
+	}
 
-  while (r_l <= msdptrr_l)
-    {
-      *t_l++ = *r_l++;
-    }
+	while (r_l <= msdptrr_l)
+	{
+		*t_l++ = *r_l++;
+	}
 
-  cpy_l (c_l, d_l);
+	cpy_l(c_l, d_l);
 
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (d_l), d_l));
-  ISPURGED_L  ((1, sizeof (d_l), d_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(d_l), d_l));
+	ISPURGED_L((1, sizeof(d_l), d_l));
 }
 
 
@@ -3722,46 +3722,46 @@ xor_l (CLINT a_l, CLINT b_l, CLINT c_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-or_l (CLINT a_l, CLINT b_l, CLINT c_l)
+or_l(CLINT a_l, CLINT b_l, CLINT c_l)
 {
-  CLINT d_l;
-  clint *r_l, *s_l, *t_l;
-  clint *msdptrr_l;
-  clint *msdptrs_l;
+	CLINT d_l;
+	clint *r_l, *s_l, *t_l;
+	clint *msdptrr_l;
+	clint *msdptrs_l;
 
-  if (DIGITS_L (a_l) < DIGITS_L (b_l))
-    {
-      r_l = LSDPTR_L (b_l);
-      s_l = LSDPTR_L (a_l);
-      msdptrr_l = MSDPTR_L (b_l);
-      msdptrs_l = MSDPTR_L (a_l);
-    }
-  else
-    {
-      r_l = LSDPTR_L (a_l);
-      s_l = LSDPTR_L (b_l);
-      msdptrr_l = MSDPTR_L (a_l);
-      msdptrs_l = MSDPTR_L (b_l);
-    }
+	if (DIGITS_L(a_l) < DIGITS_L(b_l))
+	{
+		r_l = LSDPTR_L(b_l);
+		s_l = LSDPTR_L(a_l);
+		msdptrr_l = MSDPTR_L(b_l);
+		msdptrs_l = MSDPTR_L(a_l);
+	}
+	else
+	{
+		r_l = LSDPTR_L(a_l);
+		s_l = LSDPTR_L(b_l);
+		msdptrr_l = MSDPTR_L(a_l);
+		msdptrs_l = MSDPTR_L(b_l);
+	}
 
-  t_l = LSDPTR_L (d_l);
-  SETDIGITS_L (d_l, DIGITS_L (r_l - 1));
+	t_l = LSDPTR_L(d_l);
+	SETDIGITS_L(d_l, DIGITS_L(r_l - 1));
 
-  while (s_l <= msdptrs_l)
-    {
-      *t_l++ = *r_l++ | *s_l++;
-    }
+	while (s_l <= msdptrs_l)
+	{
+		*t_l++ = *r_l++ | *s_l++;
+	}
 
-  while (r_l <= msdptrr_l)
-    {
-      *t_l++ = *r_l++;
-    }
+	while (r_l <= msdptrr_l)
+	{
+		*t_l++ = *r_l++;
+	}
 
-  cpy_l (c_l, d_l);
+	cpy_l(c_l, d_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (d_l), d_l));
-  ISPURGED_L  ((1, sizeof (d_l), d_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(d_l), d_l));
+	ISPURGED_L((1, sizeof(d_l), d_l));
 }
 
 
@@ -3775,38 +3775,38 @@ or_l (CLINT a_l, CLINT b_l, CLINT c_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-and_l (CLINT a_l, CLINT b_l, CLINT c_l)
+and_l(CLINT a_l, CLINT b_l, CLINT c_l)
 {
-  CLINT d_l;
-  clint *r_l, *s_l, *t_l;
-  clint *lastptr_l;
+	CLINT d_l;
+	clint *r_l, *s_l, *t_l;
+	clint *lastptr_l;
 
-  if (DIGITS_L (a_l) < DIGITS_L (b_l))
-    {
-      r_l = LSDPTR_L (b_l);
-      s_l = LSDPTR_L (a_l);
-      lastptr_l = MSDPTR_L (a_l);
-    }
-  else
-    {
-      r_l = LSDPTR_L (a_l);
-      s_l = LSDPTR_L (b_l);
-      lastptr_l = MSDPTR_L (b_l);
-    }
+	if (DIGITS_L(a_l) < DIGITS_L(b_l))
+	{
+		r_l = LSDPTR_L(b_l);
+		s_l = LSDPTR_L(a_l);
+		lastptr_l = MSDPTR_L(a_l);
+	}
+	else
+	{
+		r_l = LSDPTR_L(a_l);
+		s_l = LSDPTR_L(b_l);
+		lastptr_l = MSDPTR_L(b_l);
+	}
 
-  t_l = LSDPTR_L (d_l);
-  SETDIGITS_L (d_l, DIGITS_L (s_l - 1));
+	t_l = LSDPTR_L(d_l);
+	SETDIGITS_L(d_l, DIGITS_L(s_l - 1));
 
-  while (s_l <= lastptr_l)
-    {
-      *t_l++ = *r_l++ & *s_l++;
-    }
+	while (s_l <= lastptr_l)
+	{
+		*t_l++ = *r_l++ & *s_l++;
+	}
 
-  cpy_l (c_l, d_l);
+	cpy_l(c_l, d_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (d_l), d_l));
-  ISPURGED_L  ((1, sizeof (d_l), d_l));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(d_l), d_l));
+	ISPURGED_L((1, sizeof(d_l), d_l));
 }
 
 
@@ -3820,116 +3820,115 @@ and_l (CLINT a_l, CLINT b_l, CLINT c_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-gcd_l (CLINT aa_l, CLINT bb_l, CLINT cc_l)
+gcd_l(CLINT aa_l, CLINT bb_l, CLINT cc_l)
 {
-  CLINT a_l, b_l, r_l, t_l;
-  unsigned int k = 0;
-  int sign_of_t;
+	CLINT a_l, b_l, r_l, t_l;
+	unsigned int k = 0;
+	int sign_of_t;
 
-  /* Step 1 */
-  if (LT_L (aa_l, bb_l))
-    {
-      cpy_l (a_l, bb_l);
-      cpy_l (b_l, aa_l);
-    }
-  else
-    {
-      cpy_l (a_l, aa_l);
-      cpy_l (b_l, bb_l);
-    }
+	/* Step 1 */
+	if (LT_L(aa_l, bb_l))
+	{
+		cpy_l(a_l, bb_l);
+		cpy_l(b_l, aa_l);
+	}
+	else
+	{
+		cpy_l(a_l, aa_l);
+		cpy_l(b_l, bb_l);
+	}
 
-  if (EQZ_L (b_l))
-    {
-      cpy_l (cc_l, a_l);
+	if (EQZ_L(b_l))
+	{
+		cpy_l(cc_l, a_l);
 
-      PURGEVARS_L ((1, sizeof (a_l), a_l));
-      ISPURGED_L  ((1, sizeof (a_l), a_l));
+		PURGEVARS_L((1, sizeof(a_l), a_l));
+		ISPURGED_L((1, sizeof(a_l), a_l));
 
-      return;
-    }
+		return;
+	}
 
-  /* Step 2 */
-  div_l (a_l, b_l, t_l, r_l);
-  cpy_l (a_l, b_l);
-  cpy_l (b_l, r_l);
+	/* Step 2 */
+	div_l(a_l, b_l, t_l, r_l);
+	cpy_l(a_l, b_l);
+	cpy_l(b_l, r_l);
 
-  if (EQZ_L (b_l))
-    {
-      cpy_l (cc_l, a_l);
+	if (EQZ_L(b_l))
+	{
+		cpy_l(cc_l, a_l);
 
-      k = sign_of_t = 0;
-      PURGEVARS_L ((3, sizeof (a_l), a_l,
-                       sizeof (t_l), t_l,
-                       sizeof (r_l), r_l));
+		k = sign_of_t = 0;
+		PURGEVARS_L((3, sizeof(a_l), a_l,
+			sizeof(t_l), t_l,
+			sizeof(r_l), r_l));
 
-      ISPURGED_L  ((3, sizeof (a_l), a_l,
-                       sizeof (t_l), t_l,
-                       sizeof (r_l), r_l));
-      return;
-    }
+		ISPURGED_L((3, sizeof(a_l), a_l,
+			sizeof(t_l), t_l,
+			sizeof(r_l), r_l));
+		return;
+	}
 
-  while (ISEVEN_L (a_l) && ISEVEN_L (b_l))
-    {
-      ++k;
-      shr_l (a_l);
-      shr_l (b_l);
-    }
+	while (ISEVEN_L(a_l) && ISEVEN_L(b_l))
+	{
+		++k;
+		shr_l(a_l);
+		shr_l(b_l);
+	}
 
-  /* Step 3 */
-  while (ISEVEN_L (a_l))
-    {
-      shr_l (a_l);
-    }
-  while (ISEVEN_L (b_l))
-    {
-      shr_l (b_l);
-    }
+	/* Step 3 */
+	while (ISEVEN_L(a_l))
+	{
+		shr_l(a_l);
+	}
+	while (ISEVEN_L(b_l))
+	{
+		shr_l(b_l);
+	}
 
-  /* Step 4 */
-  do
-    {
-      if (GE_L (a_l, b_l))
-        {
-          sub_l (a_l, b_l, t_l);
-          sign_of_t = 1;
-        }
-      else
-        {
-          sub_l (b_l, a_l, t_l);
-          sign_of_t = -1;
-        }
+	/* Step 4 */
+	do
+	{
+		if (GE_L(a_l, b_l))
+		{
+			sub_l(a_l, b_l, t_l);
+			sign_of_t = 1;
+		}
+		else
+		{
+			sub_l(b_l, a_l, t_l);
+			sign_of_t = -1;
+		}
 
-      if (EQZ_L (t_l))
-        {                                    /* finished */
-          cpy_l (cc_l, a_l);                 /* cc_l <- a */
-          shift_l (cc_l, (long int)k);       /* cc_l <- cc_l*2**k */
+		if (EQZ_L(t_l))
+		{                                    /* finished */
+			cpy_l(cc_l, a_l);                 /* cc_l <- a */
+			shift_l(cc_l, (long int)k);       /* cc_l <- cc_l*2**k */
 
-          PURGEVARS_L ((3, sizeof (a_l), a_l,
-                           sizeof (b_l), b_l,
-                           sizeof (r_l), r_l));
+			PURGEVARS_L((3, sizeof(a_l), a_l,
+				sizeof(b_l), b_l,
+				sizeof(r_l), r_l));
 
-          ISPURGED_L  ((3, sizeof (a_l), a_l,
-                           sizeof (b_l), b_l,
-                           sizeof (r_l), r_l));
-          return;
-        }
+			ISPURGED_L((3, sizeof(a_l), a_l,
+				sizeof(b_l), b_l,
+				sizeof(r_l), r_l));
+			return;
+		}
 
-      /* Step 5 */
-      while (ISEVEN_L (t_l))
-        {
-          shr_l (t_l);
-        }
+		/* Step 5 */
+		while (ISEVEN_L(t_l))
+		{
+			shr_l(t_l);
+		}
 
-      if (-1 == sign_of_t)
-        {
-          cpy_l (b_l, t_l);
-        }
-      else
-        {
-          cpy_l (a_l, t_l);
-        }
-    }
-  while (1);    /*lint !e506 Don't complain about >>constant value boolean<< */
+		if (-1 == sign_of_t)
+		{
+			cpy_l(b_l, t_l);
+		}
+		else
+		{
+			cpy_l(a_l, t_l);
+		}
+	} while (1);    /*lint !e506 Don't complain about >>constant value boolean<< */
 }
 
 
@@ -3948,85 +3947,85 @@ gcd_l (CLINT aa_l, CLINT bb_l, CLINT cc_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-xgcd_l (CLINT a_l, CLINT b_l, CLINT d_l, CLINT u_l, int *sign_u, CLINT v_l, int *sign_v)
+xgcd_l(CLINT a_l, CLINT b_l, CLINT d_l, CLINT u_l, int *sign_u, CLINT v_l, int *sign_v)
 {
-  CLINT v1_l, v3_l, t1_l, t3_l, q_l;
-  CLINTD tmp_l, tmpu_l, tmpv_l;
-  int sign_v1, sign_t1;
+	CLINT v1_l, v3_l, t1_l, t3_l, q_l;
+	CLINTD tmp_l, tmpu_l, tmpv_l;
+	int sign_v1, sign_t1;
 
-  cpy_l (d_l, a_l);
-  cpy_l (v3_l, b_l);
+	cpy_l(d_l, a_l);
+	cpy_l(v3_l, b_l);
 
-  if (EQZ_L (v3_l))                /* b_l == 0 ? */
-    {
-      SETONE_L (u_l);
-      SETZERO_L (v_l);
-      *sign_u = 1;
-      *sign_v = 1;
-      return;
-    }
+	if (EQZ_L(v3_l))                /* b_l == 0 ? */
+	{
+		SETONE_L(u_l);
+		SETZERO_L(v_l);
+		*sign_u = 1;
+		*sign_v = 1;
+		return;
+	}
 
-  SETONE_L (tmpu_l);
-  *sign_u = 1;
-  SETZERO_L (v1_l);
-  sign_v1 = 1;
+	SETONE_L(tmpu_l);
+	*sign_u = 1;
+	SETZERO_L(v1_l);
+	sign_v1 = 1;
 
-  while (GTZ_L (v3_l))
-    {
-      div_l (d_l, v3_l, q_l, t3_l);
-      mul_l (v1_l, q_l, q_l);
-      sign_t1 = ssub (tmpu_l, *sign_u, q_l, sign_v1, t1_l);
-      cpy_l (tmpu_l, v1_l);
-      *sign_u = sign_v1;
-      cpy_l (d_l, v3_l);
-      cpy_l (v1_l, t1_l);
-      sign_v1 = sign_t1;
-      cpy_l (v3_l, t3_l);
-    }
+	while (GTZ_L(v3_l))
+	{
+		div_l(d_l, v3_l, q_l, t3_l);
+		mul_l(v1_l, q_l, q_l);
+		sign_t1 = ssub(tmpu_l, *sign_u, q_l, sign_v1, t1_l);
+		cpy_l(tmpu_l, v1_l);
+		*sign_u = sign_v1;
+		cpy_l(d_l, v3_l);
+		cpy_l(v1_l, t1_l);
+		sign_v1 = sign_t1;
+		cpy_l(v3_l, t3_l);
+	}
 
-  mult (a_l, tmpu_l, tmp_l);
-  *sign_v = ssub (d_l, 1, tmp_l, *sign_u, tmp_l);
-  div_l (tmp_l, b_l, tmpv_l, tmp_l);
+	mult(a_l, tmpu_l, tmp_l);
+	*sign_v = ssub(d_l, 1, tmp_l, *sign_u, tmp_l);
+	div_l(tmp_l, b_l, tmpv_l, tmp_l);
 
-  Assert (EQZ_L (tmp_l));
+	Assert(EQZ_L(tmp_l));
 
 #ifdef FLINT_DEBUG
-  {
-    CLINTD x_l, y_l, z_l;
-    mult (a_l, tmpu_l, x_l);
-    mult (b_l, tmpv_l, y_l);
-    sadd (x_l, *sign_u, y_l, *sign_v, z_l);
-    Assert (equ_l (z_l, d_l));
-  }
+	{
+		CLINTD x_l, y_l, z_l;
+		mult(a_l, tmpu_l, x_l);
+		mult(b_l, tmpv_l, y_l);
+		sadd(x_l, *sign_u, y_l, *sign_v, z_l);
+		Assert(equ_l(z_l, d_l));
+	}
 #endif
 
-  cpy_l (u_l, tmpu_l);
-  cpy_l (v_l, tmpv_l);
+	cpy_l(u_l, tmpu_l);
+	cpy_l(v_l, tmpv_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((10, sizeof (sign_v1), &sign_v1,
-                    sizeof (sign_t1), &sign_t1,
-                    sizeof (v1_l), v1_l,
-                    sizeof (v3_l), v3_l,
-                    sizeof (t1_l), t1_l,
-                    sizeof (t3_l), t3_l,
-                    sizeof (q_l), q_l,
-                    sizeof (tmp_l), tmp_l,
-                    sizeof (tmpu_l), tmpu_l,
-                    sizeof (tmpv_l), tmpv_l));
+	/* Purging of variables */
+	PURGEVARS_L((10, sizeof(sign_v1), &sign_v1,
+		sizeof(sign_t1), &sign_t1,
+		sizeof(v1_l), v1_l,
+		sizeof(v3_l), v3_l,
+		sizeof(t1_l), t1_l,
+		sizeof(t3_l), t3_l,
+		sizeof(q_l), q_l,
+		sizeof(tmp_l), tmp_l,
+		sizeof(tmpu_l), tmpu_l,
+		sizeof(tmpv_l), tmpv_l));
 
-  ISPURGED_L  ((10, sizeof (sign_v1), &sign_v1,
-                    sizeof (sign_t1), &sign_t1,
-                    sizeof (v1_l), v1_l,
-                    sizeof (v3_l), v3_l,
-                    sizeof (t1_l), t1_l,
-                    sizeof (t3_l), t3_l,
-                    sizeof (q_l), q_l,
-                    sizeof (tmp_l), tmp_l,
-                    sizeof (tmpu_l), tmpu_l,
-                    sizeof (tmpv_l), tmpv_l));
+	ISPURGED_L((10, sizeof(sign_v1), &sign_v1,
+		sizeof(sign_t1), &sign_t1,
+		sizeof(v1_l), v1_l,
+		sizeof(v3_l), v3_l,
+		sizeof(t1_l), t1_l,
+		sizeof(t3_l), t3_l,
+		sizeof(q_l), q_l,
+		sizeof(tmp_l), tmp_l,
+		sizeof(tmpu_l), tmpu_l,
+		sizeof(tmpv_l), tmpv_l));
 
-  return;
+	return;
 }
 
 
@@ -4042,78 +4041,78 @@ xgcd_l (CLINT a_l, CLINT b_l, CLINT d_l, CLINT u_l, int *sign_u, CLINT v_l, int 
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-inv_l (CLINT a_l, CLINT n_l, CLINT g_l, CLINT i_l)
+inv_l(CLINT a_l, CLINT n_l, CLINT g_l, CLINT i_l)
 {
-  CLINT v1_l, v3_l, t1_l, t3_l, q_l;
+	CLINT v1_l, v3_l, t1_l, t3_l, q_l;
 
-  if (EQZ_L (a_l))
-    {
-      if (EQZ_L (n_l))
-        {
-          SETZERO_L (g_l);
-          SETZERO_L (i_l);
-          return;
-        }
-      else
-        {
-          cpy_l (g_l, n_l);
-          SETZERO_L (i_l);
-          return;
-        }
-    }
-  else
-    {
-      if (EQZ_L (n_l))
-        {
-          cpy_l (g_l, a_l);
-          SETZERO_L (i_l);
-          return;
-        }
-    }
+	if (EQZ_L(a_l))
+	{
+		if (EQZ_L(n_l))
+		{
+			SETZERO_L(g_l);
+			SETZERO_L(i_l);
+			return;
+		}
+		else
+		{
+			cpy_l(g_l, n_l);
+			SETZERO_L(i_l);
+			return;
+		}
+	}
+	else
+	{
+		if (EQZ_L(n_l))
+		{
+			cpy_l(g_l, a_l);
+			SETZERO_L(i_l);
+			return;
+		}
+	}
 
-  cpy_l (g_l, a_l);
-  cpy_l (v3_l, n_l);
-  SETZERO_L (v1_l);
-  SETONE_L (t1_l);
+	cpy_l(g_l, a_l);
+	cpy_l(v3_l, n_l);
+	SETZERO_L(v1_l);
+	SETONE_L(t1_l);
 
-  do
-    {
-      div_l (g_l, v3_l, q_l, t3_l);
+	do
+	{
+		div_l(g_l, v3_l, q_l, t3_l);
 
-      if (GTZ_L (t3_l))
-        {
-          mmul_l (v1_l, q_l, q_l, n_l);
-          msub_l (t1_l, q_l, q_l, n_l);
-          cpy_l (t1_l, v1_l);
-          cpy_l (v1_l, q_l);
-          cpy_l (g_l, v3_l);
-          cpy_l (v3_l, t3_l);
-        }
-    }
+		if (GTZ_L(t3_l))
+		{
+			mmul_l(v1_l, q_l, q_l, n_l);
+			msub_l(t1_l, q_l, q_l, n_l);
+			cpy_l(t1_l, v1_l);
+			cpy_l(v1_l, q_l);
+			cpy_l(g_l, v3_l);
+			cpy_l(v3_l, t3_l);
+		}
+	}
 
-  while (GTZ_L (t3_l));
-  cpy_l (g_l, v3_l);
-  if (EQONE_L (g_l))
-    {
-      cpy_l (i_l, v1_l);
-    }
-  else
-    {
-      SETZERO_L (i_l);
-    }
+	while (GTZ_L(t3_l));
+	cpy_l(g_l, v3_l);
+	if (EQONE_L(g_l))
+	{
+		cpy_l(i_l, v1_l);
+	}
+	else
+	{
+		SETZERO_L(i_l);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((5, sizeof (v1_l), v1_l,
-                   sizeof (v3_l), v3_l,
-                   sizeof (t1_l), t1_l,
-                   sizeof (t3_l), t3_l,
-                   sizeof (q_l), q_l));
+	/* Purging of variables */
+	PURGEVARS_L((5, sizeof(v1_l), v1_l,
+		sizeof(v3_l), v3_l,
+		sizeof(t1_l), t1_l,
+		sizeof(t3_l), t3_l,
+		sizeof(q_l), q_l));
 
-  ISPURGED_L  ((5, sizeof (v1_l), v1_l,
-                   sizeof (v3_l), v3_l,
-                   sizeof (t1_l), t1_l,
-                   sizeof (t3_l), t3_l,
-                   sizeof (q_l), q_l));
+	ISPURGED_L((5, sizeof(v1_l), v1_l,
+		sizeof(v3_l), v3_l,
+		sizeof(t1_l), t1_l,
+		sizeof(t3_l), t3_l,
+		sizeof(q_l), q_l));
 }
 
 
@@ -4128,29 +4127,29 @@ inv_l (CLINT a_l, CLINT n_l, CLINT g_l, CLINT i_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-lcm_l (CLINT a_l, CLINT b_l, CLINT c_l)
+lcm_l(CLINT a_l, CLINT b_l, CLINT c_l)
 {
-  CLINT g_l, junk_l;
-  int err;
+	CLINT g_l, junk_l;
+	int err;
 
-  if (EQZ_L (a_l) || EQZ_L (b_l))
-    {
-      SETZERO_L (c_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(a_l) || EQZ_L(b_l))
+	{
+		SETZERO_L(c_l);
+		return E_CLINT_OK;
+	}
 
-  gcd_l (a_l, b_l, g_l);
-  div_l (a_l, g_l, g_l, junk_l);
-  err = mul_l (g_l, b_l, c_l);
+	gcd_l(a_l, b_l, g_l);
+	div_l(a_l, g_l, g_l, junk_l);
+	err = mul_l(g_l, b_l, c_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (g_l), g_l,
-                   sizeof (junk_l), junk_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(g_l), g_l,
+		sizeof(junk_l), junk_l));
 
-  ISPURGED_L  ((2, sizeof (g_l), g_l,
-                   sizeof (junk_l), junk_l));
+	ISPURGED_L((2, sizeof(g_l), g_l,
+		sizeof(junk_l), junk_l));
 
-  return err;
+	return err;
 }
 
 
@@ -4164,64 +4163,64 @@ lcm_l (CLINT a_l, CLINT b_l, CLINT c_l)
 /*             0: else                                                        */
 /*                                                                            */
 /******************************************************************************/
-static const UCHAR q11[11]=
-  {1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0};
+static const UCHAR q11[11] =
+{ 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0 };
 
-static const UCHAR q63[63]=
-  {1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1,
-   0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-   0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0};
+static const UCHAR q63[63] =
+{ 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1,
+0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
 
-static const UCHAR q64[64]=
-  {1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-   0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-   0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0};
+static const UCHAR q64[64] =
+{ 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 
-static const UCHAR q65[65]=
-  {1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-   1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-   0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1};
+static const UCHAR q65[65] =
+{ 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1 };
 
 
 unsigned __FLINT_API
-issqr_l (CLINT n_l, CLINT r_l)
+issqr_l(CLINT n_l, CLINT r_l)
 {
-  CLINT q_l;
-  USHORT r;
+	CLINT q_l;
+	USHORT r;
 
-  if (EQZ_L (n_l))
-    {
-      SETZERO_L (r_l);
-      return 1;
-    }
+	if (EQZ_L(n_l))
+	{
+		SETZERO_L(r_l);
+		return 1;
+	}
 
-  if (1 == q64[*LSDPTR_L (n_l) & 63])      /* q64[n_l mod 64] */
-    {
-      r = umod_l (n_l, 45045);
+	if (1 == q64[*LSDPTR_L(n_l) & 63])      /* q64[n_l mod 64] */
+	{
+		r = umod_l(n_l, 45045);
 
-      if ((1 == q63[r % 63]) && (1 == q65[r % 65]) && (1 == q11[r % 11]))
-        {
-          iroot_l (n_l, r_l);
-          sqr_l (r_l, q_l);
+		if ((1 == q63[r % 63]) && (1 == q65[r % 65]) && (1 == q11[r % 11]))
+		{
+			iroot_l(n_l, r_l);
+			sqr_l(r_l, q_l);
 
-          if (equ_l (n_l, q_l))
-            {
-              PURGEVARS_L ((1, sizeof (q_l), q_l));
-              ISPURGED_L  ((1, sizeof (q_l), q_l));
+			if (equ_l(n_l, q_l))
+			{
+				PURGEVARS_L((1, sizeof(q_l), q_l));
+				ISPURGED_L((1, sizeof(q_l), q_l));
 
-              return 1;
-            }
-        }
-    }
+				return 1;
+			}
+		}
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (r), &r,
-                   sizeof (q_l), q_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(r), &r,
+		sizeof(q_l), q_l));
 
-  ISPURGED_L  ((2, sizeof (r), &r,
-                   sizeof (q_l), q_l));
+	ISPURGED_L((2, sizeof(r), &r,
+		sizeof(q_l), q_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -4235,45 +4234,45 @@ issqr_l (CLINT n_l, CLINT r_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-iroot_l (CLINT a_l, CLINT floor_l)
+iroot_l(CLINT a_l, CLINT floor_l)
 {
-  CLINT x_l, y_l, r_l;
-  unsigned l;
+	CLINT x_l, y_l, r_l;
+	unsigned l;
 
-  if (EQZ_L (a_l))
-    {
-      SETZERO_L (floor_l);
-      return;
-    }
+	if (EQZ_L(a_l))
+	{
+		SETZERO_L(floor_l);
+		return;
+	}
 
-  /* Step 1 */
-  l = (ld_l (a_l) + 1) >> 1;       /* (ld(a_l) + 2) div 2 */
-  SETZERO_L (y_l);
-  setbit_l (y_l, l);
+	/* Step 1 */
+	l = (ld_l(a_l) + 1) >> 1;       /* (ld(a_l) + 2) div 2 */
+	SETZERO_L(y_l);
+	setbit_l(y_l, l);
 
-  do
-    {
-      cpy_l (x_l, y_l);
-      /* Step 2 */
-      div_l (a_l, x_l, y_l, r_l);
-      add_l (y_l, x_l, y_l);
-      shr_l (y_l);
-    }
+	do
+	{
+		cpy_l(x_l, y_l);
+		/* Step 2 */
+		div_l(a_l, x_l, y_l, r_l);
+		add_l(y_l, x_l, y_l);
+		shr_l(y_l);
+	}
 
-  /* Step 3 */
-  while (LT_L (y_l, x_l));
-  cpy_l (floor_l, x_l);
+	/* Step 3 */
+	while (LT_L(y_l, x_l));
+	cpy_l(floor_l, x_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (l), &l,
-                   sizeof (x_l), x_l,
-                   sizeof (y_l), y_l,
-                   sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(l), &l,
+		sizeof(x_l), x_l,
+		sizeof(y_l), y_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((4, sizeof (l), &l,
-                   sizeof (x_l), x_l,
-                   sizeof (y_l), y_l,
-                   sizeof (r_l), r_l));
+	ISPURGED_L((4, sizeof(l), &l,
+		sizeof(x_l), x_l,
+		sizeof(y_l), y_l,
+		sizeof(r_l), r_l));
 }
 
 
@@ -4288,100 +4287,99 @@ iroot_l (CLINT a_l, CLINT floor_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-proot_l (CLINT a_l, CLINT p_l, CLINT x_l)
+proot_l(CLINT a_l, CLINT p_l, CLINT x_l)
 {
-  CLINT b_l, q_l, t_l, y_l, z_l;
-  int r, m;
+	CLINT b_l, q_l, t_l, y_l, z_l;
+	int r, m;
 
-  if (EQZ_L (p_l) || ISEVEN_L (p_l))
-    {
-      return -1;
-    }
+	if (EQZ_L(p_l) || ISEVEN_L(p_l))
+	{
+		return -1;
+	}
 
-  if (EQZ_L (a_l))
-    {
-      SETZERO_L (x_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(a_l))
+	{
+		SETZERO_L(x_l);
+		return E_CLINT_OK;
+	}
 
-  cpy_l (q_l, p_l);
-  dec_l (q_l);
-  r = twofact_l (q_l, q_l);
+	cpy_l(q_l, p_l);
+	dec_l(q_l);
+	r = twofact_l(q_l, q_l);
 
-  /* Step 1: Search for residual nonsquare */
-  cpy_l (z_l, two_l);
-  while (jacobi_l (z_l, p_l) == 1)
-    {
-      inc_l (z_l);
-    }
-  mexp_l (z_l, q_l, z_l, p_l);
+	/* Step 1: Search for residual nonsquare */
+	cpy_l(z_l, two_l);
+	while (jacobi_l(z_l, p_l) == 1)
+	{
+		inc_l(z_l);
+	}
+	mexp_l(z_l, q_l, z_l, p_l);
 
-  /* Step 2: Initialization */
-  cpy_l (y_l, z_l);
-  dec_l (q_l);
-  shr_l (q_l);                     /* q_l = (q - 1)/2 */
-  mexp_l (a_l, q_l, x_l, p_l);
-  msqr_l (x_l, b_l, p_l);
-  mmul_l (b_l, a_l, b_l, p_l);
-  mmul_l (x_l, a_l, x_l, p_l);
+	/* Step 2: Initialization */
+	cpy_l(y_l, z_l);
+	dec_l(q_l);
+	shr_l(q_l);                     /* q_l = (q - 1)/2 */
+	mexp_l(a_l, q_l, x_l, p_l);
+	msqr_l(x_l, b_l, p_l);
+	mmul_l(b_l, a_l, b_l, p_l);
+	mmul_l(x_l, a_l, x_l, p_l);
 
-  /* Step 3: Search exponent */
-  mod_l (b_l, p_l, q_l);
+	/* Step 3: Search exponent */
+	mod_l(b_l, p_l, q_l);
 
-  while (!equ_l (q_l, one_l))
-    {
-      m = 0;
-      do
-        {
-          ++m;
-          msqr_l (q_l, q_l, p_l);       /* q_l = b^(2^m) */
-        }
-      while (!equ_l (q_l, one_l));      /* m <= r */
+	while (!equ_l(q_l, one_l))
+	{
+		m = 0;
+		do
+		{
+			++m;
+			msqr_l(q_l, q_l, p_l);       /* q_l = b^(2^m) */
+		} while (!equ_l(q_l, one_l));      /* m <= r */
 
-      if (m == r)
-        {
-          PURGEVARS_L ((5, sizeof (b_l), b_l,
-                           sizeof (q_l), q_l,
-                           sizeof (t_l), t_l,
-                           sizeof (y_l), y_l,
-                           sizeof (z_l), z_l));
+		if (m == r)
+		{
+			PURGEVARS_L((5, sizeof(b_l), b_l,
+				sizeof(q_l), q_l,
+				sizeof(t_l), t_l,
+				sizeof(y_l), y_l,
+				sizeof(z_l), z_l));
 
-          ISPURGED_L  ((5, sizeof (b_l), b_l,
-                           sizeof (q_l), q_l,
-                           sizeof (t_l), t_l,
-                           sizeof (y_l), y_l,
-                           sizeof (z_l), z_l));
-          return -1;
-        }
+			ISPURGED_L((5, sizeof(b_l), b_l,
+				sizeof(q_l), q_l,
+				sizeof(t_l), t_l,
+				sizeof(y_l), y_l,
+				sizeof(z_l), z_l));
+			return -1;
+		}
 
-      /* Step 4: Reduction of Exponent */
+		/* Step 4: Reduction of Exponent */
 
-      mexp2_l (y_l, (USHORT)(r - m - 1), t_l, p_l);         /*lint !e732 */
-      msqr_l (t_l, y_l, p_l);    /* Don't complain about >>loss of sign<< */
-      mmul_l (x_l, t_l, x_l, p_l);
-      mmul_l (b_l, y_l, b_l, p_l);
-      cpy_l (q_l, b_l);
-      r = m;
-    }
+		mexp2_l(y_l, (USHORT)(r - m - 1), t_l, p_l);         /*lint !e732 */
+		msqr_l(t_l, y_l, p_l);    /* Don't complain about >>loss of sign<< */
+		mmul_l(x_l, t_l, x_l, p_l);
+		mmul_l(b_l, y_l, b_l, p_l);
+		cpy_l(q_l, b_l);
+		r = m;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((7, sizeof (r), &r,
-                   sizeof (m), &m,
-                   sizeof (b_l), b_l,
-                   sizeof (q_l), q_l,
-                   sizeof (t_l), t_l,
-                   sizeof (y_l), y_l,
-                   sizeof (z_l), z_l));
+	/* Purging of variables */
+	PURGEVARS_L((7, sizeof(r), &r,
+		sizeof(m), &m,
+		sizeof(b_l), b_l,
+		sizeof(q_l), q_l,
+		sizeof(t_l), t_l,
+		sizeof(y_l), y_l,
+		sizeof(z_l), z_l));
 
-  ISPURGED_L  ((7, sizeof (r), &r,
-                   sizeof (m), &m,
-                   sizeof (b_l), b_l,
-                   sizeof (q_l), q_l,
-                   sizeof (t_l), t_l,
-                   sizeof (y_l), y_l,
-                   sizeof (z_l), z_l));
+	ISPURGED_L((7, sizeof(r), &r,
+		sizeof(m), &m,
+		sizeof(b_l), b_l,
+		sizeof(q_l), q_l,
+		sizeof(t_l), t_l,
+		sizeof(y_l), y_l,
+		sizeof(z_l), z_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -4396,68 +4394,68 @@ proot_l (CLINT a_l, CLINT p_l, CLINT x_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-root_l (CLINT a_l, CLINT p_l, CLINT q_l, CLINT x_l)
+root_l(CLINT a_l, CLINT p_l, CLINT q_l, CLINT x_l)
 {
-  CLINT x0_l, x1_l, x2_l, x3_l, xp_l, xq_l, n_l;
-  CLINTD u_l, v_l;
-  clint *xptr_l;
-  int sign_u, sign_v;
+	CLINT x0_l, x1_l, x2_l, x3_l, xp_l, xq_l, n_l;
+	CLINTD u_l, v_l;
+	clint *xptr_l;
+	int sign_u, sign_v;
 
-  if (0 != proot_l (a_l, p_l, xp_l) || 0 != proot_l (a_l, q_l, xq_l))
-    {
-      return -1;
-    }
+	if (0 != proot_l(a_l, p_l, xp_l) || 0 != proot_l(a_l, q_l, xq_l))
+	{
+		return -1;
+	}
 
-  if (EQZ_L (a_l))
-    {
-      SETZERO_L (x_l);
-      return E_CLINT_OK;
-    }
+	if (EQZ_L(a_l))
+	{
+		SETZERO_L(x_l);
+		return E_CLINT_OK;
+	}
 
-  mul_l (p_l, q_l, n_l);
-  xgcd_l (p_l, q_l, x0_l, u_l, &sign_u, v_l, &sign_v);
-  mul_l (u_l, p_l, u_l);
-  mul_l (u_l, xq_l, u_l);
-  mul_l (v_l, q_l, v_l);
-  mul_l (v_l, xp_l, v_l);
-  sign_u = sadd (u_l, sign_u, v_l, sign_v, x0_l);
-  smod (x0_l, sign_u, n_l, x0_l);
+	mul_l(p_l, q_l, n_l);
+	xgcd_l(p_l, q_l, x0_l, u_l, &sign_u, v_l, &sign_v);
+	mul_l(u_l, p_l, u_l);
+	mul_l(u_l, xq_l, u_l);
+	mul_l(v_l, q_l, v_l);
+	mul_l(v_l, xp_l, v_l);
+	sign_u = sadd(u_l, sign_u, v_l, sign_v, x0_l);
+	smod(x0_l, sign_u, n_l, x0_l);
 
-  sub_l (n_l, x0_l, x1_l);
-  msub_l (u_l, v_l, x2_l, n_l);
-  sub_l (n_l, x2_l, x3_l);
+	sub_l(n_l, x0_l, x1_l);
+	msub_l(u_l, v_l, x2_l, n_l);
+	sub_l(n_l, x2_l, x3_l);
 
-  xptr_l = MIN_L (x0_l, x1_l);
-  xptr_l = MIN_L (xptr_l, x2_l);
-  xptr_l = MIN_L (xptr_l, x3_l);
-  cpy_l (x_l, xptr_l);
+	xptr_l = MIN_L(x0_l, x1_l);
+	xptr_l = MIN_L(xptr_l, x2_l);
+	xptr_l = MIN_L(xptr_l, x3_l);
+	cpy_l(x_l, xptr_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((11, sizeof (sign_u), &sign_u,
-                    sizeof (sign_v), &sign_v,
-                    sizeof (x0_l), x0_l,
-                    sizeof (x1_l), x1_l,
-                    sizeof (x2_l), x2_l,
-                    sizeof (x3_l), x3_l,
-                    sizeof (xp_l), xp_l,
-                    sizeof (xq_l), xq_l,
-                    sizeof (n_l), n_l,
-                    sizeof (u_l), u_l,
-                    sizeof (v_l), v_l));
+	/* Purging of variables */
+	PURGEVARS_L((11, sizeof(sign_u), &sign_u,
+		sizeof(sign_v), &sign_v,
+		sizeof(x0_l), x0_l,
+		sizeof(x1_l), x1_l,
+		sizeof(x2_l), x2_l,
+		sizeof(x3_l), x3_l,
+		sizeof(xp_l), xp_l,
+		sizeof(xq_l), xq_l,
+		sizeof(n_l), n_l,
+		sizeof(u_l), u_l,
+		sizeof(v_l), v_l));
 
-  ISPURGED_L  ((11, sizeof (sign_u), &sign_u,
-                    sizeof (sign_v), &sign_v,
-                    sizeof (x0_l), x0_l,
-                    sizeof (x1_l), x1_l,
-                    sizeof (x2_l), x2_l,
-                    sizeof (x3_l), x3_l,
-                    sizeof (xp_l), xp_l,
-                    sizeof (xq_l), xq_l,
-                    sizeof (n_l), n_l,
-                    sizeof (u_l), u_l,
-                    sizeof (v_l), v_l));
+	ISPURGED_L((11, sizeof(sign_u), &sign_u,
+		sizeof(sign_v), &sign_v,
+		sizeof(x0_l), x0_l,
+		sizeof(x1_l), x1_l,
+		sizeof(x2_l), x2_l,
+		sizeof(x3_l), x3_l,
+		sizeof(xp_l), xp_l,
+		sizeof(xq_l), xq_l,
+		sizeof(n_l), n_l,
+		sizeof(u_l), u_l,
+		sizeof(v_l), v_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -4477,56 +4475,55 @@ root_l (CLINT a_l, CLINT p_l, CLINT q_l, CLINT x_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-primroot_l (CLINT a_l, unsigned int noofprimes, clint *primes_l[])
+primroot_l(CLINT a_l, unsigned int noofprimes, clint *primes_l[])
 {
-  CLINT p_l, t_l, junk_l;
-  ULONG i;
+	CLINT p_l, t_l, junk_l;
+	ULONG i;
 
-  if (ISODD_L (primes_l[0])) 
-    {
-      return -1;
-    }
+	if (ISODD_L(primes_l[0]))
+	{
+		return -1;
+	}
 
-  cpy_l (p_l, primes_l[0]);
-  inc_l (p_l);               /* p_l = p  (Modulus) */
-  SETONE_L (a_l);
+	cpy_l(p_l, primes_l[0]);
+	inc_l(p_l);               /* p_l = p  (Modulus) */
+	SETONE_L(a_l);
 
-  do
-    {
-      inc_l (a_l);
+	do
+	{
+		inc_l(a_l);
 
-      /* Test, whether a_l is a square. */
-      /* If so, a_l can't be a primitive root and a_l is incremented */
-      if (issqr_l (a_l, t_l))
-        {
-          inc_l (a_l);
-        }
+		/* Test, whether a_l is a square. */
+		/* If so, a_l can't be a primitive root and a_l is incremented */
+		if (issqr_l(a_l, t_l))
+		{
+			inc_l(a_l);
+		}
 
-      i = 1;
+		i = 1;
 
-      do
-        {
-          div_l (primes_l[0], primes_l[i++], t_l, junk_l);  /* t_l <- n/pi */
-          mexpkm_l (a_l, t_l, t_l, p_l);
-        }
+		do
+		{
+			div_l(primes_l[0], primes_l[i++], t_l, junk_l);  /* t_l <- n/pi */
+			mexpkm_l(a_l, t_l, t_l, p_l);
+		}
 
-      while ((i <= noofprimes) && !EQONE_L (t_l));
+		while ((i <= noofprimes) && !EQONE_L(t_l));
 
-    }
-  while (EQONE_L (t_l));
+	} while (EQONE_L(t_l));
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (i), &i,
-                   sizeof (p_l), p_l,
-                   sizeof (t_l), t_l,
-                   sizeof (junk_l), junk_l));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(i), &i,
+		sizeof(p_l), p_l,
+		sizeof(t_l), t_l,
+		sizeof(junk_l), junk_l));
 
-  ISPURGED_L  ((4, sizeof (i), &i,
-                   sizeof (p_l), p_l,
-                   sizeof (t_l), t_l,
-                   sizeof (junk_l), junk_l));
+	ISPURGED_L((4, sizeof(i), &i,
+		sizeof(p_l), p_l,
+		sizeof(t_l), t_l,
+		sizeof(junk_l), junk_l));
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -4546,92 +4543,92 @@ primroot_l (CLINT a_l, unsigned int noofprimes, clint *primes_l[])
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-chinrem_l (unsigned int noofeq, clint** coeff_l, CLINT x_l)
+chinrem_l(unsigned int noofeq, clint** coeff_l, CLINT x_l)
 {
-  clint *ai_l, *mi_l;
+	clint *ai_l, *mi_l;
 
-  CLINT g_l, u_l, v_l, m_l;
-  unsigned int i;
-  int sign_u, sign_v, err, error = E_CLINT_OK;
-  if (0 == noofeq)
-    {
-      return 1;
-    }
+	CLINT g_l, u_l, v_l, m_l;
+	unsigned int i;
+	int sign_u, sign_v, err, error = E_CLINT_OK;
+	if (0 == noofeq)
+	{
+		return 1;
+	}
 
-  cpy_l (x_l, *(coeff_l++));
-  cpy_l (m_l, *(coeff_l++));
+	cpy_l(x_l, *(coeff_l++));
+	cpy_l(m_l, *(coeff_l++));
 
-  for (i = 1; i < noofeq; i++)
-    {
-      ai_l = *(coeff_l++);
-      mi_l = *(coeff_l++);
+	for (i = 1; i < noofeq; i++)
+	{
+		ai_l = *(coeff_l++);
+		mi_l = *(coeff_l++);
 
-      xgcd_l (m_l, mi_l, g_l, u_l, &sign_u, v_l, &sign_v);
+		xgcd_l(m_l, mi_l, g_l, u_l, &sign_u, v_l, &sign_v);
 
-      if (!EQONE_L (g_l))
-        {
-          PURGEVARS_L ((4, sizeof (g_l), g_l,
-                           sizeof (u_l), u_l,
-                           sizeof (v_l), v_l,
-                           sizeof (m_l), m_l));
+		if (!EQONE_L(g_l))
+		{
+			PURGEVARS_L((4, sizeof(g_l), g_l,
+				sizeof(u_l), u_l,
+				sizeof(v_l), v_l,
+				sizeof(m_l), m_l));
 
-          ISPURGED_L  ((4, sizeof (g_l), g_l,
-                           sizeof (u_l), u_l,
-                           sizeof (v_l), v_l,
-                           sizeof (m_l), m_l));
-          return 2;
-        }
+			ISPURGED_L((4, sizeof(g_l), g_l,
+				sizeof(u_l), u_l,
+				sizeof(v_l), v_l,
+				sizeof(m_l), m_l));
+			return 2;
+		}
 
-      err = mul_l (u_l, m_l, u_l);
-      if (E_CLINT_OK == error)
-        {
-          error = err;
-        }
-      err = mul_l (u_l, ai_l, u_l);
-      if (E_CLINT_OK == error)
-        {
-          error = err;
-        }
-      err = mul_l (v_l, mi_l, v_l);
-      if (E_CLINT_OK == error)
-        {
-          error = err;
-        }
-      err = mul_l (v_l, x_l, v_l);
-      if (E_CLINT_OK == error)
-        {
-          error = err;
-        }
+		err = mul_l(u_l, m_l, u_l);
+		if (E_CLINT_OK == error)
+		{
+			error = err;
+		}
+		err = mul_l(u_l, ai_l, u_l);
+		if (E_CLINT_OK == error)
+		{
+			error = err;
+		}
+		err = mul_l(v_l, mi_l, v_l);
+		if (E_CLINT_OK == error)
+		{
+			error = err;
+		}
+		err = mul_l(v_l, x_l, v_l);
+		if (E_CLINT_OK == error)
+		{
+			error = err;
+		}
 
-      sign_u = sadd (u_l, sign_u, v_l, sign_v, x_l);
+		sign_u = sadd(u_l, sign_u, v_l, sign_v, x_l);
 
-      err = mul_l (m_l, mi_l, m_l);
-      if (E_CLINT_OK == error)
-        {
-          error = err;
-        }
+		err = mul_l(m_l, mi_l, m_l);
+		if (E_CLINT_OK == error)
+		{
+			error = err;
+		}
 
-      smod (x_l, sign_u, m_l, x_l);
-    }
+		smod(x_l, sign_u, m_l, x_l);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((7, sizeof (i), &i,
-                   sizeof (sign_u), &sign_u,
-                   sizeof (sign_v), &sign_v,
-                   sizeof (g_l), g_l,
-                   sizeof (u_l), u_l,
-                   sizeof (v_l), v_l,
-                   sizeof (m_l), m_l));
+	/* Purging of variables */
+	PURGEVARS_L((7, sizeof(i), &i,
+		sizeof(sign_u), &sign_u,
+		sizeof(sign_v), &sign_v,
+		sizeof(g_l), g_l,
+		sizeof(u_l), u_l,
+		sizeof(v_l), v_l,
+		sizeof(m_l), m_l));
 
-  ISPURGED_L  ((7, sizeof (i), &i,
-                   sizeof (sign_u), &sign_u,
-                   sizeof (sign_v), &sign_v,
-                   sizeof (g_l), g_l,
-                   sizeof (u_l), u_l,
-                   sizeof (v_l), v_l,
-                   sizeof (m_l), m_l));
+	ISPURGED_L((7, sizeof(i), &i,
+		sizeof(sign_u), &sign_u,
+		sizeof(sign_v), &sign_v,
+		sizeof(g_l), g_l,
+		sizeof(u_l), u_l,
+		sizeof(v_l), v_l,
+		sizeof(m_l), m_l));
 
-  return error;
+	return error;
 }
 
 
@@ -4639,7 +4636,7 @@ chinrem_l (unsigned int noofeq, clint** coeff_l, CLINT x_l)
 
 
 static int tab2[] =
-{0, 1, 0, -1, 0, -1, 0, 1};
+{ 0, 1, 0, -1, 0, -1, 0, 1 };
 
 
 /******************************************************************************/
@@ -4652,79 +4649,79 @@ static int tab2[] =
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-jacobi_l (CLINT aa_l, CLINT bb_l)
+jacobi_l(CLINT aa_l, CLINT bb_l)
 {
-  CLINT a_l, b_l, tmp_l;
-  long int k, v;
+	CLINT a_l, b_l, tmp_l;
+	long int k, v;
 
-  /* Step 1 */
-  if (EQZ_L (bb_l))
-    {
-      if (EQONE_L (aa_l))
-        {
-          return 1;
-        }
-      else
-        {
-          return 0;
-        }
-    }
+	/* Step 1 */
+	if (EQZ_L(bb_l))
+	{
+		if (EQONE_L(aa_l))
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
-  /* Step 2 */
-  if (ISEVEN_L (aa_l) && ISEVEN_L (bb_l))
-    {
-      return 0;
-    }
+	/* Step 2 */
+	if (ISEVEN_L(aa_l) && ISEVEN_L(bb_l))
+	{
+		return 0;
+	}
 
-  cpy_l (a_l, aa_l);
-  cpy_l (b_l, bb_l);
+	cpy_l(a_l, aa_l);
+	cpy_l(b_l, bb_l);
 
-  v = twofact_l (b_l, b_l);
-  if ((v & 1) == 0)
-    {
-      k = 1;
-    }
-  else
-    {
-      k = tab2[*LSDPTR_L (a_l) & 7];    /* *LSDPTR_L(a_l) & 7 == a_l % 8 */
-    }
+	v = twofact_l(b_l, b_l);
+	if ((v & 1) == 0)
+	{
+		k = 1;
+	}
+	else
+	{
+		k = tab2[*LSDPTR_L(a_l) & 7];    /* *LSDPTR_L(a_l) & 7 == a_l % 8 */
+	}
 
-  /* Step 3 */
-  while (GTZ_L (a_l))
-    {
-      v = twofact_l (a_l, a_l);
-      if ((v & 1) != 0)
-        {
-          k *= tab2[*LSDPTR_L (b_l) & 7];
-        }
+	/* Step 3 */
+	while (GTZ_L(a_l))
+	{
+		v = twofact_l(a_l, a_l);
+		if ((v & 1) != 0)
+		{
+			k *= tab2[*LSDPTR_L(b_l) & 7];
+		}
 
-      /* Step 4 */
-      if (*LSDPTR_L (a_l) & *LSDPTR_L (b_l) & 2)
-        {
-          k = -k;
-        }
-      cpy_l (tmp_l, a_l);
-      mod_l (b_l, tmp_l, a_l);
-      cpy_l (b_l, tmp_l);
-    }
+		/* Step 4 */
+		if (*LSDPTR_L(a_l) & *LSDPTR_L(b_l) & 2)
+		{
+			k = -k;
+		}
+		cpy_l(tmp_l, a_l);
+		mod_l(b_l, tmp_l, a_l);
+		cpy_l(b_l, tmp_l);
+	}
 
-  if (GT_L (b_l, one_l))
-    {
-      k = 0;
-    }
+	if (GT_L(b_l, one_l))
+	{
+		k = 0;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (v), &v,
-                   sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(v), &v,
+		sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  ISPURGED_L  ((4, sizeof (v), &v,
-                   sizeof (a_l), a_l,
-                   sizeof (b_l), b_l,
-                   sizeof (tmp_l), tmp_l));
+	ISPURGED_L((4, sizeof(v), &v,
+		sizeof(a_l), a_l,
+		sizeof(b_l), b_l,
+		sizeof(tmp_l), tmp_l));
 
-  return (int)k;
+	return (int)k;
 }
 
 
@@ -4741,69 +4738,68 @@ jacobi_l (CLINT aa_l, CLINT bb_l)
 /*                                                                            */
 /******************************************************************************/
 USHORT __FLINT_API
-sieve_l (CLINT a_l, unsigned int no_of_smallprimes)
+sieve_l(CLINT a_l, unsigned int no_of_smallprimes)
 {
-  clint *aptr_l;
-  USHORT bv, rv, qv;
-  ULONG rhat;
-  unsigned int i = 1;
+	clint *aptr_l;
+	USHORT bv, rv, qv;
+	ULONG rhat;
+	unsigned int i = 1;
 
-  if (ISEVEN_L (a_l))
-    {
-      if (equ_l (a_l, two_l))
-        {
-          return 1;
-        }
-      else
-        {
-          return 2;
-        }
-    }
+	if (ISEVEN_L(a_l))
+	{
+		if (equ_l(a_l, two_l))
+		{
+			return 1;
+		}
+		else
+		{
+			return 2;
+		}
+	}
 
-  no_of_smallprimes = MIN (no_of_smallprimes, NOOFSMALLPRIMES);
-  bv = 2;
-  do
-    {
-      rv = 0;
-      bv += smallprimes[i];
+	no_of_smallprimes = MIN(no_of_smallprimes, NOOFSMALLPRIMES);
+	bv = 2;
+	do
+	{
+		rv = 0;
+		bv += smallprimes[i];
 
-      Assert (bv < 2000);
+		Assert(bv < 2000);
 
-      for (aptr_l = MSDPTR_L (a_l); aptr_l >= LSDPTR_L (a_l); aptr_l--)
-        {
-          qv = (USHORT)((rhat = ((((ULONG)rv) << BITPERDGT) +
-                                           (ULONG)*aptr_l)) / bv);
-          rv = (USHORT)(rhat - (ULONG)bv * (ULONG)qv);
-        }
+		for (aptr_l = MSDPTR_L(a_l); aptr_l >= LSDPTR_L(a_l); aptr_l--)
+		{
+			qv = (USHORT)((rhat = ((((ULONG)rv) << BITPERDGT) +
+				(ULONG)*aptr_l)) / bv);
+			rv = (USHORT)(rhat - (ULONG)bv * (ULONG)qv);
+		}
 
-    }
-  while (rv != 0 && ++i <= no_of_smallprimes);
+	} while (rv != 0 && ++i <= no_of_smallprimes);
 
-  if (0 == rv)
-    {
-      if (DIGITS_L (a_l) == 1 && *LSDPTR_L (a_l) == bv)
-        {
-          bv = 1;
-        }
-      /* else: result is bv */
-    }
-  else
-    {
-      bv = 0;
-    }
+	if (0 == rv)
+	{
+		if (DIGITS_L(a_l) == 1 && *LSDPTR_L(a_l) == bv)
+		{
+			bv = 1;
+		}
+		/* else: result is bv */
+	}
+	else
+	{
+		bv = 0;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (rhat), &rhat,
-                   sizeof (i), &i,
-                   sizeof (rv), &rv,
-                   sizeof (qv), &qv));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(rhat), &rhat,
+		sizeof(i), &i,
+		sizeof(rv), &rv,
+		sizeof(qv), &qv));
 
-  ISPURGED_L  ((4, sizeof (rhat), &rhat,
-                   sizeof (i), &i,
-                   sizeof (rv), &rv,
-                   sizeof (qv), &qv));
+	ISPURGED_L((4, sizeof(rhat), &rhat,
+		sizeof(i), &i,
+		sizeof(rv), &rv,
+		sizeof(qv), &qv));
 
-  return bv;
+	return bv;
 }
 
 
@@ -4823,109 +4819,108 @@ sieve_l (CLINT a_l, unsigned int no_of_smallprimes)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-prime_l (CLINT n_l, unsigned int no_of_smallprimes, unsigned int iterations)
+prime_l(CLINT n_l, unsigned int no_of_smallprimes, unsigned int iterations)
 {
-  CLINT d_l, x_l, q_l;
-  USHORT i, j, k, p;
-  int isprime;
+	CLINT d_l, x_l, q_l;
+	USHORT i, j, k, p;
+	int isprime;
 
-  if (EQONE_L (n_l))
-    {
-      return 0;
-    }
+	if (EQONE_L(n_l))
+	{
+		return 0;
+	}
 
-  no_of_smallprimes = MIN (no_of_smallprimes, NOOFSMALLPRIMES);
-  k = sieve_l (n_l, no_of_smallprimes);
-  if (1 == k)
-    {
-      return 1;
-    }
+	no_of_smallprimes = MIN(no_of_smallprimes, NOOFSMALLPRIMES);
+	k = sieve_l(n_l, no_of_smallprimes);
+	if (1 == k)
+	{
+		return 1;
+	}
 
-  if (1 < k)
-    {
-      return 0;
-    }
-  else
-    {
-      /* If iterations == 0 was given as a parameter optimize the number */
-      /* of iterations for an error probability < 2^-80 (cf. Chap. 10.5) */
-      if (0 == iterations)
-        {
-          k = ld_l (n_l);
-          if      (k <   73) iterations = 37;
-          else if (k <  105) iterations = 32;
-          else if (k <  137) iterations = 25;
-          else if (k <  197) iterations = 19;
-          else if (k <  220) iterations = 15;
-          else if (k <  235) iterations = 13;
-          else if (k <  252) iterations = 12;
-          else if (k <  273) iterations = 11;
-          else if (k <  300) iterations = 10;
-          else if (k <  332) iterations =  9;
-          else if (k <  375) iterations =  8;
-          else if (k <  433) iterations =  7;
-          else if (k <  514) iterations =  6;
-          else if (k <  638) iterations =  5;
-          else if (k <  847) iterations =  4;
-          else if (k < 1275) iterations =  3;
-          else if (k < 2861) iterations =  2;
-          else iterations = 1;
-        }
+	if (1 < k)
+	{
+		return 0;
+	}
+	else
+	{
+		/* If iterations == 0 was given as a parameter optimize the number */
+		/* of iterations for an error probability < 2^-80 (cf. Chap. 10.5) */
+		if (0 == iterations)
+		{
+			k = ld_l(n_l);
+			if (k <   73) iterations = 37;
+			else if (k <  105) iterations = 32;
+			else if (k <  137) iterations = 25;
+			else if (k <  197) iterations = 19;
+			else if (k <  220) iterations = 15;
+			else if (k <  235) iterations = 13;
+			else if (k <  252) iterations = 12;
+			else if (k <  273) iterations = 11;
+			else if (k <  300) iterations = 10;
+			else if (k <  332) iterations = 9;
+			else if (k <  375) iterations = 8;
+			else if (k <  433) iterations = 7;
+			else if (k <  514) iterations = 6;
+			else if (k <  638) iterations = 5;
+			else if (k <  847) iterations = 4;
+			else if (k < 1275) iterations = 3;
+			else if (k < 2861) iterations = 2;
+			else iterations = 1;
+		}
 
-      cpy_l (d_l, n_l);
-      dec_l (d_l);
-      k = (USHORT)twofact_l (d_l, q_l);
-      p = 0; /* Start with base a = 2 */
-      i = 0;
-      isprime = 1;
+		cpy_l(d_l, n_l);
+		dec_l(d_l);
+		k = (USHORT)twofact_l(d_l, q_l);
+		p = 0; /* Start with base a = 2 */
+		i = 0;
+		isprime = 1;
 
-      do
-        {
-          p += smallprimes[i++];
+		do
+		{
+			p += smallprimes[i++];
 
 #ifdef FLINT_ASM
-          wmexp_l (p, q_l, x_l, n_l);
+			wmexp_l(p, q_l, x_l, n_l);
 #else
-          wmexpm_l (p, q_l, x_l, n_l);
+			wmexpm_l(p, q_l, x_l, n_l);
 #endif /* FLINT_ASM */
 
-          if (!EQONE_L (x_l))
-            {
+			if (!EQONE_L(x_l))
+			{
 
-              j = 0;
+				j = 0;
 
-              while (!EQONE_L (x_l) && !equ_l (x_l, d_l) && ++j < k)
-                {
-                  msqr_l (x_l, x_l, n_l);
-                }
+				while (!EQONE_L(x_l) && !equ_l(x_l, d_l) && ++j < k)
+				{
+					msqr_l(x_l, x_l, n_l);
+				}
 
-              if (!equ_l (x_l, d_l))
-                {
-                  isprime = 0;
-                }
-            }
-        }
-      while ((--iterations > 0) && isprime);
+				if (!equ_l(x_l, d_l))
+				{
+					isprime = 0;
+				}
+			}
+		} while ((--iterations > 0) && isprime);
 
-      /* Purging of variables */
-      PURGEVARS_L ((7, sizeof (i), &i,
-                       sizeof (j), &j,
-                       sizeof (k), &k,
-                       sizeof (p), &p,
-                       sizeof (d_l), d_l,
-                       sizeof (x_l), x_l,
-                       sizeof (q_l), q_l));
+		/* Purging of variables */
+		PURGEVARS_L((7, sizeof(i), &i,
+			sizeof(j), &j,
+			sizeof(k), &k,
+			sizeof(p), &p,
+			sizeof(d_l), d_l,
+			sizeof(x_l), x_l,
+			sizeof(q_l), q_l));
 
-      ISPURGED_L  ((7, sizeof (i), &i,
-                       sizeof (j), &j,
-                       sizeof (k), &k,
-                       sizeof (p), &p,
-                       sizeof (d_l), d_l,
-                       sizeof (x_l), x_l,
-                       sizeof (q_l), q_l));
+		ISPURGED_L((7, sizeof(i), &i,
+			sizeof(j), &j,
+			sizeof(k), &k,
+			sizeof(p), &p,
+			sizeof(d_l), d_l,
+			sizeof(x_l), x_l,
+			sizeof(q_l), q_l));
 
-      return isprime;
-    }
+		return isprime;
+	}
 }
 
 
@@ -4939,23 +4934,23 @@ prime_l (CLINT n_l, unsigned int no_of_smallprimes, unsigned int iterations)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-twofact_l (CLINT a_l, CLINT b_l)
+twofact_l(CLINT a_l, CLINT b_l)
 {
-  int k = 0;
-  if (EQZ_L (a_l))
-    {
-      SETZERO_L (b_l);
-      return 0;
-    }
+	int k = 0;
+	if (EQZ_L(a_l))
+	{
+		SETZERO_L(b_l);
+		return 0;
+	}
 
-  cpy_l (b_l, a_l);
-  while (ISEVEN_L (b_l))
-    {
-      shr_l (b_l);
-      ++k;
-    }
+	cpy_l(b_l, a_l);
+	while (ISEVEN_L(b_l))
+	{
+		shr_l(b_l);
+		++k;
+	}
 
-  return k;
+	return k;
 }
 
 
@@ -4964,8 +4959,8 @@ twofact_l (CLINT a_l, CLINT b_l)
 
 static char ntable[16] =
 {
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
-  'd', 'e', 'f'};
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
+	'd', 'e', 'f' };
 
 
 #ifndef isxdigit
@@ -4993,59 +4988,58 @@ static char ntable[16] =
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-xclint2str_l (CLINT n_l, USHORT base, int showbase)
+xclint2str_l(CLINT n_l, USHORT base, int showbase)
 {
-  CLINTD u_l, r_l;
-  int i = 0;
-  static char N[CLINTMAXBIT + 3];
+	CLINTD u_l, r_l;
+	int i = 0;
+	static char N[CLINTMAXBIT + 3];
 
-  if (2U > base || base > 16U)
-    {
-      return (char *)NULL;
-    }
+	if (2U > base || base > 16U)
+	{
+		return (char *)NULL;
+	}
 
-  cpy_l (u_l, n_l);
-  do
-    {
-      (void)udiv_l (u_l, base, u_l, r_l);
-      if (EQZ_L (r_l))
-        {
-          N[i++] = '0';
-        }
-      else
-        {
-          N[i++] = (char)ntable[*LSDPTR_L (r_l) & 0xff];
-        }
-    }
-  while (GTZ_L (u_l));
+	cpy_l(u_l, n_l);
+	do
+	{
+		(void)udiv_l(u_l, base, u_l, r_l);
+		if (EQZ_L(r_l))
+		{
+			N[i++] = '0';
+		}
+		else
+		{
+			N[i++] = (char)ntable[*LSDPTR_L(r_l) & 0xff];
+		}
+	} while (GTZ_L(u_l));
 
-  if (showbase)
-    {
-      switch (base)
-        {
-          case 2:
-            N[i++] = 'b';
-            N[i++] = '0';
-            break;
-          case 8:
-            N[i++] = '0';
-            break;
-          case 16:
-            N[i++] = 'x';
-            N[i++] = '0';
-            break;
-        }                          /*lint !e744 default-statement pointless */
-    }
-  N[i] = '\0';
+	if (showbase)
+	{
+		switch (base)
+		{
+		case 2:
+			N[i++] = 'b';
+			N[i++] = '0';
+			break;
+		case 8:
+			N[i++] = '0';
+			break;
+		case 16:
+			N[i++] = 'x';
+			N[i++] = '0';
+			break;
+		}                          /*lint !e744 default-statement pointless */
+	}
+	N[i] = '\0';
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (u_l), u_l,
-                   sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(u_l), u_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((2, sizeof (u_l), u_l,
-                   sizeof (r_l), r_l));
+	ISPURGED_L((2, sizeof(u_l), u_l,
+		sizeof(r_l), r_l));
 
-  return strrev_l (N);
+	return strrev_l(N);
 }
 
 
@@ -5063,71 +5057,71 @@ xclint2str_l (CLINT n_l, USHORT base, int showbase)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-str2clint_l (CLINT n_l, char *str, USHORT base)
+str2clint_l(CLINT n_l, char *str, USHORT base)
 {
-  USHORT n;
-  int error = E_CLINT_OK;
+	USHORT n;
+	int error = E_CLINT_OK;
 
-  if (str == NULL)
-    {
-      return E_CLINT_NPT;          /* Error: Base invalid */
-    }
+	if (str == NULL)
+	{
+		return E_CLINT_NPT;          /* Error: Base invalid */
+	}
 
-  if (2 > base || base > 16)
-    {
-      return E_CLINT_BOR;          /* Error: Base invalid */
-    }
+	if (2 > base || base > 16)
+	{
+		return E_CLINT_BOR;          /* Error: Base invalid */
+	}
 
-  SETZERO_L (n_l);
+	SETZERO_L(n_l);
 
-  if (*str == '0')
-    {
-      if ((tolower_l(*(str+1)) == 'x') ||
-          (tolower_l(*(str+1)) == 'b'))      /* Ignore prefixes */
-        {
-          ++str;
-          ++str;
-        }
-    }
+	if (*str == '0')
+	{
+		if ((tolower_l(*(str + 1)) == 'x') ||
+			(tolower_l(*(str + 1)) == 'b'))      /* Ignore prefixes */
+		{
+			++str;
+			++str;
+		}
+	}
 
-  while (isxdigit ((int)*str) || isspace ((int)*str))
-    {
-      if (!isspace ((int)*str))
-        {
-          n = (USHORT)tolower_l (*str);
-          switch (n)
-            {
-              case 'a':
-              case 'b':
-              case 'c':
-              case 'd':
-              case 'e':
-              case 'f':
-                n -= (USHORT)('a' - 10);
-                break;
-              default:
-                n -= (USHORT)'0';
-            }
+	while (isxdigit((int)*str) || isspace((int)*str))
+	{
+		if (!isspace((int)*str))
+		{
+			n = (USHORT)tolower_l(*str);
+			switch (n)
+			{
+			case 'a':
+			case 'b':
+			case 'c':
+			case 'd':
+			case 'e':
+			case 'f':
+				n -= (USHORT)('a' - 10);
+				break;
+			default:
+				n -= (USHORT)'0';
+			}
 
-          if (n >= base)
-            {
-              error = E_CLINT_BOR;
-              break;
-            }
+			if (n >= base)
+			{
+				error = E_CLINT_BOR;
+				break;
+			}
 
-          if ((error = umul_l (n_l, base, n_l)) != E_CLINT_OK)
-            {
-              break;
-            }
-          if ((error = uadd_l (n_l, n, n_l)) != E_CLINT_OK)
-            {
-              break;
-            }
-        }
-      ++str;
-    }
+			if ((error = umul_l(n_l, base, n_l)) != E_CLINT_OK)
+			{
+				break;
+			}
+			if ((error = uadd_l(n_l, n, n_l)) != E_CLINT_OK)
+			{
+				break;
+			}
+		}
+		++str;
+	}
 
-  return error;
+	return error;
 }
 
 
@@ -5143,56 +5137,55 @@ str2clint_l (CLINT n_l, char *str, USHORT base)
 /*                                                                            */
 /******************************************************************************/
 UCHAR * __FLINT_API
-clint2byte_l (CLINT n_l, int *len)
+clint2byte_l(CLINT n_l, int *len)
 {
-  CLINTD u_l, r_l;
-  int i = 0, j;
-  UCHAR help;
-  static UCHAR bytes[CLINTMAXBYTE];
+	CLINTD u_l, r_l;
+	int i = 0, j;
+	UCHAR help;
+	static UCHAR bytes[CLINTMAXBYTE];
 
-  if (len == NULL)
-    {
-      return NULL;
-    }
+	if (len == NULL)
+	{
+		return NULL;
+	}
 
-  cpy_l (u_l, n_l);
-  do
-    {
-      (void)udiv_l (u_l, 0x100, u_l, r_l);
-      if (GTZ_L (r_l))
-        {
-          bytes[i++] = (UCHAR)*LSDPTR_L (r_l);
-        }
-      else
-        {
-          bytes[i++] = 0;
-        }
-    }
-  while (GTZ_L (u_l));
+	cpy_l(u_l, n_l);
+	do
+	{
+		(void)udiv_l(u_l, 0x100, u_l, r_l);
+		if (GTZ_L(r_l))
+		{
+			bytes[i++] = (UCHAR)*LSDPTR_L(r_l);
+		}
+		else
+		{
+			bytes[i++] = 0;
+		}
+	} while (GTZ_L(u_l));
 
-  *len = i;
+	*len = i;
 
-  for (i = 0, j = *len - 1; i < j; i++, j--)
-    {
-      help = bytes[i];
-      bytes[i] = bytes[j];
-      bytes[j] = help;
-    }
+	for (i = 0, j = *len - 1; i < j; i++, j--)
+	{
+		help = bytes[i];
+		bytes[i] = bytes[j];
+		bytes[j] = help;
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((5, sizeof (i), &i,
-                   sizeof (j), &j,
-                   sizeof (help), &help,
-                   sizeof (u_l), u_l,
-                   sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((5, sizeof(i), &i,
+		sizeof(j), &j,
+		sizeof(help), &help,
+		sizeof(u_l), u_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((5, sizeof (i), &i,
-                   sizeof (j), &j,
-                   sizeof (help), &help,
-                   sizeof (u_l), u_l,
-                   sizeof (r_l), r_l));
+	ISPURGED_L((5, sizeof(i), &i,
+		sizeof(j), &j,
+		sizeof(help), &help,
+		sizeof(u_l), u_l,
+		sizeof(r_l), r_l));
 
-  return bytes;
+	return bytes;
 }
 
 
@@ -5210,36 +5203,36 @@ clint2byte_l (CLINT n_l, int *len)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-byte2clint_l (CLINT n_l, UCHAR *bytestr, int len)
+byte2clint_l(CLINT n_l, UCHAR *bytestr, int len)
 {
-  int error = E_CLINT_OK, i;
+	int error = E_CLINT_OK, i;
 
-  if (bytestr == NULL)
-    {
-      return E_CLINT_NPT;
-    }
+	if (bytestr == NULL)
+	{
+		return E_CLINT_NPT;
+	}
 
-  if ((unsigned)len > CLINTMAXBYTE)
-    {
-      return E_CLINT_OFL;
-    }
+	if ((unsigned)len > CLINTMAXBYTE)
+	{
+		return E_CLINT_OFL;
+	}
 
-  SETZERO_L (n_l);
+	SETZERO_L(n_l);
 
-  for (i = 0; i < len; i++, bytestr++)
-    {
-      if ((error = umul_l (n_l, 0x100, n_l)) != E_CLINT_OK)
-        {
-          break;
-        }
+	for (i = 0; i < len; i++, bytestr++)
+	{
+		if ((error = umul_l(n_l, 0x100, n_l)) != E_CLINT_OK)
+		{
+			break;
+		}
 
-      if ((error = uadd_l (n_l, *bytestr, n_l)) != E_CLINT_OK)
-        {
-          break;
-        }
-    }
+		if ((error = uadd_l(n_l, *bytestr, n_l)) != E_CLINT_OK)
+		{
+			break;
+		}
+	}
 
-  return error;
+	return error;
 }
 
 
@@ -5253,11 +5246,11 @@ byte2clint_l (CLINT n_l, UCHAR *bytestr, int len)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-u2clint_l (CLINT num_l, USHORT u)
+u2clint_l(CLINT num_l, USHORT u)
 {
-  *LSDPTR_L (num_l) = u;
-  SETDIGITS_L (num_l, 1);
-  RMLDZRS_L (num_l);
+	*LSDPTR_L(num_l) = u;
+	SETDIGITS_L(num_l, 1);
+	RMLDZRS_L(num_l);
 }
 
 
@@ -5271,12 +5264,12 @@ u2clint_l (CLINT num_l, USHORT u)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-ul2clint_l (CLINT num_l, ULONG ul)
+ul2clint_l(CLINT num_l, ULONG ul)
 {
-  *LSDPTR_L (num_l) = (USHORT)(ul & 0xffff);
-  *(LSDPTR_L (num_l) + 1) = (USHORT)((ul >> 16) & 0xffff);
-  SETDIGITS_L (num_l, 2);
-  RMLDZRS_L (num_l);
+	*LSDPTR_L(num_l) = (USHORT)(ul & 0xffff);
+	*(LSDPTR_L(num_l) + 1) = (USHORT)((ul >> 16) & 0xffff);
+	SETDIGITS_L(num_l, 2);
+	RMLDZRS_L(num_l);
 }
 
 
@@ -5291,9 +5284,9 @@ ul2clint_l (CLINT num_l, ULONG ul)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-fhexstr_l (CLINT n_l)
+fhexstr_l(CLINT n_l)
 {
-  return xclint2str_l (n_l, 16, 0);
+	return xclint2str_l(n_l, 16, 0);
 }
 
 
@@ -5308,9 +5301,9 @@ fhexstr_l (CLINT n_l)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-fdecstr_l (CLINT n_l)
+fdecstr_l(CLINT n_l)
 {
-  return xclint2str_l (n_l, 10, 0);
+	return xclint2str_l(n_l, 10, 0);
 }
 
 
@@ -5325,9 +5318,9 @@ fdecstr_l (CLINT n_l)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-foctstr_l (CLINT n_l)
+foctstr_l(CLINT n_l)
 {
-  return xclint2str_l (n_l, 8, 0);
+	return xclint2str_l(n_l, 8, 0);
 }
 
 
@@ -5342,9 +5335,9 @@ foctstr_l (CLINT n_l)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-fbinstr_l (CLINT n_l)
+fbinstr_l(CLINT n_l)
 {
-  return xclint2str_l (n_l, 2, 0);
+	return xclint2str_l(n_l, 2, 0);
 }
 
 
@@ -5365,10 +5358,10 @@ fbinstr_l (CLINT n_l)
 /*                                                                            */
 /******************************************************************************/
 ULONG __FLINT_API
-version_l (void)
+version_l(void)
 {
-  return (ULONG)((FLINT_VERSION << BITPERDGT) +
-                 (_FLINT_ASM << 8) + _FLINT_SECMOD);
+	return (ULONG)((FLINT_VERSION << BITPERDGT) +
+		(_FLINT_ASM << 8) + _FLINT_SECMOD);
 }
 
 
@@ -5386,20 +5379,20 @@ version_l (void)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-verstr_l (void)
+verstr_l(void)
 {
-  static char s[10];
-  sprintf(s, "%d.%.2d", FLINT_VERMAJ, FLINT_VERMIN);
+	static char s[10];
+	sprintf(s, "%d.%.2d", FLINT_VERMAJ, FLINT_VERMIN);
 
 #ifdef FLINT_ASM
-  strcat(s, "a");
+	strcat(s, "a");
 #endif
 
 #ifdef FLINT_SECURE
-  strcat(s, "s");
+	strcat(s, "s");
 #endif
 
-  return (char *)s;
+	return (char *)s;
 }
 
 
@@ -5409,42 +5402,42 @@ verstr_l (void)
 
 struct clint_registers
 {
-  unsigned int created;
-  unsigned int noofregs;
-  clint **reg_l;
+	unsigned int created;
+	unsigned int noofregs;
+	clint **reg_l;
 };
 
 
 /******************************************************************************/
 
 static struct clint_registers registers =
-{0, 0, 0};
+{ 0, 0, 0 };
 
 static USHORT NoofRegs = NOOFREGS;
 
 static int
-allocate_reg_l (void)
+allocate_reg_l(void)
 {
-  USHORT i, j;
+	USHORT i, j;
 
-  if ((registers.reg_l = (clint **)malloc (sizeof (clint *) * NoofRegs)) == NULL)
-    {
-      return E_CLINT_MAL;
-    }
+	if ((registers.reg_l = (clint **)malloc(sizeof(clint *) * NoofRegs)) == NULL)
+	{
+		return E_CLINT_MAL;
+	}
 
-  for (i = 0; i < NoofRegs; i++)
-    {
-      if ((registers.reg_l[i] = (clint *)malloc (CLINTMAXBYTE)) == NULL)
-        {
-          for (j = 0; j < i; j++)
-            {
-              free (registers.reg_l[j]);
-            }
-          return E_CLINT_MAL;      /* Error: malloc */
-        }
-    }
+	for (i = 0; i < NoofRegs; i++)
+	{
+		if ((registers.reg_l[i] = (clint *)malloc(CLINTMAXBYTE)) == NULL)
+		{
+			for (j = 0; j < i; j++)
+			{
+				free(registers.reg_l[j]);
+			}
+			return E_CLINT_MAL;      /* Error: malloc */
+		}
+	}
 
-  return E_CLINT_OK;
+	return E_CLINT_OK;
 }
 
 
@@ -5452,17 +5445,17 @@ allocate_reg_l (void)
 
 
 static void
-destroy_reg_l (void)
+destroy_reg_l(void)
 {
-  unsigned i;
+	unsigned i;
 
-  for (i = 0; i < registers.noofregs; i++)
-    {
-      memset (registers.reg_l[i], 0, CLINTMAXBYTE);
-      free (registers.reg_l[i]);
-      registers.reg_l[i] = NULL;
-    }
-  free (registers.reg_l);
+	for (i = 0; i < registers.noofregs; i++)
+	{
+		memset(registers.reg_l[i], 0, CLINTMAXBYTE);
+		free(registers.reg_l[i]);
+		registers.reg_l[i] = NULL;
+	}
+	free(registers.reg_l);
 }
 
 
@@ -5480,9 +5473,9 @@ destroy_reg_l (void)
 /*                                                                            */
 /******************************************************************************/
 clint * __FLINT_API
-create_l (void)
+create_l(void)
 {
-  return (clint *)malloc (CLINTMAXBYTE);
+	return (clint *)malloc(CLINTMAXBYTE);
 }
 
 
@@ -5497,12 +5490,12 @@ create_l (void)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-purge_l (CLINT reg_l)
+purge_l(CLINT reg_l)
 {
-  if (reg_l != NULL)
-    {
-      memset (reg_l, 0, CLINTMAXBYTE);
-    }
+	if (reg_l != NULL)
+	{
+		memset(reg_l, 0, CLINTMAXBYTE);
+	}
 }
 
 
@@ -5517,12 +5510,12 @@ purge_l (CLINT reg_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-purged_l (CLINTD reg_l)
+purged_l(CLINTD reg_l)
 {
-  if (reg_l != NULL)
-    {
-      memset (reg_l, 0, sizeof (CLINTD));
-    }
+	if (reg_l != NULL)
+	{
+		memset(reg_l, 0, sizeof(CLINTD));
+	}
 }
 
 
@@ -5537,12 +5530,12 @@ purged_l (CLINTD reg_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-purgeq_l (CLINTQ reg_l)
+purgeq_l(CLINTQ reg_l)
 {
-  if (reg_l != NULL)
-    {
-      memset (reg_l, 0, sizeof (CLINTQ));
-    }
+	if (reg_l != NULL)
+	{
+		memset(reg_l, 0, sizeof(CLINTQ));
+	}
 }
 
 
@@ -5556,13 +5549,13 @@ purgeq_l (CLINTQ reg_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-free_l (CLINT reg_l)
+free_l(CLINT reg_l)
 {
-  if (reg_l != NULL)
-    {
-      memset (reg_l, 0, CLINTMAXBYTE);
-      free (reg_l);
-    }
+	if (reg_l != NULL)
+	{
+		memset(reg_l, 0, CLINTMAXBYTE);
+		free(reg_l);
+	}
 }
 
 
@@ -5576,9 +5569,9 @@ free_l (CLINT reg_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-set_noofregs_l (unsigned int nregs)
+set_noofregs_l(unsigned int nregs)
 {
-  NoofRegs = (USHORT)nregs;
+	NoofRegs = (USHORT)nregs;
 }
 
 
@@ -5593,22 +5586,22 @@ set_noofregs_l (unsigned int nregs)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-create_reg_l (void)
+create_reg_l(void)
 {
-  int error = E_CLINT_OK;
+	int error = E_CLINT_OK;
 
-  if (registers.created == 0)
-    {
-      error = allocate_reg_l ();
-      registers.noofregs = NoofRegs;
-    }
+	if (registers.created == 0)
+	{
+		error = allocate_reg_l();
+		registers.noofregs = NoofRegs;
+	}
 
-  if (!error)
-    {
-      ++registers.created;
-    }
+	if (!error)
+	{
+		++registers.created;
+	}
 
-  return error;
+	return error;
 }
 
 
@@ -5622,14 +5615,14 @@ create_reg_l (void)
 /*                                                                            */
 /******************************************************************************/
 clint * __FLINT_API
-get_reg_l (unsigned int reg)
+get_reg_l(unsigned int reg)
 {
-  if (!registers.created || (reg >= registers.noofregs))
-    {
-      return (clint *)NULL;
-    }
+	if (!registers.created || (reg >= registers.noofregs))
+	{
+		return (clint *)NULL;
+	}
 
-  return registers.reg_l[reg];
+	return registers.reg_l[reg];
 }
 
 
@@ -5645,15 +5638,15 @@ get_reg_l (unsigned int reg)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-purge_reg_l (unsigned int reg)
+purge_reg_l(unsigned int reg)
 {
-  if (!registers.created || (reg >= registers.noofregs))
-    {
-      return E_CLINT_NOR;
-    }
+	if (!registers.created || (reg >= registers.noofregs))
+	{
+		return E_CLINT_NOR;
+	}
 
-  memset (registers.reg_l[reg], 0, CLINTMAXBYTE);
-  return E_CLINT_OK;
+	memset(registers.reg_l[reg], 0, CLINTMAXBYTE);
+	return E_CLINT_OK;
 }
 
 
@@ -5669,20 +5662,20 @@ purge_reg_l (unsigned int reg)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-purgeall_reg_l (void)
+purgeall_reg_l(void)
 {
-  unsigned i;
+	unsigned i;
 
-  if (registers.created)
-    {
-      for (i = 0; i < registers.noofregs; i++)
-        {
-          memset (registers.reg_l[i], 0, CLINTMAXBYTE);
-        }
-      return E_CLINT_OK;
-    }
+	if (registers.created)
+	{
+		for (i = 0; i < registers.noofregs; i++)
+		{
+			memset(registers.reg_l[i], 0, CLINTMAXBYTE);
+		}
+		return E_CLINT_OK;
+	}
 
-  return E_CLINT_NOR;              /* Error: Register not allocated */
+	return E_CLINT_NOR;              /* Error: Register not allocated */
 }
 
 
@@ -5697,17 +5690,17 @@ purgeall_reg_l (void)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-free_reg_l (void)
+free_reg_l(void)
 {
-  if (registers.created == 1)
-    {
-      destroy_reg_l ();
-    }
+	if (registers.created == 1)
+	{
+		destroy_reg_l();
+	}
 
-  if (registers.created)
-    {
-      --registers.created;
-    }
+	if (registers.created)
+	{
+		--registers.created;
+	}
 }
 
 
@@ -5724,29 +5717,29 @@ free_reg_l (void)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-vcheck_l (CLINT n_l)
+vcheck_l(CLINT n_l)
 {
-  int error = E_VCHECK_OK;
-  if (n_l == NULL)
-    {
-      error = E_VCHECK_MEM;        /* n_l is NULL-pointer */
-    }
-  else
-    {
-      if (((unsigned int)DIGITS_L (n_l)) > CLINTMAXDIGIT)
-        {
-          error = E_VCHECK_OFL;    /* Overflow  */
-        }
-      else
-        {
-          if ((DIGITS_L (n_l) > 0) && (n_l[DIGITS_L (n_l)] == 0))
-            {
-              error = E_VCHECK_LDZ;     /* Leading zeros */
-            }
-        }
-    }
+	int error = E_VCHECK_OK;
+	if (n_l == NULL)
+	{
+		error = E_VCHECK_MEM;        /* n_l is NULL-pointer */
+	}
+	else
+	{
+		if (((unsigned int)DIGITS_L(n_l)) > CLINTMAXDIGIT)
+		{
+			error = E_VCHECK_OFL;    /* Overflow  */
+		}
+		else
+		{
+			if ((DIGITS_L(n_l) > 0) && (n_l[DIGITS_L(n_l)] == 0))
+			{
+				error = E_VCHECK_LDZ;     /* Leading zeros */
+			}
+		}
+	}
 
-  return error;
+	return error;
 }
 
 
@@ -5755,7 +5748,7 @@ vcheck_l (CLINT n_l)
 
 static clint SEED64[10];
 static clint A64[] =
-{0x0004, 0x7f2d, 0x4c95, 0xf42d, 0x5851};
+{ 0x0004, 0x7f2d, 0x4c95, 0xf42d, 0x5851 };
 
 static clint BUFF64[100];
 
@@ -5770,13 +5763,13 @@ static clint BUFF64[100];
 /*                                                                            */
 /******************************************************************************/
 clint * __FLINT_API
-rand64_l (void)
+rand64_l(void)
 {
-  mul_l (SEED64, A64, SEED64);
-  inc_l (SEED64);
+	mul_l(SEED64, A64, SEED64);
+	inc_l(SEED64);
 
-  SEED64[0] = MIN (SEED64[0], 4);       /* Reduction modulo 2^64 */
-  return ((clint *)SEED64);
+	SEED64[0] = MIN(SEED64[0], 4);       /* Reduction modulo 2^64 */
+	return ((clint *)SEED64);
 }
 
 
@@ -5790,10 +5783,10 @@ rand64_l (void)
 /*                                                                            */
 /******************************************************************************/
 UCHAR __FLINT_API
-ucrand64_l (void)
+ucrand64_l(void)
 {
-  rand64_l();
-  return (UCHAR)(SEED64[SEED64[0]] >> (BITPERDGT - 8));
+	rand64_l();
+	return (UCHAR)(SEED64[SEED64[0]] >> (BITPERDGT - 8));
 }
 
 
@@ -5807,10 +5800,10 @@ ucrand64_l (void)
 /*                                                                            */
 /******************************************************************************/
 USHORT __FLINT_API
-usrand64_l (void)
+usrand64_l(void)
 {
-  rand64_l();
-  return SEED64[SEED64[0]];
+	rand64_l();
+	return SEED64[SEED64[0]];
 }
 
 
@@ -5824,29 +5817,29 @@ usrand64_l (void)
 /*                                                                            */
 /******************************************************************************/
 ULONG __FLINT_API
-ulrand64_l (void)
+ulrand64_l(void)
 {
-  ULONG val;
-  USHORT l;
-  rand64_l();
+	ULONG val;
+	USHORT l;
+	rand64_l();
 
-  l = SEED64[0];
-  switch (l)
-    {
-      case 4:
-      case 3:
-      case 2:
-        val = (ULONG)SEED64[l-1];
-        val += ((ULONG)SEED64[l] << BITPERDGT);
-        break;
-      case 1:
-        val = (ULONG)SEED64[l];
-        break;
-      default:
-        val = 0;
-    }
+	l = SEED64[0];
+	switch (l)
+	{
+	case 4:
+	case 3:
+	case 2:
+		val = (ULONG)SEED64[l - 1];
+		val += ((ULONG)SEED64[l] << BITPERDGT);
+		break;
+	case 1:
+		val = (ULONG)SEED64[l];
+		break;
+	default:
+		val = 0;
+	}
 
-  return val;
+	return val;
 }
 
 
@@ -5861,16 +5854,16 @@ ulrand64_l (void)
 /*                                                                            */
 /******************************************************************************/
 clint * __FLINT_API
-seed64_l (CLINT seed_l)
+seed64_l(CLINT seed_l)
 {
-  int i;
-  cpy_l (BUFF64, SEED64);
-  for (i = 0; i <= MIN (DIGITS_L (seed_l), 4); i++)
-    {
-      SEED64[i] = seed_l[i];
-    }
+	int i;
+	cpy_l(BUFF64, SEED64);
+	for (i = 0; i <= MIN(DIGITS_L(seed_l), 4); i++)
+	{
+		SEED64[i] = seed_l[i];
+	}
 
-  return BUFF64;
+	return BUFF64;
 }
 
 
@@ -5886,12 +5879,12 @@ seed64_l (CLINT seed_l)
 /*                                                                            */
 /******************************************************************************/
 clint * __FLINT_API
-ulseed64_l (ULONG seed)
+ulseed64_l(ULONG seed)
 {
-  cpy_l (BUFF64, SEED64);
-  ul2clint_l (SEED64, seed);
+	cpy_l(BUFF64, SEED64);
+	ul2clint_l(SEED64, seed);
 
-  return BUFF64;
+	return BUFF64;
 }
 
 
@@ -5906,44 +5899,44 @@ ulseed64_l (ULONG seed)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-rand_l (CLINT a_l, int l)
+rand_l(CLINT a_l, int l)
 {
-  USHORT i, j;
-  USHORT ls, lr;
+	USHORT i, j;
+	USHORT ls, lr;
 
-  l = MIN ((unsigned int)l, CLINTMAXBIT);
-  ls = (USHORT)l >> LDBITPERDGT;
-  lr = (USHORT)l & ((USHORT)BITPERDGT - 1);
+	l = MIN((unsigned int)l, CLINTMAXBIT);
+	ls = (USHORT)l >> LDBITPERDGT;
+	lr = (USHORT)l & ((USHORT)BITPERDGT - 1);
 
-  for (i = 1; i <= ls; i++)
-    {
-      a_l[i] = usrand64_l ();
-    }
+	for (i = 1; i <= ls; i++)
+	{
+		a_l[i] = usrand64_l();
+	}
 
-  if (lr > 0)
-    {
-      ++ls;
-      a_l[ls] = usrand64_l ();
-      j = 1U << (lr - 1);                         /* j <- 2^(lr - 1) */
-      a_l[ls] = (a_l[ls] | j) & ((j << 1) - 1);   /* Set bit lr to 1, higher bits to 0 */
-    }
-  else
-    {
-      a_l[ls] |= BASEDIV2;
-    }
+	if (lr > 0)
+	{
+		++ls;
+		a_l[ls] = usrand64_l();
+		j = 1U << (lr - 1);                         /* j <- 2^(lr - 1) */
+		a_l[ls] = (a_l[ls] | j) & ((j << 1) - 1);   /* Set bit lr to 1, higher bits to 0 */
+	}
+	else
+	{
+		a_l[ls] |= BASEDIV2;
+	}
 
-  SETDIGITS_L (a_l, ls);
+	SETDIGITS_L(a_l, ls);
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (i), &i,
-                   sizeof (j), &j,
-                   sizeof (ls), &ls,
-                   sizeof (lr), &lr));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(i), &i,
+		sizeof(j), &j,
+		sizeof(ls), &ls,
+		sizeof(lr), &lr));
 
-  ISPURGED_L  ((4, sizeof (i), &i,
-                   sizeof (j), &j,
-                   sizeof (ls), &ls,
-                   sizeof (lr), &lr));
+	ISPURGED_L((4, sizeof(i), &i,
+		sizeof(j), &j,
+		sizeof(ls), &ls,
+		sizeof(lr), &lr));
 }
 
 
@@ -5996,12 +5989,12 @@ static const char *MODBBSSTR =
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-randbit_l (void)
+randbit_l(void)
 {
-  msqr_l (XBBS, XBBS, MODBBS);
+	msqr_l(XBBS, XBBS, MODBBS);
 
-  /* Output of least significant bit of XBBS */
-  return (*LSDPTR_L (XBBS) & 1);
+	/* Output of least significant bit of XBBS */
+	return (*LSDPTR_L(XBBS) & 1);
 }
 
 
@@ -6015,15 +6008,15 @@ randbit_l (void)
 /*                                                                            */
 /******************************************************************************/
 UCHAR __FLINT_API
-ucrandBBS_l (void)
+ucrandBBS_l(void)
 {
-  UCHAR i, r = 0;
-  for (i = 0; i < (UCHAR)(sizeof (UCHAR) << 3); i++)
-    {
-      r = (r << 1) + randbit_l();
-    }
+	UCHAR i, r = 0;
+	for (i = 0; i < (UCHAR)(sizeof(UCHAR) << 3); i++)
+	{
+		r = (r << 1) + randbit_l();
+	}
 
-  return r;
+	return r;
 }
 
 
@@ -6037,15 +6030,15 @@ ucrandBBS_l (void)
 /*                                                                            */
 /******************************************************************************/
 USHORT __FLINT_API
-usrandBBS_l (void)
+usrandBBS_l(void)
 {
-  USHORT i, r = 0;
-  for (i = 0; i < (USHORT)(sizeof (USHORT) << 3); i++)
-    {
-      r = (r << 1) + randbit_l();
-    }
+	USHORT i, r = 0;
+	for (i = 0; i < (USHORT)(sizeof(USHORT) << 3); i++)
+	{
+		r = (r << 1) + randbit_l();
+	}
 
-  return r;
+	return r;
 }
 
 
@@ -6059,15 +6052,15 @@ usrandBBS_l (void)
 /*                                                                            */
 /******************************************************************************/
 ULONG __FLINT_API
-ulrandBBS_l (void)
+ulrandBBS_l(void)
 {
-  ULONG i, r = 0;
-  for (i = 0; i < (ULONG)(sizeof (ULONG) << 3); i++)
-    {
-      r = (r << 1) + randbit_l();
-    }
+	ULONG i, r = 0;
+	for (i = 0; i < (ULONG)(sizeof(ULONG) << 3); i++)
+	{
+		r = (r << 1) + randbit_l();
+	}
 
-  return r;
+	return r;
 }
 
 
@@ -6083,20 +6076,20 @@ ulrandBBS_l (void)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-seedBBS_l (CLINT seed_l)
+seedBBS_l(CLINT seed_l)
 {
-  CLINT g_l;
+	CLINT g_l;
 
-  str2clint_l (MODBBS, (char*)MODBBSSTR, 16);
-  gcd_l (MODBBS, seed_l, g_l);
+	str2clint_l(MODBBS, (char*)MODBBSSTR, 16);
+	gcd_l(MODBBS, seed_l, g_l);
 
-  if (!EQONE_L (g_l))
-    {
-      return -1;
-    }
+	if (!EQONE_L(g_l))
+	{
+		return -1;
+	}
 
-  msqr_l (seed_l, XBBS, MODBBS);
-  return E_CLINT_OK;
+	msqr_l(seed_l, XBBS, MODBBS);
+	return E_CLINT_OK;
 }
 
 
@@ -6111,11 +6104,11 @@ seedBBS_l (CLINT seed_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-ulseedBBS_l (ULONG seed)
+ulseedBBS_l(ULONG seed)
 {
-  CLINT seed_l;
-  ul2clint_l (seed_l, seed);
-  seedBBS_l (seed_l);
+	CLINT seed_l;
+	ul2clint_l(seed_l, seed);
+	seedBBS_l(seed_l);
 }
 
 
@@ -6130,44 +6123,44 @@ ulseedBBS_l (ULONG seed)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-randBBS_l (CLINT a_l, int l)
+randBBS_l(CLINT a_l, int l)
 {
-  USHORT i, j;
-  USHORT ls, lr;
+	USHORT i, j;
+	USHORT ls, lr;
 
-  l = (int)MIN ((unsigned int)l, CLINTMAXBIT);
-  ls = (USHORT)l >> LDBITPERDGT;
-  lr = (USHORT)l & ((USHORT)BITPERDGT - 1);
+	l = (int)MIN((unsigned int)l, CLINTMAXBIT);
+	ls = (USHORT)l >> LDBITPERDGT;
+	lr = (USHORT)l & ((USHORT)BITPERDGT - 1);
 
-  for (i = 1; i <= ls; i++)
-    {
-      a_l[i] = usrandBBS_l ();
-    }
+	for (i = 1; i <= ls; i++)
+	{
+		a_l[i] = usrandBBS_l();
+	}
 
-  if (lr > 0)
-    {
-      ++ls;
-      a_l[ls] = usrandBBS_l ();
-      j = 1U << (lr - 1);                         /* j <- 2^(lr - 1) */
-      a_l[ls] = (a_l[ls] | j) & ((j << 1) - 1);   /* Set bit lr to 1, higher bits to 0 */
-    }
-  else
-    {
-      a_l[ls] |= BASEDIV2;
-    }
+	if (lr > 0)
+	{
+		++ls;
+		a_l[ls] = usrandBBS_l();
+		j = 1U << (lr - 1);                         /* j <- 2^(lr - 1) */
+		a_l[ls] = (a_l[ls] | j) & ((j << 1) - 1);   /* Set bit lr to 1, higher bits to 0 */
+	}
+	else
+	{
+		a_l[ls] |= BASEDIV2;
+	}
 
-  SETDIGITS_L (a_l, ls);
+	SETDIGITS_L(a_l, ls);
 
-  /* Purging of variables */
-  PURGEVARS_L ((4, sizeof (i), &i,
-                   sizeof (j), &j,
-                   sizeof (ls), &ls,
-                   sizeof (lr), &lr));
+	/* Purging of variables */
+	PURGEVARS_L((4, sizeof(i), &i,
+		sizeof(j), &j,
+		sizeof(ls), &ls,
+		sizeof(lr), &lr));
 
-  ISPURGED_L  ((4, sizeof (i), &i,
-                   sizeof (j), &j,
-                   sizeof (ls), &ls,
-                   sizeof (lr), &lr));
+	ISPURGED_L((4, sizeof(i), &i,
+		sizeof(j), &j,
+		sizeof(ls), &ls,
+		sizeof(lr), &lr));
 }
 
 
@@ -6176,8 +6169,8 @@ randBBS_l (CLINT a_l, int l)
 
 
 /******************************************************************************
- * Private arithmetic kernel functions                                        *
- ******************************************************************************/
+* Private arithmetic kernel functions                                        *
+******************************************************************************/
 
 
 /******************************************************************************/
@@ -6191,48 +6184,48 @@ randBBS_l (CLINT a_l, int l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-add (CLINT a_l, CLINT b_l, CLINT s_l)
+add(CLINT a_l, CLINT b_l, CLINT s_l)
 {
-  clint *msdptra_l, *msdptrb_l;
-  clint *aptr_l, *bptr_l, *sptr_l = LSDPTR_L (s_l);
-  ULONG carry = 0L;
+	clint *msdptra_l, *msdptrb_l;
+	clint *aptr_l, *bptr_l, *sptr_l = LSDPTR_L(s_l);
+	ULONG carry = 0L;
 
-  if (DIGITS_L (a_l) < DIGITS_L (b_l))
-    {
-      aptr_l = LSDPTR_L (b_l);
-      bptr_l = LSDPTR_L (a_l);
-      msdptra_l = MSDPTR_L (b_l);
-      msdptrb_l = MSDPTR_L (a_l);
-      SETDIGITS_L (s_l, DIGITS_L (b_l));
-    }
-  else
-    {
-      aptr_l = LSDPTR_L (a_l);
-      bptr_l = LSDPTR_L (b_l);
-      msdptra_l = MSDPTR_L (a_l);
-      msdptrb_l = MSDPTR_L (b_l);
-      SETDIGITS_L (s_l, DIGITS_L (a_l));
-    }
+	if (DIGITS_L(a_l) < DIGITS_L(b_l))
+	{
+		aptr_l = LSDPTR_L(b_l);
+		bptr_l = LSDPTR_L(a_l);
+		msdptra_l = MSDPTR_L(b_l);
+		msdptrb_l = MSDPTR_L(a_l);
+		SETDIGITS_L(s_l, DIGITS_L(b_l));
+	}
+	else
+	{
+		aptr_l = LSDPTR_L(a_l);
+		bptr_l = LSDPTR_L(b_l);
+		msdptra_l = MSDPTR_L(a_l);
+		msdptrb_l = MSDPTR_L(b_l);
+		SETDIGITS_L(s_l, DIGITS_L(a_l));
+	}
 
-  while (bptr_l <= msdptrb_l)
-    {
-      *sptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++ + (ULONG)*bptr_l++
-                                   + (ULONG)(USHORT)(carry >> BITPERDGT));
-    }
-  while (aptr_l <= msdptra_l)
-    {
-      *sptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++
-               + (ULONG)(USHORT)(carry >> BITPERDGT));
-    }
-  if (carry & BASE)
-    {
-      *sptr_l = 1;
-      INCDIGITS_L (s_l);
-    }
+	while (bptr_l <= msdptrb_l)
+	{
+		*sptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++ + (ULONG)*bptr_l++
+			+ (ULONG)(USHORT)(carry >> BITPERDGT));
+	}
+	while (aptr_l <= msdptra_l)
+	{
+		*sptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++
+			+ (ULONG)(USHORT)(carry >> BITPERDGT));
+	}
+	if (carry & BASE)
+	{
+		*sptr_l = 1;
+		INCDIGITS_L(s_l);
+	}
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (carry), &carry));
-  ISPURGED_L  ((1, sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(carry), &carry));
+	ISPURGED_L((1, sizeof(carry), &carry));
 }
 
 
@@ -6247,34 +6240,34 @@ add (CLINT a_l, CLINT b_l, CLINT s_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-sub (CLINT a_l, CLINT b_l, CLINT d_l)
+sub(CLINT a_l, CLINT b_l, CLINT d_l)
 {
-  clint *msdptra_l, *msdptrb_l;
-  clint *aptr_l = LSDPTR_L (a_l), *bptr_l = LSDPTR_L (b_l), *dptr_l = LSDPTR_L (d_l);
-  ULONG carry = 0L;
+	clint *msdptra_l, *msdptrb_l;
+	clint *aptr_l = LSDPTR_L(a_l), *bptr_l = LSDPTR_L(b_l), *dptr_l = LSDPTR_L(d_l);
+	ULONG carry = 0L;
 
-  msdptra_l = MSDPTR_L (a_l);
-  msdptrb_l = MSDPTR_L (b_l);
+	msdptra_l = MSDPTR_L(a_l);
+	msdptrb_l = MSDPTR_L(b_l);
 
-  SETDIGITS_L (d_l, DIGITS_L (a_l));
+	SETDIGITS_L(d_l, DIGITS_L(a_l));
 
-  while (bptr_l <= msdptrb_l)
-    {
-      *dptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++ - (ULONG)*bptr_l++
-                                         - ((carry & BASE) >> BITPERDGT));
-    }
+	while (bptr_l <= msdptrb_l)
+	{
+		*dptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++ - (ULONG)*bptr_l++
+			- ((carry & BASE) >> BITPERDGT));
+	}
 
-  while (aptr_l <= msdptra_l)
-    {
-      *dptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++
-                     - ((carry & BASE) >> BITPERDGT));
-    }
+	while (aptr_l <= msdptra_l)
+	{
+		*dptr_l++ = (USHORT)(carry = (ULONG)*aptr_l++
+			- ((carry & BASE) >> BITPERDGT));
+	}
 
-  RMLDZRS_L (d_l);
+	RMLDZRS_L(d_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (carry), &carry));
-  ISPURGED_L  ((1, sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(carry), &carry));
+	ISPURGED_L((1, sizeof(carry), &carry));
 }
 
 
@@ -6291,63 +6284,63 @@ sub (CLINT a_l, CLINT b_l, CLINT d_l)
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-mult (CLINT aa_l, CLINT bb_l, CLINT p_l) /* Allow for double length result    */
+mult(CLINT aa_l, CLINT bb_l, CLINT p_l) /* Allow for double length result    */
 {
-  register clint *cptr_l, *bptr_l;
-  clint *a_l, *b_l, *aptr_l, *csptr_l, *msdptra_l, *msdptrb_l;
-  USHORT av;
-  ULONG carry;
+	register clint *cptr_l, *bptr_l;
+	clint *a_l, *b_l, *aptr_l, *csptr_l, *msdptra_l, *msdptrb_l;
+	USHORT av;
+	ULONG carry;
 
-  if (EQZ_L (aa_l) || EQZ_L (bb_l))
-    {
-      SETZERO_L (p_l);
-      return;
-    }
+	if (EQZ_L(aa_l) || EQZ_L(bb_l))
+	{
+		SETZERO_L(p_l);
+		return;
+	}
 
-  if (DIGITS_L (aa_l) < DIGITS_L (bb_l))
-    {
-      a_l = bb_l;
-      b_l = aa_l;
-    }
-  else
-    {
-      a_l = aa_l;
-      b_l = bb_l;
-    }
+	if (DIGITS_L(aa_l) < DIGITS_L(bb_l))
+	{
+		a_l = bb_l;
+		b_l = aa_l;
+	}
+	else
+	{
+		a_l = aa_l;
+		b_l = bb_l;
+	}
 
-  msdptra_l = MSDPTR_L (a_l);
-  msdptrb_l = MSDPTR_L (b_l);
+	msdptra_l = MSDPTR_L(a_l);
+	msdptrb_l = MSDPTR_L(b_l);
 
-  carry = 0;
-  av = *LSDPTR_L (a_l);
-  for (bptr_l = LSDPTR_L (b_l), cptr_l = LSDPTR_L (p_l); bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
-    {
-      *cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
-                           (ULONG)(USHORT)(carry >> BITPERDGT));
-    }
-  *cptr_l = (USHORT)(carry >> BITPERDGT);
+	carry = 0;
+	av = *LSDPTR_L(a_l);
+	for (bptr_l = LSDPTR_L(b_l), cptr_l = LSDPTR_L(p_l); bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
+	{
+		*cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
+			(ULONG)(USHORT)(carry >> BITPERDGT));
+	}
+	*cptr_l = (USHORT)(carry >> BITPERDGT);
 
-  for (csptr_l = LSDPTR_L (p_l) + 1, aptr_l = LSDPTR_L (a_l) + 1; aptr_l <= msdptra_l; csptr_l++, aptr_l++)
-    {
-      carry = 0;
-      av = *aptr_l;
-      for (bptr_l = LSDPTR_L (b_l), cptr_l = csptr_l; bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
-        {
-          *cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
-              (ULONG)*cptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-        }
-      *cptr_l = (USHORT)(carry >> BITPERDGT);
-    }
+	for (csptr_l = LSDPTR_L(p_l) + 1, aptr_l = LSDPTR_L(a_l) + 1; aptr_l <= msdptra_l; csptr_l++, aptr_l++)
+	{
+		carry = 0;
+		av = *aptr_l;
+		for (bptr_l = LSDPTR_L(b_l), cptr_l = csptr_l; bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
+		{
+			*cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
+				(ULONG)*cptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		}
+		*cptr_l = (USHORT)(carry >> BITPERDGT);
+	}
 
-  SETDIGITS_L (p_l, DIGITS_L (a_l) + DIGITS_L (b_l));
-  RMLDZRS_L (p_l);
+	SETDIGITS_L(p_l, DIGITS_L(a_l) + DIGITS_L(b_l));
+	RMLDZRS_L(p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (carry), &carry,
-                   sizeof (av), &av));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(carry), &carry,
+		sizeof(av), &av));
 
-  ISPURGED_L  ((2, sizeof (carry), &carry,
-                   sizeof (av), &av));
+	ISPURGED_L((2, sizeof(carry), &carry,
+		sizeof(av), &av));
 }
 
 
@@ -6363,34 +6356,34 @@ mult (CLINT aa_l, CLINT bb_l, CLINT p_l) /* Allow for double length result    */
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-umul (CLINT a_l, USHORT b, CLINT p_l)   /* Allow for double length result     */
+umul(CLINT a_l, USHORT b, CLINT p_l)   /* Allow for double length result     */
 {
-  register clint *aptr_l, *cptr_l;
-  clint *msdptra_l;
-  ULONG carry;
+	register clint *aptr_l, *cptr_l;
+	clint *msdptra_l;
+	ULONG carry;
 
-  if (EQZ_L (a_l) || 0 == b)
-    {
-      SETZERO_L (p_l);
-      return;
-    }
+	if (EQZ_L(a_l) || 0 == b)
+	{
+		SETZERO_L(p_l);
+		return;
+	}
 
-  msdptra_l = MSDPTR_L (a_l);
+	msdptra_l = MSDPTR_L(a_l);
 
-  carry = 0;
-  for (aptr_l = LSDPTR_L (a_l), cptr_l = LSDPTR_L (p_l); aptr_l <= msdptra_l; aptr_l++, cptr_l++)
-    {
-      *cptr_l = (USHORT)(carry = (ULONG)b * (ULONG)*aptr_l +
-                          (ULONG)(USHORT)(carry >> BITPERDGT));
-    }
-  *cptr_l = (USHORT)(carry >> BITPERDGT);
+	carry = 0;
+	for (aptr_l = LSDPTR_L(a_l), cptr_l = LSDPTR_L(p_l); aptr_l <= msdptra_l; aptr_l++, cptr_l++)
+	{
+		*cptr_l = (USHORT)(carry = (ULONG)b * (ULONG)*aptr_l +
+			(ULONG)(USHORT)(carry >> BITPERDGT));
+	}
+	*cptr_l = (USHORT)(carry >> BITPERDGT);
 
-  SETDIGITS_L (p_l, DIGITS_L (a_l) + 1);
-  RMLDZRS_L (p_l);
+	SETDIGITS_L(p_l, DIGITS_L(a_l) + 1);
+	RMLDZRS_L(p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((1, sizeof (carry), &carry));
-  ISPURGED_L  ((1, sizeof (carry), &carry));
+	/* Purging of variables */
+	PURGEVARS_L((1, sizeof(carry), &carry));
+	ISPURGED_L((1, sizeof(carry), &carry));
 }
 
 
@@ -6406,70 +6399,70 @@ umul (CLINT a_l, USHORT b, CLINT p_l)   /* Allow for double length result     */
 /*                                                                            */
 /******************************************************************************/
 void __FLINT_API
-sqr (CLINT a_l, CLINT p_l)              /* Allow for double length result     */
+sqr(CLINT a_l, CLINT p_l)              /* Allow for double length result     */
 {
-  register clint *cptr_l, *bptr_l;
-  clint *aptr_l, *csptr_l, *msdptra_l, *msdptrb_l, *msdptrc_l;
-  USHORT av;
-  ULONG carry;
+	register clint *cptr_l, *bptr_l;
+	clint *aptr_l, *csptr_l, *msdptra_l, *msdptrb_l, *msdptrc_l;
+	USHORT av;
+	ULONG carry;
 
-  if (EQZ_L (a_l))
-    {
-      SETZERO_L (p_l);
-      return;
-    }
+	if (EQZ_L(a_l))
+	{
+		SETZERO_L(p_l);
+		return;
+	}
 
-  msdptrb_l = MSDPTR_L (a_l);
-  msdptra_l = msdptrb_l - 1;
-  *LSDPTR_L (p_l) = 0;
-  carry = 0;
-  av = *LSDPTR_L (a_l);
-  for (bptr_l = LSDPTR_L (a_l) + 1, cptr_l = LSDPTR_L (p_l) + 1; bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
-    {
-      *cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
-                           (ULONG)(USHORT)(carry >> BITPERDGT));
-    }
-  *cptr_l = (USHORT)(carry >> BITPERDGT);
+	msdptrb_l = MSDPTR_L(a_l);
+	msdptra_l = msdptrb_l - 1;
+	*LSDPTR_L(p_l) = 0;
+	carry = 0;
+	av = *LSDPTR_L(a_l);
+	for (bptr_l = LSDPTR_L(a_l) + 1, cptr_l = LSDPTR_L(p_l) + 1; bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
+	{
+		*cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
+			(ULONG)(USHORT)(carry >> BITPERDGT));
+	}
+	*cptr_l = (USHORT)(carry >> BITPERDGT);
 
-  for (aptr_l = LSDPTR_L (a_l) + 1, csptr_l = LSDPTR_L (p_l) + 3; aptr_l <= msdptra_l; aptr_l++, csptr_l += 2)
-    {
-      carry = 0;
-      av = *aptr_l;
-      for (bptr_l = aptr_l + 1, cptr_l = csptr_l; bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
-        {
-          *cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
-              (ULONG)*cptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-        }
-      *cptr_l = (USHORT)(carry >> BITPERDGT);
-    }
+	for (aptr_l = LSDPTR_L(a_l) + 1, csptr_l = LSDPTR_L(p_l) + 3; aptr_l <= msdptra_l; aptr_l++, csptr_l += 2)
+	{
+		carry = 0;
+		av = *aptr_l;
+		for (bptr_l = aptr_l + 1, cptr_l = csptr_l; bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
+		{
+			*cptr_l = (USHORT)(carry = (ULONG)av * (ULONG)*bptr_l +
+				(ULONG)*cptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		}
+		*cptr_l = (USHORT)(carry >> BITPERDGT);
+	}
 
-  msdptrc_l = cptr_l;
-  carry = 0;
-  for (cptr_l = LSDPTR_L (p_l); cptr_l <= msdptrc_l; cptr_l++)
-    {
-      *cptr_l = (USHORT)(carry = (((ULONG)*cptr_l) << 1) +
-                        (ULONG)(USHORT)(carry >> BITPERDGT));
-    }
-  *cptr_l = (USHORT)(carry >> BITPERDGT);
+	msdptrc_l = cptr_l;
+	carry = 0;
+	for (cptr_l = LSDPTR_L(p_l); cptr_l <= msdptrc_l; cptr_l++)
+	{
+		*cptr_l = (USHORT)(carry = (((ULONG)*cptr_l) << 1) +
+			(ULONG)(USHORT)(carry >> BITPERDGT));
+	}
+	*cptr_l = (USHORT)(carry >> BITPERDGT);
 
-  carry = 0;
-  for (bptr_l = LSDPTR_L (a_l), cptr_l = LSDPTR_L (p_l); bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
-    {
-      *cptr_l = (USHORT)(carry = (ULONG)*bptr_l * (ULONG)*bptr_l +
-                (ULONG)*cptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
-      cptr_l++;
-      *cptr_l = (USHORT)(carry = (ULONG)*cptr_l + (carry >> BITPERDGT));
-    }
+	carry = 0;
+	for (bptr_l = LSDPTR_L(a_l), cptr_l = LSDPTR_L(p_l); bptr_l <= msdptrb_l; bptr_l++, cptr_l++)
+	{
+		*cptr_l = (USHORT)(carry = (ULONG)*bptr_l * (ULONG)*bptr_l +
+			(ULONG)*cptr_l + (ULONG)(USHORT)(carry >> BITPERDGT));
+		cptr_l++;
+		*cptr_l = (USHORT)(carry = (ULONG)*cptr_l + (carry >> BITPERDGT));
+	}
 
-  SETDIGITS_L (p_l, DIGITS_L (a_l) << 1);
-  RMLDZRS_L (p_l);
+	SETDIGITS_L(p_l, DIGITS_L(a_l) << 1);
+	RMLDZRS_L(p_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (carry), &carry,
-                   sizeof (av), &av));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(carry), &carry,
+		sizeof(av), &av));
 
-  ISPURGED_L  ((2, sizeof (carry), &carry,
-                   sizeof (av), &av));
+	ISPURGED_L((2, sizeof(carry), &carry,
+		sizeof(av), &av));
 }
 
 #endif /* FLINT_ASM */
@@ -6487,57 +6480,57 @@ sqr (CLINT a_l, CLINT p_l)              /* Allow for double length result     */
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-sadd (CLINT a_l, int sign_a, CLINT b_l, int sign_b, CLINT c_l)
+sadd(CLINT a_l, int sign_a, CLINT b_l, int sign_b, CLINT c_l)
 {
-  int sign_c;
+	int sign_c;
 
-  Assert (sign_a == 1 || sign_a == -1);
-  Assert (sign_b == 1 || sign_b == -1);
+	Assert(sign_a == 1 || sign_a == -1);
+	Assert(sign_b == 1 || sign_b == -1);
 
-  if (1 == sign_a)
-    {
-      if (1 == sign_b)            /* a + b */
-        {
-          add (a_l, b_l, c_l);
-          sign_c = 1;
-        }
-      else                        /* -1 == sign_b, a - b */
-        {
-          if (LT_L (a_l, b_l))
-            {
-              sub (b_l, a_l, c_l);
-              sign_c = -1;
-            }
-          else
-            {
-              sub (a_l, b_l, c_l);
-              sign_c = 1;
-            }
-        }
-    }
-  else                            /* -1 == sign_a */
-    {
-      if (1 == sign_b)            /* b - a */
-        {
-          if (LT_L (b_l, a_l))
-            {
-              sub (a_l, b_l, c_l);
-              sign_c = -1;
-            }
-          else
-            {
-              sub (b_l, a_l, c_l);
-              sign_c = 1;
-            }
-        }
-      else                        /* -1 == sign_b, -(a + b) */
-        {
-          add (a_l, b_l, c_l);
-          sign_c = -1;
-        }
-    }
+	if (1 == sign_a)
+	{
+		if (1 == sign_b)            /* a + b */
+		{
+			add(a_l, b_l, c_l);
+			sign_c = 1;
+		}
+		else                        /* -1 == sign_b, a - b */
+		{
+			if (LT_L(a_l, b_l))
+			{
+				sub(b_l, a_l, c_l);
+				sign_c = -1;
+			}
+			else
+			{
+				sub(a_l, b_l, c_l);
+				sign_c = 1;
+			}
+		}
+	}
+	else                            /* -1 == sign_a */
+	{
+		if (1 == sign_b)            /* b - a */
+		{
+			if (LT_L(b_l, a_l))
+			{
+				sub(a_l, b_l, c_l);
+				sign_c = -1;
+			}
+			else
+			{
+				sub(b_l, a_l, c_l);
+				sign_c = 1;
+			}
+		}
+		else                        /* -1 == sign_b, -(a + b) */
+		{
+			add(a_l, b_l, c_l);
+			sign_c = -1;
+		}
+	}
 
-  return sign_c;
+	return sign_c;
 }
 
 
@@ -6553,57 +6546,57 @@ sadd (CLINT a_l, int sign_a, CLINT b_l, int sign_b, CLINT c_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-ssub (CLINT a_l, int sign_a, CLINT b_l, int sign_b, CLINT c_l)
+ssub(CLINT a_l, int sign_a, CLINT b_l, int sign_b, CLINT c_l)
 {
-  int sign_c;
+	int sign_c;
 
-  Assert (sign_a == 1 || sign_a == -1);
-  Assert (sign_b == 1 || sign_b == -1);
+	Assert(sign_a == 1 || sign_a == -1);
+	Assert(sign_b == 1 || sign_b == -1);
 
-  if (1 == sign_a)
-    {
-      if (1 == sign_b)            /* a - b */
-        {
-          if (LT_L (a_l, b_l))
-            {
-              sub (b_l, a_l, c_l);
-              sign_c = -1;
-            }
-          else
-            {
-              sub (a_l, b_l, c_l);
-              sign_c = 1;
-            }
-        }
-      else                        /* -1 == sign_b, a + b */
-        {
-          add (a_l, b_l, c_l);
-          sign_c = 1;
-        }
-    }
-  else                            /* -1 == sign_a */
-    {
-      if (1 == sign_b)            /* -(a + b) */
-        {
-          add (a_l, b_l, c_l);
-          sign_c = -1;
-        }
-      else                        /* -1 == sign_b, b - a) */
-        {
-          if (LT_L (b_l, a_l))
-            {
-              sub (a_l, b_l, c_l);
-              sign_c = -1;
-            }
-          else
-            {
-              sub (b_l, a_l, c_l);
-              sign_c = 1;
-            }
-        }
-    }
+	if (1 == sign_a)
+	{
+		if (1 == sign_b)            /* a - b */
+		{
+			if (LT_L(a_l, b_l))
+			{
+				sub(b_l, a_l, c_l);
+				sign_c = -1;
+			}
+			else
+			{
+				sub(a_l, b_l, c_l);
+				sign_c = 1;
+			}
+		}
+		else                        /* -1 == sign_b, a + b */
+		{
+			add(a_l, b_l, c_l);
+			sign_c = 1;
+		}
+	}
+	else                            /* -1 == sign_a */
+	{
+		if (1 == sign_b)            /* -(a + b) */
+		{
+			add(a_l, b_l, c_l);
+			sign_c = -1;
+		}
+		else                        /* -1 == sign_b, b - a) */
+		{
+			if (LT_L(b_l, a_l))
+			{
+				sub(a_l, b_l, c_l);
+				sign_c = -1;
+			}
+			else
+			{
+				sub(b_l, a_l, c_l);
+				sign_c = 1;
+			}
+		}
+	}
 
-  return sign_c;
+	return sign_c;
 }
 
 
@@ -6617,32 +6610,32 @@ ssub (CLINT a_l, int sign_a, CLINT b_l, int sign_b, CLINT c_l)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-smod (CLINT a_l, int sign_a, CLINT b_l, CLINT c_l)
+smod(CLINT a_l, int sign_a, CLINT b_l, CLINT c_l)
 {
-  CLINT q_l, r_l;
+	CLINT q_l, r_l;
 
-  if (EQZ_L (b_l))
-    {
-      return E_CLINT_DBZ;
-    }
+	if (EQZ_L(b_l))
+	{
+		return E_CLINT_DBZ;
+	}
 
-  div_l (a_l, b_l, q_l, r_l);
+	div_l(a_l, b_l, q_l, r_l);
 
-  if ((-1 == sign_a) && GTZ_L (r_l))
-    {
-      sub_l (b_l, r_l, r_l);
-    }
+	if ((-1 == sign_a) && GTZ_L(r_l))
+	{
+		sub_l(b_l, r_l, r_l);
+	}
 
-  cpy_l (c_l, r_l);
+	cpy_l(c_l, r_l);
 
-  /* Purging of variables */
-  PURGEVARS_L ((2, sizeof (q_l), q_l,
-                   sizeof (r_l), r_l));
+	/* Purging of variables */
+	PURGEVARS_L((2, sizeof(q_l), q_l,
+		sizeof(r_l), r_l));
 
-  ISPURGED_L  ((2, sizeof (q_l), q_l,
-                   sizeof (r_l), r_l));
+	ISPURGED_L((2, sizeof(q_l), q_l,
+		sizeof(r_l), r_l));
 
-  return 1;
+	return 1;
 }
 
 
@@ -6658,76 +6651,76 @@ smod (CLINT a_l, int sign_a, CLINT b_l, CLINT c_l)
 /*                                                                            */
 /******************************************************************************/
 ULONG * __FLINT_API
-genprimes (ULONG N)
+genprimes(ULONG N)
 {
-  ULONG i, k, p, s, L, B, count;
-  char *f;
-  ULONG *primes;
+	ULONG i, k, p, s, L, B, count;
+	char *f;
+	ULONG *primes;
 
-  B = (1 + ul_iroot (N)) >> 1;
-  L = N >> 1;
-  if (((N&1) == 0) && (N > 0))
-    {
-      --L;
-    }
+	B = (1 + ul_iroot(N)) >> 1;
+	L = N >> 1;
+	if (((N & 1) == 0) && (N > 0))
+	{
+		--L;
+	}
 
-  if ((f = (char *)malloc ((size_t)L+1)) == NULL)
-    {
-      return (ULONG *)NULL;
-    }
+	if ((f = (char *)malloc((size_t)L + 1)) == NULL)
+	{
+		return (ULONG *)NULL;
+	}
 
-  for (i = 1; i <= L; i++)
-    {
-      f[i] = 1;
-    }
+	for (i = 1; i <= L; i++)
+	{
+		f[i] = 1;
+	}
 
-  p = 3;
-  s = 4;
-  for (i = 1; i <= B; i++)
-    {
-      if (f[i])
-        {
-          for (k = s; k <= L; k += p)
-            {
-              f[k] = 0;
-            }
-        }
-      s += p + p + 2;
-      p += 2;
-    }
+	p = 3;
+	s = 4;
+	for (i = 1; i <= B; i++)
+	{
+		if (f[i])
+		{
+			for (k = s; k <= L; k += p)
+			{
+				f[k] = 0;
+			}
+		}
+		s += p + p + 2;
+		p += 2;
+	}
 
-  for (count = i = 1; i <= L; i++)
-    {
-      count += f[i];
-    }
+	for (count = i = 1; i <= L; i++)
+	{
+		count += f[i];
+	}
 
-  if ((primes = (ULONG*)malloc ((size_t)(count+1) * sizeof (ULONG))) == NULL)
-    {
-      free (f);
-      return (ULONG *)NULL;
-    }
+	if ((primes = (ULONG*)malloc((size_t)(count + 1) * sizeof(ULONG))) == NULL)
+	{
+		free(f);
+		return (ULONG *)NULL;
+	}
 
-  for (count = i = 1; i <= L; i++)
-    {
-      if (f[i])
-        {
-          ++count;
-          primes[count] = (i << 1) + 1;      /*lint !e796 !e797 */
-        }
-    }
+	for (count = i = 1; i <= L; i++)
+	{
+		if (f[i])
+		{
+			++count;
+			primes[count] = (i << 1) + 1;      /*lint !e796 !e797 */
+		}
+	}
 
-  if (N < 2)
-    {
-      primes[0] = 0;
-    }
-  else
-    {
-      primes[0] = count;
-      primes[1] = 2;                         /*lint !e796 */
-    }
-  free (f);
+	if (N < 2)
+	{
+		primes[0] = 0;
+	}
+	else
+	{
+		primes[0] = count;
+		primes[1] = 2;                         /*lint !e796 */
+	}
+	free(f);
 
-  return primes;
+	return primes;
 }
 
 
@@ -6749,28 +6742,27 @@ genprimes (ULONG N)
 /*                                                                            */
 /******************************************************************************/
 static ULONG
-ul_iroot (ULONG n)
+ul_iroot(ULONG n)
 {
-  ULONG x = 1, y = 0;
-  if (0 == n)
-    {
-      return 0;
-    }
+	ULONG x = 1, y = 0;
+	if (0 == n)
+	{
+		return 0;
+	}
 
-  while (y <= n)
-    {
-      x = x << 1;
-      y = x * x;
-    }
-  do
-    {
-      y = x;
-      x = (x * x + n) / (2 * x);
-    }
-  while (x < y);
+	while (y <= n)
+	{
+		x = x << 1;
+		y = x * x;
+	}
+	do
+	{
+		y = x;
+		x = (x * x + n) / (2 * x);
+	} while (x < y);
 
-  y = 0;
-  return x;
+	y = 0;
+	return x;
 }
 
 
@@ -6784,20 +6776,20 @@ ul_iroot (ULONG n)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-strrev_l (char *str)
+strrev_l(char *str)
 {
-  char help;
-  char *anfang = str;
-  char *ende = str + strlen (str) - 1;  /* '\0' bleibt am Platz */
+	char help;
+	char *anfang = str;
+	char *ende = str + strlen(str) - 1;  /* '\0' bleibt am Platz */
 
-  for (; ende > anfang; ende--, anfang++)
-    {
-      help = *anfang;
-      *anfang = *ende;
-      *ende = help;
-    }
+	for (; ende > anfang; ende--, anfang++)
+	{
+		help = *anfang;
+		*anfang = *ende;
+		*ende = help;
+	}
 
-  return str;
+	return str;
 }
 
 
@@ -6811,16 +6803,16 @@ strrev_l (char *str)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-tolower_l (int c)
+tolower_l(int c)
 {
-  if (isupper (c))
-    {
-      return tolower (c);
-    }
-  else
-    {
-      return c;
-    }
+	if (isupper(c))
+	{
+		return tolower(c);
+	}
+	else
+	{
+		return c;
+	}
 }
 
 
@@ -6834,16 +6826,16 @@ tolower_l (int c)
 /*                                                                            */
 /******************************************************************************/
 int __FLINT_API
-toupper_l (int c)
+toupper_l(int c)
 {
-  if (islower (c))
-    {
-      return toupper (c);
-    }
-  else
-    {
-      return c;
-    }
+	if (islower(c))
+	{
+		return toupper(c);
+	}
+	else
+	{
+		return c;
+	}
 }
 
 
@@ -6857,16 +6849,16 @@ toupper_l (int c)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-strlwr_l (char *str)
+strlwr_l(char *str)
 {
-  unsigned i;
+	unsigned i;
 
-  for (i = 0 ; i < (unsigned)strlen (str); i++)
-    {
-      str[i] = (char)tolower_l (str[i]);
-    }
+	for (i = 0; i < (unsigned)strlen(str); i++)
+	{
+		str[i] = (char)tolower_l(str[i]);
+	}
 
-  return str;
+	return str;
 }
 
 
@@ -6880,14 +6872,14 @@ strlwr_l (char *str)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-strupr_l (char *str)
+strupr_l(char *str)
 {
-  unsigned i;
-  for (i = 0 ; i < (unsigned)strlen (str) ; i++)
-    {
-      str[i] = (char)toupper_l (str[i]);
-    }
-  return str;
+	unsigned i;
+	for (i = 0; i < (unsigned)strlen(str); i++)
+	{
+		str[i] = (char)toupper_l(str[i]);
+	}
+	return str;
 }
 
 
@@ -6904,27 +6896,26 @@ strupr_l (char *str)
 /*                                                                            */
 /******************************************************************************/
 char * __FLINT_API
-ultoa_l (char *str, ULONG ul, int base)
+ultoa_l(char *str, ULONG ul, int base)
 {
-  int i = 0, j;
+	int i = 0, j;
 
-  if ((base < 2) || (base > 16))
-    {
-      return (char *)NULL;
-    }
+	if ((base < 2) || (base > 16))
+	{
+		return (char *)NULL;
+	}
 
-  do
-    {
-      j = ul % (unsigned)(base + '0');
-      if (j > (int)'9')
-        {
-          j += (int)('a' - '9') - 1;
-        }
-      str[i++] = j;
-    }
-  while ((ul /= (unsigned)base) != 0);
-  str[i] = '\0';
-  return (strrev_l (str));
+	do
+	{
+		j = ul % (unsigned)(base + '0');
+		if (j > (int)'9')
+		{
+			j += (int)('a' - '9') - 1;
+		}
+		str[i++] = j;
+	} while ((ul /= (unsigned)base) != 0);
+	str[i] = '\0';
+	return (strrev_l(str));
 }
 
 
@@ -6945,26 +6936,26 @@ ultoa_l (char *str, ULONG ul, int base)
 /*  Returns:   -                                                              */
 /*                                                                            */
 /******************************************************************************/
-static void purgevars_l (int noofvars, ...)
+static void purgevars_l(int noofvars, ...)
 {
-  va_list ap;
-  size_t size;
-  va_start (ap, noofvars);
-  for (; noofvars > 0; --noofvars)
-    {
-      switch (size = va_arg (ap, size_t))
-        {
-          case 1:  *va_arg (ap, char *) = 0;
-                   break;
-          case 2:  *va_arg (ap, short *) = 0;
-                   break;
-          case 4:  *va_arg (ap, long *) = 0;
-                   break;
-          default: Assert (size >= CLINTMAXBYTE);
-                   memset (va_arg(ap, char *), 0, size);
-        }
-    }
-  va_end (ap);
+	va_list ap;
+	size_t size;
+	va_start(ap, noofvars);
+	for (; noofvars > 0; --noofvars)
+	{
+		switch (size = va_arg(ap, size_t))
+		{
+		case 1:  *va_arg(ap, char *) = 0;
+			break;
+		case 2:  *va_arg(ap, short *) = 0;
+			break;
+		case 4:  *va_arg(ap, long *) = 0;
+			break;
+		default: Assert(size >= CLINTMAXBYTE);
+			memset(va_arg(ap, char *), 0, size);
+		}
+	}
+	va_end(ap);
 }
 
 #ifdef FLINT_DEBUG
@@ -6979,23 +6970,23 @@ static void purgevars_l (int noofvars, ...)
 /*             0 else                                                         */
 /*                                                                            */
 /******************************************************************************/
-static int ispurged_l (int noofvars, ...)
+static int ispurged_l(int noofvars, ...)
 {
-  va_list ap;
-  size_t size;
-  char *cptr;
-  va_start (ap, noofvars);
-  for (; noofvars > 0; --noofvars)
-    {
-      size = va_arg (ap, size_t);
-      cptr = va_arg(ap, char *);
-      for (; size > 0; size--)
-        {
-          if (0 != *cptr++) return 0;
-        }
-    }
-  va_end (ap);
-  return 1;
+	va_list ap;
+	size_t size;
+	char *cptr;
+	va_start(ap, noofvars);
+	for (; noofvars > 0; --noofvars)
+	{
+		size = va_arg(ap, size_t);
+		cptr = va_arg(ap, char *);
+		for (; size > 0; size--)
+		{
+			if (0 != *cptr++) return 0;
+		}
+	}
+	va_end(ap);
+	return 1;
 }
 #endif /* FLINT_DEBUG */
 #endif /* FLINT_SECURE */
@@ -7006,332 +6997,332 @@ static int ispurged_l (int noofvars, ...)
 /* 2, 2 + 1 = 3, 3 + 2 = 5, 5 + 2 = 7, 7 + 4 = 11 etc until 65519 + 2 = 65521 */
 
 USHORT __FLINT_API_DATA smallprimes[NOOFSMALLPRIMES] =
-{   2, 1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6, 4, 2, 4, 6, 6, 2, 6, 4, 2,
-    6, 4, 6, 8, 4, 2, 4, 2, 4, 14, 4, 6, 2, 10, 2, 6, 6, 4, 6, 6,
-    2, 10, 2, 4, 2, 12, 12, 4, 2, 4, 6, 2, 10, 6, 6, 6, 2, 6, 4, 2,
-    10, 14, 4, 2, 4, 14, 6, 10, 2, 4, 6, 8, 6, 6, 4, 6, 8, 4, 8, 10,
-    2, 10, 2, 6, 4, 6, 8, 4, 2, 4, 12, 8, 4, 8, 4, 6, 12, 2, 18, 6,
-    10, 6, 6, 2, 6, 10, 6, 6, 2, 6, 6, 4, 2, 12, 10, 2, 4, 6, 6, 2,
-    12, 4, 6, 8, 10, 8, 10, 8, 6, 6, 4, 8, 6, 4, 8, 4, 14, 10, 12, 2,
-    10, 2, 4, 2, 10, 14, 4, 2, 4, 14, 4, 2, 4, 20, 4, 8, 10, 8, 4, 6,
-    6, 14, 4, 6, 6, 8, 6, 12, 4, 6, 2, 10, 2, 6, 10, 2, 10, 2, 6, 18,
-    4, 2, 4, 6, 6, 8, 6, 6, 22, 2, 10, 8, 10, 6, 6, 8, 12, 4, 6, 6,
-    2, 6, 12, 10, 18, 2, 4, 6, 2, 6, 4, 2, 4, 12, 2, 6, 34, 6, 6, 8,
-    18, 10, 14, 4, 2, 4, 6, 8, 4, 2, 6, 12, 10, 2, 4, 2, 4, 6, 12, 12,
-    8, 12, 6, 4, 6, 8, 4, 8, 4, 14, 4, 6, 2, 4, 6, 2, 6, 10, 20, 6,
-    4, 2, 24, 4, 2, 10, 12, 2, 10, 8, 6, 6, 6, 18, 6, 4, 2, 12, 10, 12,
-    8, 16, 14, 6, 4, 2, 4, 2, 10, 12, 6, 6, 18, 2, 16, 2, 22, 6, 8, 6,
-    4, 2, 4, 8, 6, 10, 2, 10, 14, 10, 6, 12, 2, 4, 2, 10, 12, 2, 16, 2,
-    6, 4, 2, 10, 8, 18, 24, 4, 6, 8, 16, 2, 4, 8, 16, 2, 4, 8, 6, 6,
-    4, 12, 2, 22, 6, 2, 6, 4, 6, 14, 6, 4, 2, 6, 4, 6, 12, 6, 6, 14,
-    4, 6, 12, 8, 6, 4, 26, 18, 10, 8, 4, 6, 2, 6, 22, 12, 2, 16, 8, 4,
-    12, 14, 10, 2, 4, 8, 6, 6, 4, 2, 4, 6, 8, 4, 2, 6, 10, 2, 10, 8,
-    4, 14, 10, 12, 2, 6, 4, 2, 16, 14, 4, 6, 8, 6, 4, 18, 8, 10, 6, 6,
-    8, 10, 12, 14, 4, 6, 6, 2, 28, 2, 10, 8, 4, 14, 4, 8, 12, 6, 12, 4,
-    6, 20, 10, 2, 16, 26, 4, 2, 12, 6, 4, 12, 6, 8, 4, 8, 22, 2, 4, 2,
-    12, 28, 2, 6, 6, 6, 4, 6, 2, 12, 4, 12, 2, 10, 2, 16, 2, 16, 6, 20,
-    16, 8, 4, 2, 4, 2, 22, 8, 12, 6, 10, 2, 4, 6, 2, 6, 10, 2, 12, 10,
-    2, 10, 14, 6, 4, 6, 8, 6, 6, 16, 12, 2, 4, 14, 6, 4, 8, 10, 8, 6,
-    6, 22, 6, 2, 10, 14, 4, 6, 18, 2, 10, 14, 4, 2, 10, 14, 4, 8, 18, 4,
-    6, 2, 4, 6, 2, 12, 4, 20, 22, 12, 2, 4, 6, 6, 2, 6, 22, 2, 6, 16,
-    6, 12, 2, 6, 12, 16, 2, 4, 6, 14, 4, 2, 18, 24, 10, 6, 2, 10, 2, 10,
-    2, 10, 6, 2, 10, 2, 10, 6, 8, 30, 10, 2, 10, 8, 6, 10, 18, 6, 12, 12,
-    2, 18, 6, 4, 6, 6, 18, 2, 10, 14, 6, 4, 2, 4, 24, 2, 12, 6, 16, 8,
-    6, 6, 18, 16, 2, 4, 6, 2, 6, 6, 10, 6, 12, 12, 18, 2, 6, 4, 18, 8,
-    24, 4, 2, 4, 6, 2, 12, 4, 14, 30, 10, 6, 12, 14, 6, 10, 12, 2, 4, 6,
-    8, 6, 10, 2, 4, 14, 6, 6, 4, 6, 2, 10, 2, 16, 12, 8, 18, 4, 6, 12,
-    2, 6, 6, 6, 28, 6, 14, 4, 8, 10, 8, 12, 18, 4, 2, 4, 24, 12, 6, 2,
-    16, 6, 6, 14, 10, 14, 4, 30, 6, 6, 6, 8, 6, 4, 2, 12, 6, 4, 2, 6,
-    22, 6, 2, 4, 18, 2, 4, 12, 2, 6, 4, 26, 6, 6, 4, 8, 10, 32, 16, 2,
-    6, 4, 2, 4, 2, 10, 14, 6, 4, 8, 10, 6, 20, 4, 2, 6, 30, 4, 8, 10,
-    6, 6, 8, 6, 12, 4, 6, 2, 6, 4, 6, 2, 10, 2, 16, 6, 20, 4, 12, 14,
-    28, 6, 20, 4, 18, 8, 6, 4, 6, 14, 6, 6, 10, 2, 10, 12, 8, 10, 2, 10,
-    8, 12, 10, 24, 2, 4, 8, 6, 4, 8, 18, 10, 6, 6, 2, 6, 10, 12, 2, 10,
-    6, 6, 6, 8, 6, 10, 6, 2, 6, 6, 6, 10, 8, 24, 6, 22, 2, 18, 4, 8,
-    10, 30, 8, 18, 4, 2, 10, 6, 2, 6, 4, 18, 8, 12, 18, 16, 6, 2, 12, 6,
-    10, 2, 10, 2, 6, 10, 14, 4, 24, 2, 16, 2, 10, 2, 10, 20, 4, 2, 4, 8,
-    16, 6, 6, 2, 12, 16, 8, 4, 6, 30, 2, 10, 2, 6, 4, 6, 6, 8, 6, 4,
-    12, 6, 8, 12, 4, 14, 12, 10, 24, 6, 12, 6, 2, 22, 8, 18, 10, 6, 14, 4,
-    2, 6, 10, 8, 6, 4, 6, 30, 14, 10, 2, 12, 10, 2, 16, 2, 18, 24, 18, 6,
-    16, 18, 6, 2, 18, 4, 6, 2, 10, 8, 10, 6, 6, 8, 4, 6, 2, 10, 2, 12,
-    4, 6, 6, 2, 12, 4, 14, 18, 4, 6, 20, 4, 8, 6, 4, 8, 4, 14, 6, 4,
-    14, 12, 4, 2, 30, 4, 24, 6, 6, 12, 12, 14, 6, 4, 2, 4, 18, 6, 12, 8,
-    6, 4, 12, 2, 12, 30, 16, 2, 6, 22, 14, 6, 10, 12, 6, 2, 4, 8, 10, 6,
-    6, 24, 14, 6, 4, 8, 12, 18, 10, 2, 10, 2, 4, 6, 20, 6, 4, 14, 4, 2,
-    4, 14, 6, 12, 24, 10, 6, 8, 10, 2, 30, 4, 6, 2, 12, 4, 14, 6, 34, 12,
-    8, 6, 10, 2, 4, 20, 10, 8, 16, 2, 10, 14, 4, 2, 12, 6, 16, 6, 8, 4,
-    8, 4, 6, 8, 6, 6, 12, 6, 4, 6, 6, 8, 18, 4, 20, 4, 12, 2, 10, 6,
-    2, 10, 12, 2, 4, 20, 6, 30, 6, 4, 8, 10, 12, 6, 2, 28, 2, 6, 4, 2,
-    16, 12, 2, 6, 10, 8, 24, 12, 6, 18, 6, 4, 14, 6, 4, 12, 8, 6, 12, 4,
-    6, 12, 6, 12, 2, 16, 20, 4, 2, 10, 18, 8, 4, 14, 4, 2, 6, 22, 6, 14,
-    6, 6, 10, 6, 2, 10, 2, 4, 2, 22, 2, 4, 6, 6, 12, 6, 14, 10, 12, 6,
-    8, 4, 36, 14, 12, 6, 4, 6, 2, 12, 6, 12, 16, 2, 10, 8, 22, 2, 12, 6,
-    4, 6, 18, 2, 12, 6, 4, 12, 8, 6, 12, 4, 6, 12, 6, 2, 12, 12, 4, 14,
-    6, 16, 6, 2, 10, 8, 18, 6, 34, 2, 28, 2, 22, 6, 2, 10, 12, 2, 6, 4,
-    8, 22, 6, 2, 10, 8, 4, 6, 8, 4, 12, 18, 12, 20, 4, 6, 6, 8, 4, 2,
-    16, 12, 2, 10, 8, 10, 2, 4, 6, 14, 12, 22, 8, 28, 2, 4, 20, 4, 2, 4,
-    14, 10, 12, 2, 12, 16, 2, 28, 8, 22, 8, 4, 6, 6, 14, 4, 8, 12, 6, 6,
-    4, 20, 4, 18, 2, 12, 6, 4, 6, 14, 18, 10, 8, 10, 32, 6, 10, 6, 6, 2,
-    6, 16, 6, 2, 12, 6, 28, 2, 10, 8, 16, 6, 8, 6, 10, 24, 20, 10, 2, 10,
-    2, 12, 4, 6, 20, 4, 2, 12, 18, 10, 2, 10, 2, 4, 20, 16, 26, 4, 8, 6,
-    4, 12, 6, 8, 12, 12, 6, 4, 8, 22, 2, 16, 14, 10, 6, 12, 12, 14, 6, 4,
-    20, 4, 12, 6, 2, 6, 6, 16, 8, 22, 2, 28, 8, 6, 4, 20, 4, 12, 24, 20,
-    4, 8, 10, 2, 16, 2, 12, 12, 34, 2, 4, 6, 12, 6, 6, 8, 6, 4, 2, 6,
-    24, 4, 20, 10, 6, 6, 14, 4, 6, 6, 2, 12, 6, 10, 2, 10, 6, 20, 4, 26,
-    4, 2, 6, 22, 2, 24, 4, 6, 2, 4, 6, 24, 6, 8, 4, 2, 34, 6, 8, 16,
-    12, 2, 10, 2, 10, 6, 8, 4, 8, 12, 22, 6, 14, 4, 26, 4, 2, 12, 10, 8,
-    4, 8, 12, 4, 14, 6, 16, 6, 8, 4, 6, 6, 8, 6, 10, 12, 2, 6, 6, 16,
-    8, 6, 6, 12, 10, 2, 6, 18, 4, 6, 6, 6, 12, 18, 8, 6, 10, 8, 18, 4,
-    14, 6, 18, 10, 8, 10, 12, 2, 6, 12, 12, 36, 4, 6, 8, 4, 6, 2, 4, 18,
-    12, 6, 8, 6, 6, 4, 18, 2, 4, 2, 24, 4, 6, 6, 14, 30, 6, 4, 6, 12,
-    6, 20, 4, 8, 4, 8, 6, 6, 4, 30, 2, 10, 12, 8, 10, 8, 24, 6, 12, 4,
-    14, 4, 6, 2, 28, 14, 16, 2, 12, 6, 4, 20, 10, 6, 6, 6, 8, 10, 12, 14,
-    10, 14, 16, 14, 10, 14, 6, 16, 6, 8, 6, 16, 20, 10, 2, 6, 4, 2, 4, 12,
-    2, 10, 2, 6, 22, 6, 2, 4, 18, 8, 10, 8, 22, 2, 10, 18, 14, 4, 2, 4,
-    18, 2, 4, 6, 8, 10, 2, 30, 4, 30, 2, 10, 2, 18, 4, 18, 6, 14, 10, 2,
-    4, 20, 36, 6, 4, 6, 14, 4, 20, 10, 14, 22, 6, 2, 30, 12, 10, 18, 2, 4,
-    14, 6, 22, 18, 2, 12, 6, 4, 8, 4, 8, 6, 10, 2, 12, 18, 10, 14, 16, 14,
-    4, 6, 6, 2, 6, 4, 2, 28, 2, 28, 6, 2, 4, 6, 14, 4, 12, 14, 16, 14,
-    4, 6, 8, 6, 4, 6, 6, 6, 8, 4, 8, 4, 14, 16, 8, 6, 4, 12, 8, 16,
-    2, 10, 8, 4, 6, 26, 6, 10, 8, 4, 6, 12, 14, 30, 4, 14, 22, 8, 12, 4,
-    6, 8, 10, 6, 14, 10, 6, 2, 10, 12, 12, 14, 6, 6, 18, 10, 6, 8, 18, 4,
-    6, 2, 6, 10, 2, 10, 8, 6, 6, 10, 2, 18, 10, 2, 12, 4, 6, 8, 10, 12,
-    14, 12, 4, 8, 10, 6, 6, 20, 4, 14, 16, 14, 10, 8, 10, 12, 2, 18, 6, 12,
-    10, 12, 2, 4, 2, 12, 6, 4, 8, 4, 44, 4, 2, 4, 2, 10, 12, 6, 6, 14,
-    4, 6, 6, 6, 8, 6, 36, 18, 4, 6, 2, 12, 6, 6, 6, 4, 14, 22, 12, 2,
-    18, 10, 6, 26, 24, 4, 2, 4, 2, 4, 14, 4, 6, 6, 8, 16, 12, 2, 42, 4,
-    2, 4, 24, 6, 6, 2, 18, 4, 14, 6, 28, 18, 14, 6, 10, 12, 2, 6, 12, 30,
-    6, 4, 6, 6, 14, 4, 2, 24, 4, 6, 6, 26, 10, 18, 6, 8, 6, 6, 30, 4,
-    12, 12, 2, 16, 2, 6, 4, 12, 18, 2, 6, 4, 26, 12, 6, 12, 4, 24, 24, 12,
-    6, 2, 12, 28, 8, 4, 6, 12, 2, 18, 6, 4, 6, 6, 20, 16, 2, 6, 6, 18,
-    10, 6, 2, 4, 8, 6, 6, 24, 16, 6, 8, 10, 6, 14, 22, 8, 16, 6, 2, 12,
-    4, 2, 22, 8, 18, 34, 2, 6, 18, 4, 6, 6, 8, 10, 8, 18, 6, 4, 2, 4,
-    8, 16, 2, 12, 12, 6, 18, 4, 6, 6, 6, 2, 6, 12, 10, 20, 12, 18, 4, 6,
-    2, 16, 2, 10, 14, 4, 30, 2, 10, 12, 2, 24, 6, 16, 8, 10, 2, 12, 22, 6,
-    2, 16, 20, 10, 2, 12, 12, 18, 10, 12, 6, 2, 10, 2, 6, 10, 18, 2, 12, 6,
-    4, 6, 2, 24, 28, 2, 4, 2, 10, 2, 16, 12, 8, 22, 2, 6, 4, 2, 10, 6,
-    20, 12, 10, 8, 12, 6, 6, 6, 4, 18, 2, 4, 12, 18, 2, 12, 6, 4, 2, 16,
-    12, 12, 14, 4, 8, 18, 4, 12, 14, 6, 6, 4, 8, 6, 4, 20, 12, 10, 14, 4,
-    2, 16, 2, 12, 30, 4, 6, 24, 20, 24, 10, 8, 12, 10, 12, 6, 12, 12, 6, 8,
-    16, 14, 6, 4, 6, 36, 20, 10, 30, 12, 2, 4, 2, 28, 12, 14, 6, 22, 8, 4,
-    18, 6, 14, 18, 4, 6, 2, 6, 34, 18, 2, 16, 6, 18, 2, 24, 4, 2, 6, 12,
-    6, 12, 10, 8, 6, 16, 12, 8, 10, 14, 40, 6, 2, 6, 4, 12, 14, 4, 2, 4,
-    2, 4, 8, 6, 10, 6, 6, 2, 6, 6, 6, 12, 6, 24, 10, 2, 10, 6, 12, 6,
-    6, 14, 6, 6, 52, 20, 6, 10, 2, 10, 8, 10, 12, 12, 2, 6, 4, 14, 16, 8,
-    12, 6, 22, 2, 10, 8, 6, 22, 2, 22, 6, 8, 10, 12, 12, 2, 10, 6, 12, 2,
-    4, 14, 10, 2, 6, 18, 4, 12, 8, 18, 12, 6, 6, 4, 6, 6, 14, 4, 2, 12,
-    12, 4, 6, 18, 18, 12, 2, 16, 12, 8, 18, 10, 26, 4, 6, 8, 6, 6, 4, 2,
-    10, 20, 4, 6, 8, 4, 20, 10, 2, 34, 2, 4, 24, 2, 12, 12, 10, 6, 2, 12,
-    30, 6, 12, 16, 12, 2, 22, 18, 12, 14, 10, 2, 12, 12, 4, 2, 4, 6, 12, 2,
-    16, 18, 2, 40, 8, 16, 6, 8, 10, 2, 4, 18, 8, 10, 8, 12, 4, 18, 2, 18,
-    10, 2, 4, 2, 4, 8, 28, 2, 6, 22, 12, 6, 14, 18, 4, 6, 8, 6, 6, 10,
-    8, 4, 2, 18, 10, 6, 20, 22, 8, 6, 30, 4, 2, 4, 18, 6, 30, 2, 4, 8,
-    6, 4, 6, 12, 14, 34, 14, 6, 4, 2, 6, 4, 14, 4, 2, 6, 28, 2, 4, 6,
-    8, 10, 2, 10, 2, 10, 2, 4, 30, 2, 12, 12, 10, 18, 12, 14, 10, 2, 12, 6,
-    10, 6, 14, 12, 4, 14, 4, 18, 2, 10, 8, 4, 8, 10, 12, 18, 18, 8, 6, 18,
-    16, 14, 6, 6, 10, 14, 4, 6, 2, 12, 12, 4, 6, 6, 12, 2, 16, 2, 12, 6,
-    4, 14, 6, 4, 2, 12, 18, 4, 36, 18, 12, 12, 2, 4, 2, 4, 8, 12, 4, 36,
-    6, 18, 2, 12, 10, 6, 12, 24, 8, 6, 6, 16, 12, 2, 18, 10, 20, 10, 2, 6,
-    18, 4, 2, 40, 6, 2, 16, 2, 4, 8, 18, 10, 12, 6, 2, 10, 8, 4, 6, 12,
-    2, 10, 18, 8, 6, 4, 20, 4, 6, 36, 6, 2, 10, 6, 24, 6, 14, 16, 6, 18,
-    2, 10, 20, 10, 8, 6, 4, 6, 2, 10, 2, 12, 4, 2, 4, 8, 10, 6, 12, 18,
-    14, 12, 16, 8, 6, 16, 8, 4, 2, 6, 18, 24, 18, 10, 12, 2, 4, 14, 10, 6,
-    6, 6, 18, 12, 2, 28, 18, 14, 16, 12, 14, 24, 12, 22, 6, 2, 10, 8, 4, 2,
-    4, 14, 12, 6, 4, 6, 14, 4, 2, 4, 30, 6, 2, 6, 10, 2, 30, 22, 2, 4,
-    6, 8, 6, 6, 16, 12, 12, 6, 8, 4, 2, 24, 12, 4, 6, 8, 6, 6, 10, 2,
-    6, 12, 28, 14, 6, 4, 12, 8, 6, 12, 4, 6, 14, 6, 12, 10, 6, 6, 8, 6,
-    6, 4, 2, 4, 8, 12, 4, 14, 18, 10, 2, 16, 6, 20, 6, 10, 8, 4, 30, 36,
-    12, 8, 22, 12, 2, 6, 12, 16, 6, 6, 2, 18, 4, 26, 4, 8, 18, 10, 8, 10,
-    6, 14, 4, 20, 22, 18, 12, 8, 28, 12, 6, 6, 8, 6, 12, 24, 16, 14, 4, 14,
-    12, 6, 10, 12, 20, 6, 4, 8, 18, 12, 18, 10, 2, 4, 20, 10, 14, 4, 6, 2,
-    10, 24, 18, 2, 4, 20, 16, 14, 10, 14, 6, 4, 6, 20, 6, 10, 6, 2, 12, 6,
-    30, 10, 8, 6, 4, 6, 8, 40, 2, 4, 2, 12, 18, 4, 6, 8, 10, 6, 18, 18,
-    2, 12, 16, 8, 6, 4, 6, 6, 2, 52, 14, 4, 20, 16, 2, 4, 6, 12, 2, 6,
-    12, 12, 6, 4, 14, 10, 6, 6, 14, 10, 14, 16, 8, 6, 12, 4, 8, 22, 6, 2,
-    18, 22, 6, 2, 18, 6, 16, 14, 10, 6, 12, 2, 6, 4, 8, 18, 12, 16, 2, 4,
-    14, 4, 8, 12, 12, 30, 16, 8, 4, 2, 6, 22, 12, 8, 10, 6, 6, 6, 14, 6,
-    18, 10, 12, 2, 10, 2, 4, 26, 4, 12, 8, 4, 18, 8, 10, 14, 16, 6, 6, 8,
-    10, 6, 8, 6, 12, 10, 20, 10, 8, 4, 12, 26, 18, 4, 12, 18, 6, 30, 6, 8,
-    6, 22, 12, 2, 4, 6, 6, 2, 10, 2, 4, 6, 6, 2, 6, 22, 18, 6, 18, 12,
-    8, 12, 6, 10, 12, 2, 16, 2, 10, 2, 10, 18, 6, 20, 4, 2, 6, 22, 6, 6,
-    18, 6, 14, 12, 16, 2, 6, 6, 4, 14, 12, 4, 2, 18, 16, 36, 12, 6, 14, 28,
-    2, 12, 6, 12, 6, 4, 2, 16, 30, 8, 24, 6, 30, 10, 2, 18, 4, 6, 12, 8,
-    22, 2, 6, 22, 18, 2, 10, 2, 10, 30, 2, 28, 6, 14, 16, 6, 20, 16, 2, 6,
-    4, 32, 4, 2, 4, 6, 2, 12, 4, 6, 6, 12, 2, 6, 4, 6, 8, 6, 4, 20,
-    4, 32, 10, 8, 16, 2, 22, 2, 4, 6, 8, 6, 16, 14, 4, 18, 8, 4, 20, 6,
-    12, 12, 6, 10, 2, 10, 2, 12, 28, 12, 18, 2, 18, 10, 8, 10, 48, 2, 4, 6,
-    8, 10, 2, 10, 30, 2, 36, 6, 10, 6, 2, 18, 4, 6, 8, 16, 14, 16, 6, 14,
-    4, 20, 4, 6, 2, 10, 12, 2, 6, 12, 6, 6, 4, 12, 2, 6, 4, 12, 6, 8,
-    4, 2, 6, 18, 10, 6, 8, 12, 6, 22, 2, 6, 12, 18, 4, 14, 6, 4, 20, 6,
-    16, 8, 4, 8, 22, 8, 12, 6, 6, 16, 12, 18, 30, 8, 4, 2, 4, 6, 26, 4,
-    14, 24, 22, 6, 2, 6, 10, 6, 14, 6, 6, 12, 10, 6, 2, 12, 10, 12, 8, 18,
-    18, 10, 6, 8, 16, 6, 6, 8, 16, 20, 4, 2, 10, 2, 10, 12, 6, 8, 6, 10,
-    20, 10, 18, 26, 4, 6, 30, 2, 4, 8, 6, 12, 12, 18, 4, 8, 22, 6, 2, 12,
-    34, 6, 18, 12, 6, 2, 28, 14, 16, 14, 4, 14, 12, 4, 6, 6, 2, 36, 4, 6,
-    20, 12, 24, 6, 22, 2, 16, 18, 12, 12, 18, 2, 6, 6, 6, 4, 6, 14, 4, 2,
-    22, 8, 12, 6, 10, 6, 8, 12, 18, 12, 6, 10, 2, 22, 14, 6, 6, 4, 18, 6,
-    20, 22, 2, 12, 24, 4, 18, 18, 2, 22, 2, 4, 12, 8, 12, 10, 14, 4, 2, 18,
-    16, 38, 6, 6, 6, 12, 10, 6, 12, 8, 6, 4, 6, 14, 30, 6, 10, 8, 22, 6,
-    8, 12, 10, 2, 10, 2, 6, 10, 2, 10, 12, 18, 20, 6, 4, 8, 22, 6, 6, 30,
-    6, 14, 6, 12, 12, 6, 10, 2, 10, 30, 2, 16, 8, 4, 2, 6, 18, 4, 2, 6,
-    4, 26, 4, 8, 6, 10, 2, 4, 6, 8, 4, 6, 30, 12, 2, 6, 6, 4, 20, 22,
-    8, 4, 2, 4, 72, 8, 4, 8, 22, 2, 4, 14, 10, 2, 4, 20, 6, 10, 18, 6,
-    20, 16, 6, 8, 6, 4, 20, 12, 22, 2, 4, 2, 12, 10, 18, 2, 22, 6, 18, 30,
-    2, 10, 14, 10, 8, 16, 50, 6, 10, 8, 10, 12, 6, 18, 2, 22, 6, 2, 4, 6,
-    8, 6, 6, 10, 18, 2, 22, 2, 16, 14, 10, 6, 2, 12, 10, 20, 4, 14, 6, 4,
-    36, 2, 4, 6, 12, 2, 4, 14, 12, 6, 4, 6, 2, 6, 4, 20, 10, 2, 10, 6,
-    12, 2, 24, 12, 12, 6, 6, 4, 24, 2, 4, 24, 2, 6, 4, 6, 8, 16, 6, 2,
-    10, 12, 14, 6, 34, 6, 14, 6, 4, 2, 30, 22, 8, 4, 6, 8, 4, 2, 28, 2,
-    6, 4, 26, 18, 22, 2, 6, 16, 6, 2, 16, 12, 2, 12, 4, 6, 6, 14, 10, 6,
-    8, 12, 4, 18, 2, 10, 8, 16, 6, 6, 30, 2, 10, 18, 2, 10, 8, 4, 8, 12,
-    24, 40, 2, 12, 10, 6, 12, 2, 12, 4, 2, 4, 6, 18, 14, 12, 6, 4, 14, 30,
-    4, 8, 10, 8, 6, 10, 18, 8, 4, 14, 16, 6, 8, 4, 6, 2, 10, 2, 12, 4,
-    2, 4, 6, 8, 4, 6, 32, 24, 10, 8, 18, 10, 2, 6, 10, 2, 4, 18, 6, 12,
-    2, 16, 2, 22, 6, 6, 8, 18, 4, 18, 12, 8, 6, 4, 20, 6, 30, 22, 12, 2,
-    6, 18, 4, 62, 4, 2, 12, 6, 10, 2, 12, 12, 28, 2, 4, 14, 22, 6, 2, 6,
-    6, 10, 14, 4, 2, 10, 6, 8, 10, 14, 10, 6, 2, 12, 22, 18, 8, 10, 18, 12,
-    2, 12, 4, 12, 2, 10, 2, 6, 18, 6, 6, 34, 6, 2, 12, 4, 6, 18, 18, 2,
-    16, 6, 6, 8, 6, 10, 18, 8, 10, 8, 10, 2, 4, 18, 26, 12, 22, 2, 4, 2,
-    22, 6, 6, 14, 16, 6, 20, 10, 12, 2, 18, 42, 4, 24, 2, 6, 10, 12, 2, 6,
-    10, 8, 4, 6, 12, 12, 8, 4, 6, 12, 30, 20, 6, 24, 6, 10, 12, 2, 10, 20,
-    6, 6, 4, 12, 14, 10, 18, 12, 8, 6, 12, 4, 14, 10, 2, 12, 30, 16, 2, 12,
-    6, 4, 2, 4, 6, 26, 4, 18, 2, 4, 6, 14, 54, 6, 52, 2, 16, 6, 6, 12,
-    26, 4, 2, 6, 22, 6, 2, 12, 12, 6, 10, 18, 2, 12, 12, 10, 18, 12, 6, 8,
-    6, 10, 6, 8, 4, 2, 4, 20, 24, 6, 6, 10, 14, 10, 2, 22, 6, 14, 10, 26,
-    4, 18, 8, 12, 12, 10, 12, 6, 8, 16, 6, 8, 6, 6, 22, 2, 10, 20, 10, 6,
-    44, 18, 6, 10, 2, 4, 6, 14, 4, 26, 4, 2, 12, 10, 8, 4, 8, 12, 4, 12,
-    8, 22, 8, 6, 10, 18, 6, 6, 8, 6, 12, 4, 8, 18, 10, 12, 6, 12, 2, 6,
-    4, 2, 16, 12, 12, 14, 10, 14, 6, 10, 12, 2, 12, 6, 4, 6, 2, 12, 4, 26,
-    6, 18, 6, 10, 6, 2, 18, 10, 8, 4, 26, 10, 20, 6, 16, 20, 12, 10, 8, 10,
-    2, 16, 6, 20, 10, 20, 4, 30, 2, 4, 8, 16, 2, 18, 4, 2, 6, 10, 18, 12,
-    14, 18, 6, 16, 20, 6, 4, 8, 6, 4, 6, 12, 8, 10, 2, 12, 6, 4, 2, 6,
-    10, 2, 16, 12, 14, 10, 6, 8, 6, 28, 2, 6, 18, 30, 34, 2, 16, 12, 2, 18,
-    16, 6, 8, 10, 8, 10, 8, 10, 44, 6, 6, 4, 20, 4, 2, 4, 14, 28, 8, 6,
-    16, 14, 30, 6, 30, 4, 14, 10, 6, 6, 8, 4, 18, 12, 6, 2, 22, 12, 8, 6,
-    12, 4, 14, 4, 6, 2, 4, 18, 20, 6, 16, 38, 16, 2, 4, 6, 2, 40, 42, 14,
-    4, 6, 2, 24, 10, 6, 2, 18, 10, 12, 2, 16, 2, 6, 16, 6, 8, 4, 2, 10,
-    6, 8, 10, 2, 18, 16, 8, 12, 18, 12, 6, 12, 10, 6, 6, 18, 12, 14, 4, 2,
-    10, 20, 6, 12, 6, 16, 26, 4, 18, 2, 4, 32, 10, 8, 6, 4, 6, 6, 14, 6,
-    18, 4, 2, 18, 10, 8, 10, 8, 10, 2, 4, 6, 2, 10, 42, 8, 12, 4, 6, 18,
-    2, 16, 8, 4, 2, 10, 14, 12, 10, 20, 4, 8, 10, 38, 4, 6, 2, 10, 20, 10,
-    12, 6, 12, 26, 12, 4, 8, 28, 8, 4, 8, 24, 6, 10, 8, 6, 16, 12, 8, 10,
-    12, 8, 22, 6, 2, 10, 2, 6, 10, 6, 6, 8, 6, 4, 14, 28, 8, 16, 18, 8,
-    4, 6, 20, 4, 18, 6, 2, 24, 24, 6, 6, 12, 12, 4, 2, 22, 2, 10, 6, 8,
-    12, 4, 20, 18, 6, 4, 12, 24, 6, 6, 54, 8, 6, 4, 26, 36, 4, 2, 4, 26,
-    12, 12, 4, 6, 6, 8, 12, 10, 2, 12, 16, 18, 6, 8, 6, 12, 18, 10, 2, 54,
-    4, 2, 10, 30, 12, 8, 4, 8, 16, 14, 12, 6, 4, 6, 12, 6, 2, 4, 14, 12,
-    4, 14, 6, 24, 6, 6, 10, 12, 12, 20, 18, 6, 6, 16, 8, 4, 6, 20, 4, 32,
-    4, 14, 10, 2, 6, 12, 16, 2, 4, 6, 12, 2, 10, 8, 6, 4, 2, 10, 14, 6,
-    6, 12, 18, 34, 8, 10, 6, 24, 6, 2, 10, 12, 2, 30, 10, 14, 12, 12, 16, 6,
-    6, 2, 18, 4, 6, 30, 14, 4, 6, 6, 2, 6, 4, 6, 14, 6, 4, 8, 10, 12,
-    6, 32, 10, 8, 22, 2, 10, 6, 24, 8, 4, 30, 6, 2, 12, 16, 8, 6, 4, 6,
-    8, 16, 14, 6, 6, 4, 2, 10, 12, 2, 16, 14, 4, 2, 4, 20, 18, 10, 2, 10,
-    6, 12, 30, 8, 18, 12, 10, 2, 6, 6, 4, 12, 12, 2, 4, 12, 18, 24, 2, 10,
-    6, 8, 16, 8, 6, 12, 10, 14, 6, 12, 6, 6, 4, 2, 24, 4, 6, 8, 6, 4,
-    2, 4, 6, 14, 4, 8, 10, 24, 24, 12, 2, 6, 12, 22, 30, 2, 6, 18, 10, 6,
-    6, 8, 4, 2, 6, 10, 8, 10, 6, 8, 16, 6, 14, 6, 4, 24, 8, 10, 2, 12,
-    6, 4, 36, 2, 22, 6, 8, 6, 10, 8, 6, 12, 10, 14, 10, 6, 18, 12, 2, 12,
-    4, 26, 10, 14, 16, 18, 8, 18, 12, 12, 6, 16, 14, 24, 10, 12, 8, 22, 6, 2,
-    10, 60, 6, 2, 4, 8, 16, 14, 10, 6, 24, 6, 12, 18, 24, 2, 30, 4, 2, 12,
-    6, 10, 2, 4, 14, 6, 16, 2, 10, 8, 22, 20, 6, 4, 32, 6, 18, 4, 2, 4,
-    2, 4, 8, 52, 14, 22, 2, 22, 20, 10, 8, 10, 2, 6, 4, 14, 4, 6, 20, 4,
-    6, 2, 12, 12, 6, 12, 16, 2, 12, 10, 8, 4, 6, 2, 28, 12, 8, 10, 12, 2,
-    4, 14, 28, 8, 6, 4, 2, 4, 6, 2, 12, 58, 6, 14, 10, 2, 6, 28, 32, 4,
-    30, 8, 6, 4, 6, 12, 12, 2, 4, 6, 6, 14, 16, 8, 30, 4, 2, 10, 8, 6,
-    4, 6, 26, 4, 12, 2, 10, 18, 12, 12, 18, 2, 4, 12, 8, 12, 10, 20, 4, 8,
-    16, 12, 8, 6, 16, 8, 10, 12, 14, 6, 4, 8, 12, 4, 20, 6, 40, 8, 16, 6,
-    36, 2, 6, 4, 6, 2, 22, 18, 2, 10, 6, 36, 14, 12, 4, 18, 8, 4, 14, 10,
-    2, 10, 8, 4, 2, 18, 16, 12, 14, 10, 14, 6, 6, 42, 10, 6, 6, 20, 10, 8,
-    12, 4, 12, 18, 2, 10, 14, 18, 10, 18, 8, 6, 4, 14, 6, 10, 30, 14, 6, 6,
-    4, 12, 38, 4, 2, 4, 6, 8, 12, 10, 6, 18, 6, 50, 6, 4, 6, 12, 8, 10,
-    32, 6, 22, 2, 10, 12, 18, 2, 6, 4, 30, 8, 6, 6, 18, 10, 2, 4, 12, 20,
-    10, 8, 24, 10, 2, 6, 22, 6, 2, 18, 10, 12, 2, 30, 18, 12, 28, 2, 6, 4,
-    6, 14, 6, 12, 10, 8, 4, 12, 26, 10, 8, 6, 16, 2, 10, 18, 14, 6, 4, 6,
-    14, 16, 2, 6, 4, 12, 20, 4, 20, 4, 6, 12, 2, 36, 4, 6, 2, 10, 2, 22,
-    8, 6, 10, 12, 12, 18, 14, 24, 36, 4, 20, 24, 10, 6, 2, 28, 6, 18, 8, 4,
-    6, 8, 6, 4, 2, 12, 28, 18, 14, 16, 14, 18, 10, 8, 6, 4, 6, 6, 8, 22,
-    12, 2, 10, 18, 6, 2, 18, 10, 2, 12, 10, 18, 32, 6, 4, 6, 6, 8, 6, 6,
-    10, 20, 6, 12, 10, 8, 10, 14, 6, 10, 14, 4, 2, 22, 18, 2, 10, 2, 4, 20,
-    4, 2, 34, 2, 12, 6, 10, 2, 10, 18, 6, 14, 12, 12, 22, 8, 6, 16, 6, 8,
-    4, 12, 6, 8, 4, 36, 6, 6, 20, 24, 6, 12, 18, 10, 2, 10, 26, 6, 16, 8,
-    6, 4, 24, 18, 8, 12, 12, 10, 18, 12, 2, 24, 4, 12, 18, 12, 14, 10, 2, 4,
-    24, 12, 14, 10, 6, 2, 6, 4, 6, 26, 4, 6, 6, 2, 22, 8, 18, 4, 18, 8,
-    4, 24, 2, 12, 12, 4, 2, 52, 2, 18, 6, 4, 6, 12, 2, 6, 12, 10, 8, 4,
-    2, 24, 10, 2, 10, 2, 12, 6, 18, 40, 6, 20, 16, 2, 12, 6, 10, 12, 2, 4,
-    6, 14, 12, 12, 22, 6, 8, 4, 2, 16, 18, 12, 2, 6, 16, 6, 2, 6, 4, 12,
-    30, 8, 16, 2, 18, 10, 24, 2, 6, 24, 4, 2, 22, 2, 16, 2, 6, 12, 4, 18,
-    8, 4, 14, 4, 18, 24, 6, 2, 6, 10, 2, 10, 38, 6, 10, 14, 6, 6, 24, 4,
-    2, 12, 16, 14, 16, 12, 2, 6, 10, 26, 4, 2, 12, 6, 4, 12, 8, 12, 10, 18,
-    6, 14, 28, 2, 6, 10, 2, 4, 14, 34, 2, 6, 22, 2, 10, 14, 4, 2, 16, 8,
-    10, 6, 8, 10, 8, 4, 6, 2, 16, 6, 6, 18, 30, 14, 6, 4, 30, 2, 10, 14,
-    4, 20, 10, 8, 4, 8, 18, 4, 14, 6, 4, 24, 6, 6, 18, 18, 2, 36, 6, 10,
-    14, 12, 4, 6, 2, 30, 6, 4, 2, 6, 28, 20, 4, 20, 12, 24, 16, 18, 12, 14,
-    6, 4, 12, 32, 12, 6, 10, 8, 10, 6, 18, 2, 16, 14, 6, 22, 6, 12, 2, 18,
-    4, 8, 30, 12, 4, 12, 2, 10, 38, 22, 2, 4, 14, 6, 12, 24, 4, 2, 4, 14,
-    12, 10, 2, 16, 6, 20, 4, 20, 22, 12, 2, 4, 2, 12, 22, 24, 6, 6, 2, 6,
-    4, 6, 2, 10, 12, 12, 6, 2, 6, 16, 8, 6, 4, 18, 12, 12, 14, 4, 12, 6,
-    8, 6, 18, 6, 10, 12, 14, 6, 4, 8, 22, 6, 2, 28, 18, 2, 18, 10, 6, 14,
-    10, 2, 10, 14, 6, 10, 2, 22, 6, 8, 6, 16, 12, 8, 22, 2, 4, 14, 18, 12,
-    6, 24, 6, 10, 2, 12, 22, 18, 6, 20, 6, 10, 14, 4, 2, 6, 12, 22, 14, 12,
-    4, 6, 8, 22, 2, 10, 12, 8, 40, 2, 6, 10, 8, 4, 42, 20, 4, 32, 12, 10,
-    6, 12, 12, 2, 10, 8, 6, 4, 8, 4, 26, 18, 4, 8, 28, 6, 18, 6, 12, 2,
-    10, 6, 6, 14, 10, 12, 14, 24, 6, 4, 20, 22, 2, 18, 4, 6, 12, 2, 16, 18,
-    14, 6, 6, 4, 6, 8, 18, 4, 14, 30, 4, 18, 8, 10, 2, 4, 8, 12, 4, 12,
-    18, 2, 12, 10, 2, 16, 8, 4, 30, 2, 6, 28, 2, 10, 2, 18, 10, 14, 4, 26,
-    6, 18, 4, 20, 6, 4, 8, 18, 4, 12, 26, 24, 4, 20, 22, 2, 18, 22, 2, 4,
-    12, 2, 6, 6, 6, 4, 6, 14, 4, 24, 12, 6, 18, 2, 12, 28, 14, 4, 6, 8,
-    22, 6, 12, 18, 8, 4, 20, 6, 4, 6, 2, 18, 6, 4, 12, 12, 8, 28, 6, 8,
-    10, 2, 24, 12, 10, 24, 8, 10, 20, 12, 6, 12, 12, 4, 14, 12, 24, 34, 18, 8,
-    10, 6, 18, 8, 4, 8, 16, 14, 6, 4, 6, 24, 2, 6, 4, 6, 2, 16, 6, 6,
-    20, 24, 4, 2, 4, 14, 4, 18, 2, 6, 12, 4, 14, 4, 2, 18, 16, 6, 6, 2,
-    16, 20, 6, 6, 30, 4, 8, 6, 24, 16, 6, 6, 8, 12, 30, 4, 18, 18, 8, 4,
-    26, 10, 2, 22, 8, 10, 14, 6, 4, 18, 8, 12, 28, 2, 6, 4, 12, 6, 24, 6,
-    8, 10, 20, 16, 8, 30, 6, 6, 4, 2, 10, 14, 6, 10, 32, 22, 18, 2, 4, 2,
-    4, 8, 22, 8, 18, 12, 28, 2, 16, 12, 18, 14, 10, 18, 12, 6, 32, 10, 14, 6,
-    10, 2, 10, 2, 6, 22, 2, 4, 6, 8, 10, 6, 14, 6, 4, 12, 30, 24, 6, 6,
-    8, 6, 4, 2, 4, 6, 8, 6, 6, 22, 18, 8, 4, 2, 18, 6, 4, 2, 16, 18,
-    20, 10, 6, 6, 30, 2, 12, 28, 6, 6, 6, 2, 12, 10, 8, 18, 18, 4, 8, 18,
-    10, 2, 28, 2, 10, 14, 4, 2, 30, 12, 22, 26, 10, 8, 6, 10, 8, 16, 14, 6,
-    6, 10, 14, 6, 4, 2, 10, 12, 2, 6, 10, 8, 4, 2, 10, 26, 22, 6, 2, 12,
-    18, 4, 26, 4, 8, 10, 6, 14, 10, 2, 18, 6, 10, 20, 6, 6, 4, 24, 2, 4,
-    8, 6, 16, 14, 16, 18, 2, 4, 12, 2, 10, 2, 6, 12, 10, 6, 6, 20, 6, 4,
-    6, 38, 4, 6, 12, 14, 4, 12, 8, 10, 12, 12, 8, 4, 6, 14, 10, 6, 12, 2,
-    10, 18, 2, 18, 10, 8, 10, 2, 12, 4, 14, 28, 2, 16, 2, 18, 6, 10, 6, 8,
-    16, 14, 30, 10, 20, 6, 10, 24, 2, 28, 2, 12, 16, 6, 8, 36, 4, 8, 4, 14,
-    12, 10, 8, 12, 4, 6, 8, 4, 6, 14, 22, 8, 6, 4, 2, 10, 6, 20, 10, 8,
-    6, 6, 22, 18, 2, 16, 6, 20, 4, 26, 4, 14, 22, 14, 4, 12, 6, 8, 4, 6,
-    6, 26, 10, 2, 18, 18, 4, 2, 16, 2, 18, 4, 6, 8, 4, 6, 12, 2, 6, 6,
-    28, 38, 4, 8, 16, 26, 4, 2, 10, 12, 2, 10, 8, 6, 10, 12, 2, 10, 2, 24,
-    4, 30, 26, 6, 6, 18, 6, 6, 22, 2, 10, 18, 26, 4, 18, 8, 6, 6, 12, 16,
-    6, 8, 16, 6, 8, 16, 2, 42, 58, 8, 4, 6, 2, 4, 8, 16, 6, 20, 4, 12,
-    12, 6, 12, 2, 10, 2, 6, 22, 2, 10, 6, 8, 6, 10, 14, 6, 6, 4, 18, 8,
-    10, 8, 16, 14, 10, 2, 10, 2, 12, 6, 4, 20, 10, 8, 52, 8, 10, 6, 2, 10,
-    8, 10, 6, 6, 8, 10, 2, 22, 2, 4, 6, 14, 4, 2, 24, 12, 4, 26, 18, 4,
-    6, 14, 30, 6, 4, 6, 2, 22, 8, 4, 6, 2, 22, 6, 8, 16, 6, 14, 4, 6,
-    18, 8, 12, 6, 12, 24, 30, 16, 8, 34, 8, 22, 6, 14, 10, 18, 14, 4, 12, 8,
-    4, 36, 6, 6, 2, 10, 2, 4, 20, 6, 6, 10, 12, 6, 2, 40, 8, 6, 28, 6,
-    2, 12, 18, 4, 24, 14, 6, 6, 10, 20, 10, 14, 16, 14, 16, 6, 8, 36, 4, 12,
-    12, 6, 12, 50, 12, 6, 4, 6, 6, 8, 6, 10, 2, 10, 2, 18, 10, 14, 16, 8,
-    6, 4, 20, 4, 2, 10, 6, 14, 18, 10, 38, 10, 18, 2, 10, 2, 12, 4, 2, 4,
-    14, 6, 10, 8, 40, 6, 20, 4, 12, 8, 6, 34, 8, 22, 8, 12, 10, 2, 16, 42,
-    12, 8, 22, 8, 22, 8, 6, 34, 2, 6, 4, 14, 6, 16, 2, 22, 6, 8, 24, 22,
-    6, 2, 12, 4, 6, 14, 4, 8, 24, 4, 6, 6, 2, 22, 20, 6, 4, 14, 4, 6,
-    6, 8, 6, 10, 6, 8, 6, 16, 14, 6, 6, 22, 6, 24, 32, 6, 18, 6, 18, 10,
-    8, 30, 18, 6, 16, 12, 6, 12, 2, 6, 4, 12, 8, 6, 22, 8, 6, 4, 14, 10,
-    18, 20, 10, 2, 6, 4, 2, 28, 18, 2, 10, 6, 6, 6, 14, 40, 24, 2, 4, 8,
-    12, 4, 20, 4, 32, 18, 16, 6, 36, 8, 6, 4, 6, 14, 4, 6, 26, 6, 10, 14,
-    18, 10, 6, 6, 14, 10, 6, 6, 14, 6, 24, 4, 14, 22, 8, 12, 10, 8, 12, 18,
-    10, 18, 8, 24, 10, 8, 4, 24, 6, 18, 6, 2, 10, 30, 2, 10, 2, 4, 2, 40,
-    2, 28, 8, 6, 6, 18, 6, 10, 14, 4, 18, 30, 18, 2, 12, 30, 6, 30, 4, 18,
-    12, 2, 4, 14, 6, 10, 6, 8, 6, 10, 12, 2, 6, 12, 10, 2, 18, 4, 20, 4,
-    6, 14, 6, 6, 22, 6, 6, 8, 18, 18, 10, 2, 10, 2, 6, 4, 6, 12, 18, 2,
-    10, 8, 4, 18, 2, 6, 6, 6, 10, 8, 10, 6, 18, 12, 8, 12, 6, 4, 6, 14,
-    16, 2, 12, 4, 6, 38, 6, 6, 16, 20, 28, 20, 10, 6, 6, 14, 4, 26, 4, 14,
-    10, 18, 14, 28, 2, 4, 14, 16, 2, 28, 6, 8, 6, 34, 8, 4, 18, 2, 16, 8,
-    6, 40, 8, 18, 4, 30, 6, 12, 2, 30, 6, 10, 14, 40, 14, 10, 2, 12, 10, 8,
-    4, 8, 6, 6, 28, 2, 4, 12, 14, 16, 8, 30, 16, 18, 2, 10, 18, 6, 32, 4,
-    18, 6, 2, 12, 10, 18, 2, 6, 10, 14, 18, 28, 6, 8, 16, 2, 4, 20, 10, 8,
-    18, 10, 2, 10, 8, 4, 6, 12, 6, 20, 4, 2, 6, 4, 20, 10, 26, 18, 10, 2,
-    18, 6, 16, 14, 4, 26, 4, 14, 10, 12, 14, 6, 6, 4, 14, 10, 2, 30, 18, 22, 2};
+{ 2, 1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6, 4, 2, 4, 6, 6, 2, 6, 4, 2,
+6, 4, 6, 8, 4, 2, 4, 2, 4, 14, 4, 6, 2, 10, 2, 6, 6, 4, 6, 6,
+2, 10, 2, 4, 2, 12, 12, 4, 2, 4, 6, 2, 10, 6, 6, 6, 2, 6, 4, 2,
+10, 14, 4, 2, 4, 14, 6, 10, 2, 4, 6, 8, 6, 6, 4, 6, 8, 4, 8, 10,
+2, 10, 2, 6, 4, 6, 8, 4, 2, 4, 12, 8, 4, 8, 4, 6, 12, 2, 18, 6,
+10, 6, 6, 2, 6, 10, 6, 6, 2, 6, 6, 4, 2, 12, 10, 2, 4, 6, 6, 2,
+12, 4, 6, 8, 10, 8, 10, 8, 6, 6, 4, 8, 6, 4, 8, 4, 14, 10, 12, 2,
+10, 2, 4, 2, 10, 14, 4, 2, 4, 14, 4, 2, 4, 20, 4, 8, 10, 8, 4, 6,
+6, 14, 4, 6, 6, 8, 6, 12, 4, 6, 2, 10, 2, 6, 10, 2, 10, 2, 6, 18,
+4, 2, 4, 6, 6, 8, 6, 6, 22, 2, 10, 8, 10, 6, 6, 8, 12, 4, 6, 6,
+2, 6, 12, 10, 18, 2, 4, 6, 2, 6, 4, 2, 4, 12, 2, 6, 34, 6, 6, 8,
+18, 10, 14, 4, 2, 4, 6, 8, 4, 2, 6, 12, 10, 2, 4, 2, 4, 6, 12, 12,
+8, 12, 6, 4, 6, 8, 4, 8, 4, 14, 4, 6, 2, 4, 6, 2, 6, 10, 20, 6,
+4, 2, 24, 4, 2, 10, 12, 2, 10, 8, 6, 6, 6, 18, 6, 4, 2, 12, 10, 12,
+8, 16, 14, 6, 4, 2, 4, 2, 10, 12, 6, 6, 18, 2, 16, 2, 22, 6, 8, 6,
+4, 2, 4, 8, 6, 10, 2, 10, 14, 10, 6, 12, 2, 4, 2, 10, 12, 2, 16, 2,
+6, 4, 2, 10, 8, 18, 24, 4, 6, 8, 16, 2, 4, 8, 16, 2, 4, 8, 6, 6,
+4, 12, 2, 22, 6, 2, 6, 4, 6, 14, 6, 4, 2, 6, 4, 6, 12, 6, 6, 14,
+4, 6, 12, 8, 6, 4, 26, 18, 10, 8, 4, 6, 2, 6, 22, 12, 2, 16, 8, 4,
+12, 14, 10, 2, 4, 8, 6, 6, 4, 2, 4, 6, 8, 4, 2, 6, 10, 2, 10, 8,
+4, 14, 10, 12, 2, 6, 4, 2, 16, 14, 4, 6, 8, 6, 4, 18, 8, 10, 6, 6,
+8, 10, 12, 14, 4, 6, 6, 2, 28, 2, 10, 8, 4, 14, 4, 8, 12, 6, 12, 4,
+6, 20, 10, 2, 16, 26, 4, 2, 12, 6, 4, 12, 6, 8, 4, 8, 22, 2, 4, 2,
+12, 28, 2, 6, 6, 6, 4, 6, 2, 12, 4, 12, 2, 10, 2, 16, 2, 16, 6, 20,
+16, 8, 4, 2, 4, 2, 22, 8, 12, 6, 10, 2, 4, 6, 2, 6, 10, 2, 12, 10,
+2, 10, 14, 6, 4, 6, 8, 6, 6, 16, 12, 2, 4, 14, 6, 4, 8, 10, 8, 6,
+6, 22, 6, 2, 10, 14, 4, 6, 18, 2, 10, 14, 4, 2, 10, 14, 4, 8, 18, 4,
+6, 2, 4, 6, 2, 12, 4, 20, 22, 12, 2, 4, 6, 6, 2, 6, 22, 2, 6, 16,
+6, 12, 2, 6, 12, 16, 2, 4, 6, 14, 4, 2, 18, 24, 10, 6, 2, 10, 2, 10,
+2, 10, 6, 2, 10, 2, 10, 6, 8, 30, 10, 2, 10, 8, 6, 10, 18, 6, 12, 12,
+2, 18, 6, 4, 6, 6, 18, 2, 10, 14, 6, 4, 2, 4, 24, 2, 12, 6, 16, 8,
+6, 6, 18, 16, 2, 4, 6, 2, 6, 6, 10, 6, 12, 12, 18, 2, 6, 4, 18, 8,
+24, 4, 2, 4, 6, 2, 12, 4, 14, 30, 10, 6, 12, 14, 6, 10, 12, 2, 4, 6,
+8, 6, 10, 2, 4, 14, 6, 6, 4, 6, 2, 10, 2, 16, 12, 8, 18, 4, 6, 12,
+2, 6, 6, 6, 28, 6, 14, 4, 8, 10, 8, 12, 18, 4, 2, 4, 24, 12, 6, 2,
+16, 6, 6, 14, 10, 14, 4, 30, 6, 6, 6, 8, 6, 4, 2, 12, 6, 4, 2, 6,
+22, 6, 2, 4, 18, 2, 4, 12, 2, 6, 4, 26, 6, 6, 4, 8, 10, 32, 16, 2,
+6, 4, 2, 4, 2, 10, 14, 6, 4, 8, 10, 6, 20, 4, 2, 6, 30, 4, 8, 10,
+6, 6, 8, 6, 12, 4, 6, 2, 6, 4, 6, 2, 10, 2, 16, 6, 20, 4, 12, 14,
+28, 6, 20, 4, 18, 8, 6, 4, 6, 14, 6, 6, 10, 2, 10, 12, 8, 10, 2, 10,
+8, 12, 10, 24, 2, 4, 8, 6, 4, 8, 18, 10, 6, 6, 2, 6, 10, 12, 2, 10,
+6, 6, 6, 8, 6, 10, 6, 2, 6, 6, 6, 10, 8, 24, 6, 22, 2, 18, 4, 8,
+10, 30, 8, 18, 4, 2, 10, 6, 2, 6, 4, 18, 8, 12, 18, 16, 6, 2, 12, 6,
+10, 2, 10, 2, 6, 10, 14, 4, 24, 2, 16, 2, 10, 2, 10, 20, 4, 2, 4, 8,
+16, 6, 6, 2, 12, 16, 8, 4, 6, 30, 2, 10, 2, 6, 4, 6, 6, 8, 6, 4,
+12, 6, 8, 12, 4, 14, 12, 10, 24, 6, 12, 6, 2, 22, 8, 18, 10, 6, 14, 4,
+2, 6, 10, 8, 6, 4, 6, 30, 14, 10, 2, 12, 10, 2, 16, 2, 18, 24, 18, 6,
+16, 18, 6, 2, 18, 4, 6, 2, 10, 8, 10, 6, 6, 8, 4, 6, 2, 10, 2, 12,
+4, 6, 6, 2, 12, 4, 14, 18, 4, 6, 20, 4, 8, 6, 4, 8, 4, 14, 6, 4,
+14, 12, 4, 2, 30, 4, 24, 6, 6, 12, 12, 14, 6, 4, 2, 4, 18, 6, 12, 8,
+6, 4, 12, 2, 12, 30, 16, 2, 6, 22, 14, 6, 10, 12, 6, 2, 4, 8, 10, 6,
+6, 24, 14, 6, 4, 8, 12, 18, 10, 2, 10, 2, 4, 6, 20, 6, 4, 14, 4, 2,
+4, 14, 6, 12, 24, 10, 6, 8, 10, 2, 30, 4, 6, 2, 12, 4, 14, 6, 34, 12,
+8, 6, 10, 2, 4, 20, 10, 8, 16, 2, 10, 14, 4, 2, 12, 6, 16, 6, 8, 4,
+8, 4, 6, 8, 6, 6, 12, 6, 4, 6, 6, 8, 18, 4, 20, 4, 12, 2, 10, 6,
+2, 10, 12, 2, 4, 20, 6, 30, 6, 4, 8, 10, 12, 6, 2, 28, 2, 6, 4, 2,
+16, 12, 2, 6, 10, 8, 24, 12, 6, 18, 6, 4, 14, 6, 4, 12, 8, 6, 12, 4,
+6, 12, 6, 12, 2, 16, 20, 4, 2, 10, 18, 8, 4, 14, 4, 2, 6, 22, 6, 14,
+6, 6, 10, 6, 2, 10, 2, 4, 2, 22, 2, 4, 6, 6, 12, 6, 14, 10, 12, 6,
+8, 4, 36, 14, 12, 6, 4, 6, 2, 12, 6, 12, 16, 2, 10, 8, 22, 2, 12, 6,
+4, 6, 18, 2, 12, 6, 4, 12, 8, 6, 12, 4, 6, 12, 6, 2, 12, 12, 4, 14,
+6, 16, 6, 2, 10, 8, 18, 6, 34, 2, 28, 2, 22, 6, 2, 10, 12, 2, 6, 4,
+8, 22, 6, 2, 10, 8, 4, 6, 8, 4, 12, 18, 12, 20, 4, 6, 6, 8, 4, 2,
+16, 12, 2, 10, 8, 10, 2, 4, 6, 14, 12, 22, 8, 28, 2, 4, 20, 4, 2, 4,
+14, 10, 12, 2, 12, 16, 2, 28, 8, 22, 8, 4, 6, 6, 14, 4, 8, 12, 6, 6,
+4, 20, 4, 18, 2, 12, 6, 4, 6, 14, 18, 10, 8, 10, 32, 6, 10, 6, 6, 2,
+6, 16, 6, 2, 12, 6, 28, 2, 10, 8, 16, 6, 8, 6, 10, 24, 20, 10, 2, 10,
+2, 12, 4, 6, 20, 4, 2, 12, 18, 10, 2, 10, 2, 4, 20, 16, 26, 4, 8, 6,
+4, 12, 6, 8, 12, 12, 6, 4, 8, 22, 2, 16, 14, 10, 6, 12, 12, 14, 6, 4,
+20, 4, 12, 6, 2, 6, 6, 16, 8, 22, 2, 28, 8, 6, 4, 20, 4, 12, 24, 20,
+4, 8, 10, 2, 16, 2, 12, 12, 34, 2, 4, 6, 12, 6, 6, 8, 6, 4, 2, 6,
+24, 4, 20, 10, 6, 6, 14, 4, 6, 6, 2, 12, 6, 10, 2, 10, 6, 20, 4, 26,
+4, 2, 6, 22, 2, 24, 4, 6, 2, 4, 6, 24, 6, 8, 4, 2, 34, 6, 8, 16,
+12, 2, 10, 2, 10, 6, 8, 4, 8, 12, 22, 6, 14, 4, 26, 4, 2, 12, 10, 8,
+4, 8, 12, 4, 14, 6, 16, 6, 8, 4, 6, 6, 8, 6, 10, 12, 2, 6, 6, 16,
+8, 6, 6, 12, 10, 2, 6, 18, 4, 6, 6, 6, 12, 18, 8, 6, 10, 8, 18, 4,
+14, 6, 18, 10, 8, 10, 12, 2, 6, 12, 12, 36, 4, 6, 8, 4, 6, 2, 4, 18,
+12, 6, 8, 6, 6, 4, 18, 2, 4, 2, 24, 4, 6, 6, 14, 30, 6, 4, 6, 12,
+6, 20, 4, 8, 4, 8, 6, 6, 4, 30, 2, 10, 12, 8, 10, 8, 24, 6, 12, 4,
+14, 4, 6, 2, 28, 14, 16, 2, 12, 6, 4, 20, 10, 6, 6, 6, 8, 10, 12, 14,
+10, 14, 16, 14, 10, 14, 6, 16, 6, 8, 6, 16, 20, 10, 2, 6, 4, 2, 4, 12,
+2, 10, 2, 6, 22, 6, 2, 4, 18, 8, 10, 8, 22, 2, 10, 18, 14, 4, 2, 4,
+18, 2, 4, 6, 8, 10, 2, 30, 4, 30, 2, 10, 2, 18, 4, 18, 6, 14, 10, 2,
+4, 20, 36, 6, 4, 6, 14, 4, 20, 10, 14, 22, 6, 2, 30, 12, 10, 18, 2, 4,
+14, 6, 22, 18, 2, 12, 6, 4, 8, 4, 8, 6, 10, 2, 12, 18, 10, 14, 16, 14,
+4, 6, 6, 2, 6, 4, 2, 28, 2, 28, 6, 2, 4, 6, 14, 4, 12, 14, 16, 14,
+4, 6, 8, 6, 4, 6, 6, 6, 8, 4, 8, 4, 14, 16, 8, 6, 4, 12, 8, 16,
+2, 10, 8, 4, 6, 26, 6, 10, 8, 4, 6, 12, 14, 30, 4, 14, 22, 8, 12, 4,
+6, 8, 10, 6, 14, 10, 6, 2, 10, 12, 12, 14, 6, 6, 18, 10, 6, 8, 18, 4,
+6, 2, 6, 10, 2, 10, 8, 6, 6, 10, 2, 18, 10, 2, 12, 4, 6, 8, 10, 12,
+14, 12, 4, 8, 10, 6, 6, 20, 4, 14, 16, 14, 10, 8, 10, 12, 2, 18, 6, 12,
+10, 12, 2, 4, 2, 12, 6, 4, 8, 4, 44, 4, 2, 4, 2, 10, 12, 6, 6, 14,
+4, 6, 6, 6, 8, 6, 36, 18, 4, 6, 2, 12, 6, 6, 6, 4, 14, 22, 12, 2,
+18, 10, 6, 26, 24, 4, 2, 4, 2, 4, 14, 4, 6, 6, 8, 16, 12, 2, 42, 4,
+2, 4, 24, 6, 6, 2, 18, 4, 14, 6, 28, 18, 14, 6, 10, 12, 2, 6, 12, 30,
+6, 4, 6, 6, 14, 4, 2, 24, 4, 6, 6, 26, 10, 18, 6, 8, 6, 6, 30, 4,
+12, 12, 2, 16, 2, 6, 4, 12, 18, 2, 6, 4, 26, 12, 6, 12, 4, 24, 24, 12,
+6, 2, 12, 28, 8, 4, 6, 12, 2, 18, 6, 4, 6, 6, 20, 16, 2, 6, 6, 18,
+10, 6, 2, 4, 8, 6, 6, 24, 16, 6, 8, 10, 6, 14, 22, 8, 16, 6, 2, 12,
+4, 2, 22, 8, 18, 34, 2, 6, 18, 4, 6, 6, 8, 10, 8, 18, 6, 4, 2, 4,
+8, 16, 2, 12, 12, 6, 18, 4, 6, 6, 6, 2, 6, 12, 10, 20, 12, 18, 4, 6,
+2, 16, 2, 10, 14, 4, 30, 2, 10, 12, 2, 24, 6, 16, 8, 10, 2, 12, 22, 6,
+2, 16, 20, 10, 2, 12, 12, 18, 10, 12, 6, 2, 10, 2, 6, 10, 18, 2, 12, 6,
+4, 6, 2, 24, 28, 2, 4, 2, 10, 2, 16, 12, 8, 22, 2, 6, 4, 2, 10, 6,
+20, 12, 10, 8, 12, 6, 6, 6, 4, 18, 2, 4, 12, 18, 2, 12, 6, 4, 2, 16,
+12, 12, 14, 4, 8, 18, 4, 12, 14, 6, 6, 4, 8, 6, 4, 20, 12, 10, 14, 4,
+2, 16, 2, 12, 30, 4, 6, 24, 20, 24, 10, 8, 12, 10, 12, 6, 12, 12, 6, 8,
+16, 14, 6, 4, 6, 36, 20, 10, 30, 12, 2, 4, 2, 28, 12, 14, 6, 22, 8, 4,
+18, 6, 14, 18, 4, 6, 2, 6, 34, 18, 2, 16, 6, 18, 2, 24, 4, 2, 6, 12,
+6, 12, 10, 8, 6, 16, 12, 8, 10, 14, 40, 6, 2, 6, 4, 12, 14, 4, 2, 4,
+2, 4, 8, 6, 10, 6, 6, 2, 6, 6, 6, 12, 6, 24, 10, 2, 10, 6, 12, 6,
+6, 14, 6, 6, 52, 20, 6, 10, 2, 10, 8, 10, 12, 12, 2, 6, 4, 14, 16, 8,
+12, 6, 22, 2, 10, 8, 6, 22, 2, 22, 6, 8, 10, 12, 12, 2, 10, 6, 12, 2,
+4, 14, 10, 2, 6, 18, 4, 12, 8, 18, 12, 6, 6, 4, 6, 6, 14, 4, 2, 12,
+12, 4, 6, 18, 18, 12, 2, 16, 12, 8, 18, 10, 26, 4, 6, 8, 6, 6, 4, 2,
+10, 20, 4, 6, 8, 4, 20, 10, 2, 34, 2, 4, 24, 2, 12, 12, 10, 6, 2, 12,
+30, 6, 12, 16, 12, 2, 22, 18, 12, 14, 10, 2, 12, 12, 4, 2, 4, 6, 12, 2,
+16, 18, 2, 40, 8, 16, 6, 8, 10, 2, 4, 18, 8, 10, 8, 12, 4, 18, 2, 18,
+10, 2, 4, 2, 4, 8, 28, 2, 6, 22, 12, 6, 14, 18, 4, 6, 8, 6, 6, 10,
+8, 4, 2, 18, 10, 6, 20, 22, 8, 6, 30, 4, 2, 4, 18, 6, 30, 2, 4, 8,
+6, 4, 6, 12, 14, 34, 14, 6, 4, 2, 6, 4, 14, 4, 2, 6, 28, 2, 4, 6,
+8, 10, 2, 10, 2, 10, 2, 4, 30, 2, 12, 12, 10, 18, 12, 14, 10, 2, 12, 6,
+10, 6, 14, 12, 4, 14, 4, 18, 2, 10, 8, 4, 8, 10, 12, 18, 18, 8, 6, 18,
+16, 14, 6, 6, 10, 14, 4, 6, 2, 12, 12, 4, 6, 6, 12, 2, 16, 2, 12, 6,
+4, 14, 6, 4, 2, 12, 18, 4, 36, 18, 12, 12, 2, 4, 2, 4, 8, 12, 4, 36,
+6, 18, 2, 12, 10, 6, 12, 24, 8, 6, 6, 16, 12, 2, 18, 10, 20, 10, 2, 6,
+18, 4, 2, 40, 6, 2, 16, 2, 4, 8, 18, 10, 12, 6, 2, 10, 8, 4, 6, 12,
+2, 10, 18, 8, 6, 4, 20, 4, 6, 36, 6, 2, 10, 6, 24, 6, 14, 16, 6, 18,
+2, 10, 20, 10, 8, 6, 4, 6, 2, 10, 2, 12, 4, 2, 4, 8, 10, 6, 12, 18,
+14, 12, 16, 8, 6, 16, 8, 4, 2, 6, 18, 24, 18, 10, 12, 2, 4, 14, 10, 6,
+6, 6, 18, 12, 2, 28, 18, 14, 16, 12, 14, 24, 12, 22, 6, 2, 10, 8, 4, 2,
+4, 14, 12, 6, 4, 6, 14, 4, 2, 4, 30, 6, 2, 6, 10, 2, 30, 22, 2, 4,
+6, 8, 6, 6, 16, 12, 12, 6, 8, 4, 2, 24, 12, 4, 6, 8, 6, 6, 10, 2,
+6, 12, 28, 14, 6, 4, 12, 8, 6, 12, 4, 6, 14, 6, 12, 10, 6, 6, 8, 6,
+6, 4, 2, 4, 8, 12, 4, 14, 18, 10, 2, 16, 6, 20, 6, 10, 8, 4, 30, 36,
+12, 8, 22, 12, 2, 6, 12, 16, 6, 6, 2, 18, 4, 26, 4, 8, 18, 10, 8, 10,
+6, 14, 4, 20, 22, 18, 12, 8, 28, 12, 6, 6, 8, 6, 12, 24, 16, 14, 4, 14,
+12, 6, 10, 12, 20, 6, 4, 8, 18, 12, 18, 10, 2, 4, 20, 10, 14, 4, 6, 2,
+10, 24, 18, 2, 4, 20, 16, 14, 10, 14, 6, 4, 6, 20, 6, 10, 6, 2, 12, 6,
+30, 10, 8, 6, 4, 6, 8, 40, 2, 4, 2, 12, 18, 4, 6, 8, 10, 6, 18, 18,
+2, 12, 16, 8, 6, 4, 6, 6, 2, 52, 14, 4, 20, 16, 2, 4, 6, 12, 2, 6,
+12, 12, 6, 4, 14, 10, 6, 6, 14, 10, 14, 16, 8, 6, 12, 4, 8, 22, 6, 2,
+18, 22, 6, 2, 18, 6, 16, 14, 10, 6, 12, 2, 6, 4, 8, 18, 12, 16, 2, 4,
+14, 4, 8, 12, 12, 30, 16, 8, 4, 2, 6, 22, 12, 8, 10, 6, 6, 6, 14, 6,
+18, 10, 12, 2, 10, 2, 4, 26, 4, 12, 8, 4, 18, 8, 10, 14, 16, 6, 6, 8,
+10, 6, 8, 6, 12, 10, 20, 10, 8, 4, 12, 26, 18, 4, 12, 18, 6, 30, 6, 8,
+6, 22, 12, 2, 4, 6, 6, 2, 10, 2, 4, 6, 6, 2, 6, 22, 18, 6, 18, 12,
+8, 12, 6, 10, 12, 2, 16, 2, 10, 2, 10, 18, 6, 20, 4, 2, 6, 22, 6, 6,
+18, 6, 14, 12, 16, 2, 6, 6, 4, 14, 12, 4, 2, 18, 16, 36, 12, 6, 14, 28,
+2, 12, 6, 12, 6, 4, 2, 16, 30, 8, 24, 6, 30, 10, 2, 18, 4, 6, 12, 8,
+22, 2, 6, 22, 18, 2, 10, 2, 10, 30, 2, 28, 6, 14, 16, 6, 20, 16, 2, 6,
+4, 32, 4, 2, 4, 6, 2, 12, 4, 6, 6, 12, 2, 6, 4, 6, 8, 6, 4, 20,
+4, 32, 10, 8, 16, 2, 22, 2, 4, 6, 8, 6, 16, 14, 4, 18, 8, 4, 20, 6,
+12, 12, 6, 10, 2, 10, 2, 12, 28, 12, 18, 2, 18, 10, 8, 10, 48, 2, 4, 6,
+8, 10, 2, 10, 30, 2, 36, 6, 10, 6, 2, 18, 4, 6, 8, 16, 14, 16, 6, 14,
+4, 20, 4, 6, 2, 10, 12, 2, 6, 12, 6, 6, 4, 12, 2, 6, 4, 12, 6, 8,
+4, 2, 6, 18, 10, 6, 8, 12, 6, 22, 2, 6, 12, 18, 4, 14, 6, 4, 20, 6,
+16, 8, 4, 8, 22, 8, 12, 6, 6, 16, 12, 18, 30, 8, 4, 2, 4, 6, 26, 4,
+14, 24, 22, 6, 2, 6, 10, 6, 14, 6, 6, 12, 10, 6, 2, 12, 10, 12, 8, 18,
+18, 10, 6, 8, 16, 6, 6, 8, 16, 20, 4, 2, 10, 2, 10, 12, 6, 8, 6, 10,
+20, 10, 18, 26, 4, 6, 30, 2, 4, 8, 6, 12, 12, 18, 4, 8, 22, 6, 2, 12,
+34, 6, 18, 12, 6, 2, 28, 14, 16, 14, 4, 14, 12, 4, 6, 6, 2, 36, 4, 6,
+20, 12, 24, 6, 22, 2, 16, 18, 12, 12, 18, 2, 6, 6, 6, 4, 6, 14, 4, 2,
+22, 8, 12, 6, 10, 6, 8, 12, 18, 12, 6, 10, 2, 22, 14, 6, 6, 4, 18, 6,
+20, 22, 2, 12, 24, 4, 18, 18, 2, 22, 2, 4, 12, 8, 12, 10, 14, 4, 2, 18,
+16, 38, 6, 6, 6, 12, 10, 6, 12, 8, 6, 4, 6, 14, 30, 6, 10, 8, 22, 6,
+8, 12, 10, 2, 10, 2, 6, 10, 2, 10, 12, 18, 20, 6, 4, 8, 22, 6, 6, 30,
+6, 14, 6, 12, 12, 6, 10, 2, 10, 30, 2, 16, 8, 4, 2, 6, 18, 4, 2, 6,
+4, 26, 4, 8, 6, 10, 2, 4, 6, 8, 4, 6, 30, 12, 2, 6, 6, 4, 20, 22,
+8, 4, 2, 4, 72, 8, 4, 8, 22, 2, 4, 14, 10, 2, 4, 20, 6, 10, 18, 6,
+20, 16, 6, 8, 6, 4, 20, 12, 22, 2, 4, 2, 12, 10, 18, 2, 22, 6, 18, 30,
+2, 10, 14, 10, 8, 16, 50, 6, 10, 8, 10, 12, 6, 18, 2, 22, 6, 2, 4, 6,
+8, 6, 6, 10, 18, 2, 22, 2, 16, 14, 10, 6, 2, 12, 10, 20, 4, 14, 6, 4,
+36, 2, 4, 6, 12, 2, 4, 14, 12, 6, 4, 6, 2, 6, 4, 20, 10, 2, 10, 6,
+12, 2, 24, 12, 12, 6, 6, 4, 24, 2, 4, 24, 2, 6, 4, 6, 8, 16, 6, 2,
+10, 12, 14, 6, 34, 6, 14, 6, 4, 2, 30, 22, 8, 4, 6, 8, 4, 2, 28, 2,
+6, 4, 26, 18, 22, 2, 6, 16, 6, 2, 16, 12, 2, 12, 4, 6, 6, 14, 10, 6,
+8, 12, 4, 18, 2, 10, 8, 16, 6, 6, 30, 2, 10, 18, 2, 10, 8, 4, 8, 12,
+24, 40, 2, 12, 10, 6, 12, 2, 12, 4, 2, 4, 6, 18, 14, 12, 6, 4, 14, 30,
+4, 8, 10, 8, 6, 10, 18, 8, 4, 14, 16, 6, 8, 4, 6, 2, 10, 2, 12, 4,
+2, 4, 6, 8, 4, 6, 32, 24, 10, 8, 18, 10, 2, 6, 10, 2, 4, 18, 6, 12,
+2, 16, 2, 22, 6, 6, 8, 18, 4, 18, 12, 8, 6, 4, 20, 6, 30, 22, 12, 2,
+6, 18, 4, 62, 4, 2, 12, 6, 10, 2, 12, 12, 28, 2, 4, 14, 22, 6, 2, 6,
+6, 10, 14, 4, 2, 10, 6, 8, 10, 14, 10, 6, 2, 12, 22, 18, 8, 10, 18, 12,
+2, 12, 4, 12, 2, 10, 2, 6, 18, 6, 6, 34, 6, 2, 12, 4, 6, 18, 18, 2,
+16, 6, 6, 8, 6, 10, 18, 8, 10, 8, 10, 2, 4, 18, 26, 12, 22, 2, 4, 2,
+22, 6, 6, 14, 16, 6, 20, 10, 12, 2, 18, 42, 4, 24, 2, 6, 10, 12, 2, 6,
+10, 8, 4, 6, 12, 12, 8, 4, 6, 12, 30, 20, 6, 24, 6, 10, 12, 2, 10, 20,
+6, 6, 4, 12, 14, 10, 18, 12, 8, 6, 12, 4, 14, 10, 2, 12, 30, 16, 2, 12,
+6, 4, 2, 4, 6, 26, 4, 18, 2, 4, 6, 14, 54, 6, 52, 2, 16, 6, 6, 12,
+26, 4, 2, 6, 22, 6, 2, 12, 12, 6, 10, 18, 2, 12, 12, 10, 18, 12, 6, 8,
+6, 10, 6, 8, 4, 2, 4, 20, 24, 6, 6, 10, 14, 10, 2, 22, 6, 14, 10, 26,
+4, 18, 8, 12, 12, 10, 12, 6, 8, 16, 6, 8, 6, 6, 22, 2, 10, 20, 10, 6,
+44, 18, 6, 10, 2, 4, 6, 14, 4, 26, 4, 2, 12, 10, 8, 4, 8, 12, 4, 12,
+8, 22, 8, 6, 10, 18, 6, 6, 8, 6, 12, 4, 8, 18, 10, 12, 6, 12, 2, 6,
+4, 2, 16, 12, 12, 14, 10, 14, 6, 10, 12, 2, 12, 6, 4, 6, 2, 12, 4, 26,
+6, 18, 6, 10, 6, 2, 18, 10, 8, 4, 26, 10, 20, 6, 16, 20, 12, 10, 8, 10,
+2, 16, 6, 20, 10, 20, 4, 30, 2, 4, 8, 16, 2, 18, 4, 2, 6, 10, 18, 12,
+14, 18, 6, 16, 20, 6, 4, 8, 6, 4, 6, 12, 8, 10, 2, 12, 6, 4, 2, 6,
+10, 2, 16, 12, 14, 10, 6, 8, 6, 28, 2, 6, 18, 30, 34, 2, 16, 12, 2, 18,
+16, 6, 8, 10, 8, 10, 8, 10, 44, 6, 6, 4, 20, 4, 2, 4, 14, 28, 8, 6,
+16, 14, 30, 6, 30, 4, 14, 10, 6, 6, 8, 4, 18, 12, 6, 2, 22, 12, 8, 6,
+12, 4, 14, 4, 6, 2, 4, 18, 20, 6, 16, 38, 16, 2, 4, 6, 2, 40, 42, 14,
+4, 6, 2, 24, 10, 6, 2, 18, 10, 12, 2, 16, 2, 6, 16, 6, 8, 4, 2, 10,
+6, 8, 10, 2, 18, 16, 8, 12, 18, 12, 6, 12, 10, 6, 6, 18, 12, 14, 4, 2,
+10, 20, 6, 12, 6, 16, 26, 4, 18, 2, 4, 32, 10, 8, 6, 4, 6, 6, 14, 6,
+18, 4, 2, 18, 10, 8, 10, 8, 10, 2, 4, 6, 2, 10, 42, 8, 12, 4, 6, 18,
+2, 16, 8, 4, 2, 10, 14, 12, 10, 20, 4, 8, 10, 38, 4, 6, 2, 10, 20, 10,
+12, 6, 12, 26, 12, 4, 8, 28, 8, 4, 8, 24, 6, 10, 8, 6, 16, 12, 8, 10,
+12, 8, 22, 6, 2, 10, 2, 6, 10, 6, 6, 8, 6, 4, 14, 28, 8, 16, 18, 8,
+4, 6, 20, 4, 18, 6, 2, 24, 24, 6, 6, 12, 12, 4, 2, 22, 2, 10, 6, 8,
+12, 4, 20, 18, 6, 4, 12, 24, 6, 6, 54, 8, 6, 4, 26, 36, 4, 2, 4, 26,
+12, 12, 4, 6, 6, 8, 12, 10, 2, 12, 16, 18, 6, 8, 6, 12, 18, 10, 2, 54,
+4, 2, 10, 30, 12, 8, 4, 8, 16, 14, 12, 6, 4, 6, 12, 6, 2, 4, 14, 12,
+4, 14, 6, 24, 6, 6, 10, 12, 12, 20, 18, 6, 6, 16, 8, 4, 6, 20, 4, 32,
+4, 14, 10, 2, 6, 12, 16, 2, 4, 6, 12, 2, 10, 8, 6, 4, 2, 10, 14, 6,
+6, 12, 18, 34, 8, 10, 6, 24, 6, 2, 10, 12, 2, 30, 10, 14, 12, 12, 16, 6,
+6, 2, 18, 4, 6, 30, 14, 4, 6, 6, 2, 6, 4, 6, 14, 6, 4, 8, 10, 12,
+6, 32, 10, 8, 22, 2, 10, 6, 24, 8, 4, 30, 6, 2, 12, 16, 8, 6, 4, 6,
+8, 16, 14, 6, 6, 4, 2, 10, 12, 2, 16, 14, 4, 2, 4, 20, 18, 10, 2, 10,
+6, 12, 30, 8, 18, 12, 10, 2, 6, 6, 4, 12, 12, 2, 4, 12, 18, 24, 2, 10,
+6, 8, 16, 8, 6, 12, 10, 14, 6, 12, 6, 6, 4, 2, 24, 4, 6, 8, 6, 4,
+2, 4, 6, 14, 4, 8, 10, 24, 24, 12, 2, 6, 12, 22, 30, 2, 6, 18, 10, 6,
+6, 8, 4, 2, 6, 10, 8, 10, 6, 8, 16, 6, 14, 6, 4, 24, 8, 10, 2, 12,
+6, 4, 36, 2, 22, 6, 8, 6, 10, 8, 6, 12, 10, 14, 10, 6, 18, 12, 2, 12,
+4, 26, 10, 14, 16, 18, 8, 18, 12, 12, 6, 16, 14, 24, 10, 12, 8, 22, 6, 2,
+10, 60, 6, 2, 4, 8, 16, 14, 10, 6, 24, 6, 12, 18, 24, 2, 30, 4, 2, 12,
+6, 10, 2, 4, 14, 6, 16, 2, 10, 8, 22, 20, 6, 4, 32, 6, 18, 4, 2, 4,
+2, 4, 8, 52, 14, 22, 2, 22, 20, 10, 8, 10, 2, 6, 4, 14, 4, 6, 20, 4,
+6, 2, 12, 12, 6, 12, 16, 2, 12, 10, 8, 4, 6, 2, 28, 12, 8, 10, 12, 2,
+4, 14, 28, 8, 6, 4, 2, 4, 6, 2, 12, 58, 6, 14, 10, 2, 6, 28, 32, 4,
+30, 8, 6, 4, 6, 12, 12, 2, 4, 6, 6, 14, 16, 8, 30, 4, 2, 10, 8, 6,
+4, 6, 26, 4, 12, 2, 10, 18, 12, 12, 18, 2, 4, 12, 8, 12, 10, 20, 4, 8,
+16, 12, 8, 6, 16, 8, 10, 12, 14, 6, 4, 8, 12, 4, 20, 6, 40, 8, 16, 6,
+36, 2, 6, 4, 6, 2, 22, 18, 2, 10, 6, 36, 14, 12, 4, 18, 8, 4, 14, 10,
+2, 10, 8, 4, 2, 18, 16, 12, 14, 10, 14, 6, 6, 42, 10, 6, 6, 20, 10, 8,
+12, 4, 12, 18, 2, 10, 14, 18, 10, 18, 8, 6, 4, 14, 6, 10, 30, 14, 6, 6,
+4, 12, 38, 4, 2, 4, 6, 8, 12, 10, 6, 18, 6, 50, 6, 4, 6, 12, 8, 10,
+32, 6, 22, 2, 10, 12, 18, 2, 6, 4, 30, 8, 6, 6, 18, 10, 2, 4, 12, 20,
+10, 8, 24, 10, 2, 6, 22, 6, 2, 18, 10, 12, 2, 30, 18, 12, 28, 2, 6, 4,
+6, 14, 6, 12, 10, 8, 4, 12, 26, 10, 8, 6, 16, 2, 10, 18, 14, 6, 4, 6,
+14, 16, 2, 6, 4, 12, 20, 4, 20, 4, 6, 12, 2, 36, 4, 6, 2, 10, 2, 22,
+8, 6, 10, 12, 12, 18, 14, 24, 36, 4, 20, 24, 10, 6, 2, 28, 6, 18, 8, 4,
+6, 8, 6, 4, 2, 12, 28, 18, 14, 16, 14, 18, 10, 8, 6, 4, 6, 6, 8, 22,
+12, 2, 10, 18, 6, 2, 18, 10, 2, 12, 10, 18, 32, 6, 4, 6, 6, 8, 6, 6,
+10, 20, 6, 12, 10, 8, 10, 14, 6, 10, 14, 4, 2, 22, 18, 2, 10, 2, 4, 20,
+4, 2, 34, 2, 12, 6, 10, 2, 10, 18, 6, 14, 12, 12, 22, 8, 6, 16, 6, 8,
+4, 12, 6, 8, 4, 36, 6, 6, 20, 24, 6, 12, 18, 10, 2, 10, 26, 6, 16, 8,
+6, 4, 24, 18, 8, 12, 12, 10, 18, 12, 2, 24, 4, 12, 18, 12, 14, 10, 2, 4,
+24, 12, 14, 10, 6, 2, 6, 4, 6, 26, 4, 6, 6, 2, 22, 8, 18, 4, 18, 8,
+4, 24, 2, 12, 12, 4, 2, 52, 2, 18, 6, 4, 6, 12, 2, 6, 12, 10, 8, 4,
+2, 24, 10, 2, 10, 2, 12, 6, 18, 40, 6, 20, 16, 2, 12, 6, 10, 12, 2, 4,
+6, 14, 12, 12, 22, 6, 8, 4, 2, 16, 18, 12, 2, 6, 16, 6, 2, 6, 4, 12,
+30, 8, 16, 2, 18, 10, 24, 2, 6, 24, 4, 2, 22, 2, 16, 2, 6, 12, 4, 18,
+8, 4, 14, 4, 18, 24, 6, 2, 6, 10, 2, 10, 38, 6, 10, 14, 6, 6, 24, 4,
+2, 12, 16, 14, 16, 12, 2, 6, 10, 26, 4, 2, 12, 6, 4, 12, 8, 12, 10, 18,
+6, 14, 28, 2, 6, 10, 2, 4, 14, 34, 2, 6, 22, 2, 10, 14, 4, 2, 16, 8,
+10, 6, 8, 10, 8, 4, 6, 2, 16, 6, 6, 18, 30, 14, 6, 4, 30, 2, 10, 14,
+4, 20, 10, 8, 4, 8, 18, 4, 14, 6, 4, 24, 6, 6, 18, 18, 2, 36, 6, 10,
+14, 12, 4, 6, 2, 30, 6, 4, 2, 6, 28, 20, 4, 20, 12, 24, 16, 18, 12, 14,
+6, 4, 12, 32, 12, 6, 10, 8, 10, 6, 18, 2, 16, 14, 6, 22, 6, 12, 2, 18,
+4, 8, 30, 12, 4, 12, 2, 10, 38, 22, 2, 4, 14, 6, 12, 24, 4, 2, 4, 14,
+12, 10, 2, 16, 6, 20, 4, 20, 22, 12, 2, 4, 2, 12, 22, 24, 6, 6, 2, 6,
+4, 6, 2, 10, 12, 12, 6, 2, 6, 16, 8, 6, 4, 18, 12, 12, 14, 4, 12, 6,
+8, 6, 18, 6, 10, 12, 14, 6, 4, 8, 22, 6, 2, 28, 18, 2, 18, 10, 6, 14,
+10, 2, 10, 14, 6, 10, 2, 22, 6, 8, 6, 16, 12, 8, 22, 2, 4, 14, 18, 12,
+6, 24, 6, 10, 2, 12, 22, 18, 6, 20, 6, 10, 14, 4, 2, 6, 12, 22, 14, 12,
+4, 6, 8, 22, 2, 10, 12, 8, 40, 2, 6, 10, 8, 4, 42, 20, 4, 32, 12, 10,
+6, 12, 12, 2, 10, 8, 6, 4, 8, 4, 26, 18, 4, 8, 28, 6, 18, 6, 12, 2,
+10, 6, 6, 14, 10, 12, 14, 24, 6, 4, 20, 22, 2, 18, 4, 6, 12, 2, 16, 18,
+14, 6, 6, 4, 6, 8, 18, 4, 14, 30, 4, 18, 8, 10, 2, 4, 8, 12, 4, 12,
+18, 2, 12, 10, 2, 16, 8, 4, 30, 2, 6, 28, 2, 10, 2, 18, 10, 14, 4, 26,
+6, 18, 4, 20, 6, 4, 8, 18, 4, 12, 26, 24, 4, 20, 22, 2, 18, 22, 2, 4,
+12, 2, 6, 6, 6, 4, 6, 14, 4, 24, 12, 6, 18, 2, 12, 28, 14, 4, 6, 8,
+22, 6, 12, 18, 8, 4, 20, 6, 4, 6, 2, 18, 6, 4, 12, 12, 8, 28, 6, 8,
+10, 2, 24, 12, 10, 24, 8, 10, 20, 12, 6, 12, 12, 4, 14, 12, 24, 34, 18, 8,
+10, 6, 18, 8, 4, 8, 16, 14, 6, 4, 6, 24, 2, 6, 4, 6, 2, 16, 6, 6,
+20, 24, 4, 2, 4, 14, 4, 18, 2, 6, 12, 4, 14, 4, 2, 18, 16, 6, 6, 2,
+16, 20, 6, 6, 30, 4, 8, 6, 24, 16, 6, 6, 8, 12, 30, 4, 18, 18, 8, 4,
+26, 10, 2, 22, 8, 10, 14, 6, 4, 18, 8, 12, 28, 2, 6, 4, 12, 6, 24, 6,
+8, 10, 20, 16, 8, 30, 6, 6, 4, 2, 10, 14, 6, 10, 32, 22, 18, 2, 4, 2,
+4, 8, 22, 8, 18, 12, 28, 2, 16, 12, 18, 14, 10, 18, 12, 6, 32, 10, 14, 6,
+10, 2, 10, 2, 6, 22, 2, 4, 6, 8, 10, 6, 14, 6, 4, 12, 30, 24, 6, 6,
+8, 6, 4, 2, 4, 6, 8, 6, 6, 22, 18, 8, 4, 2, 18, 6, 4, 2, 16, 18,
+20, 10, 6, 6, 30, 2, 12, 28, 6, 6, 6, 2, 12, 10, 8, 18, 18, 4, 8, 18,
+10, 2, 28, 2, 10, 14, 4, 2, 30, 12, 22, 26, 10, 8, 6, 10, 8, 16, 14, 6,
+6, 10, 14, 6, 4, 2, 10, 12, 2, 6, 10, 8, 4, 2, 10, 26, 22, 6, 2, 12,
+18, 4, 26, 4, 8, 10, 6, 14, 10, 2, 18, 6, 10, 20, 6, 6, 4, 24, 2, 4,
+8, 6, 16, 14, 16, 18, 2, 4, 12, 2, 10, 2, 6, 12, 10, 6, 6, 20, 6, 4,
+6, 38, 4, 6, 12, 14, 4, 12, 8, 10, 12, 12, 8, 4, 6, 14, 10, 6, 12, 2,
+10, 18, 2, 18, 10, 8, 10, 2, 12, 4, 14, 28, 2, 16, 2, 18, 6, 10, 6, 8,
+16, 14, 30, 10, 20, 6, 10, 24, 2, 28, 2, 12, 16, 6, 8, 36, 4, 8, 4, 14,
+12, 10, 8, 12, 4, 6, 8, 4, 6, 14, 22, 8, 6, 4, 2, 10, 6, 20, 10, 8,
+6, 6, 22, 18, 2, 16, 6, 20, 4, 26, 4, 14, 22, 14, 4, 12, 6, 8, 4, 6,
+6, 26, 10, 2, 18, 18, 4, 2, 16, 2, 18, 4, 6, 8, 4, 6, 12, 2, 6, 6,
+28, 38, 4, 8, 16, 26, 4, 2, 10, 12, 2, 10, 8, 6, 10, 12, 2, 10, 2, 24,
+4, 30, 26, 6, 6, 18, 6, 6, 22, 2, 10, 18, 26, 4, 18, 8, 6, 6, 12, 16,
+6, 8, 16, 6, 8, 16, 2, 42, 58, 8, 4, 6, 2, 4, 8, 16, 6, 20, 4, 12,
+12, 6, 12, 2, 10, 2, 6, 22, 2, 10, 6, 8, 6, 10, 14, 6, 6, 4, 18, 8,
+10, 8, 16, 14, 10, 2, 10, 2, 12, 6, 4, 20, 10, 8, 52, 8, 10, 6, 2, 10,
+8, 10, 6, 6, 8, 10, 2, 22, 2, 4, 6, 14, 4, 2, 24, 12, 4, 26, 18, 4,
+6, 14, 30, 6, 4, 6, 2, 22, 8, 4, 6, 2, 22, 6, 8, 16, 6, 14, 4, 6,
+18, 8, 12, 6, 12, 24, 30, 16, 8, 34, 8, 22, 6, 14, 10, 18, 14, 4, 12, 8,
+4, 36, 6, 6, 2, 10, 2, 4, 20, 6, 6, 10, 12, 6, 2, 40, 8, 6, 28, 6,
+2, 12, 18, 4, 24, 14, 6, 6, 10, 20, 10, 14, 16, 14, 16, 6, 8, 36, 4, 12,
+12, 6, 12, 50, 12, 6, 4, 6, 6, 8, 6, 10, 2, 10, 2, 18, 10, 14, 16, 8,
+6, 4, 20, 4, 2, 10, 6, 14, 18, 10, 38, 10, 18, 2, 10, 2, 12, 4, 2, 4,
+14, 6, 10, 8, 40, 6, 20, 4, 12, 8, 6, 34, 8, 22, 8, 12, 10, 2, 16, 42,
+12, 8, 22, 8, 22, 8, 6, 34, 2, 6, 4, 14, 6, 16, 2, 22, 6, 8, 24, 22,
+6, 2, 12, 4, 6, 14, 4, 8, 24, 4, 6, 6, 2, 22, 20, 6, 4, 14, 4, 6,
+6, 8, 6, 10, 6, 8, 6, 16, 14, 6, 6, 22, 6, 24, 32, 6, 18, 6, 18, 10,
+8, 30, 18, 6, 16, 12, 6, 12, 2, 6, 4, 12, 8, 6, 22, 8, 6, 4, 14, 10,
+18, 20, 10, 2, 6, 4, 2, 28, 18, 2, 10, 6, 6, 6, 14, 40, 24, 2, 4, 8,
+12, 4, 20, 4, 32, 18, 16, 6, 36, 8, 6, 4, 6, 14, 4, 6, 26, 6, 10, 14,
+18, 10, 6, 6, 14, 10, 6, 6, 14, 6, 24, 4, 14, 22, 8, 12, 10, 8, 12, 18,
+10, 18, 8, 24, 10, 8, 4, 24, 6, 18, 6, 2, 10, 30, 2, 10, 2, 4, 2, 40,
+2, 28, 8, 6, 6, 18, 6, 10, 14, 4, 18, 30, 18, 2, 12, 30, 6, 30, 4, 18,
+12, 2, 4, 14, 6, 10, 6, 8, 6, 10, 12, 2, 6, 12, 10, 2, 18, 4, 20, 4,
+6, 14, 6, 6, 22, 6, 6, 8, 18, 18, 10, 2, 10, 2, 6, 4, 6, 12, 18, 2,
+10, 8, 4, 18, 2, 6, 6, 6, 10, 8, 10, 6, 18, 12, 8, 12, 6, 4, 6, 14,
+16, 2, 12, 4, 6, 38, 6, 6, 16, 20, 28, 20, 10, 6, 6, 14, 4, 26, 4, 14,
+10, 18, 14, 28, 2, 4, 14, 16, 2, 28, 6, 8, 6, 34, 8, 4, 18, 2, 16, 8,
+6, 40, 8, 18, 4, 30, 6, 12, 2, 30, 6, 10, 14, 40, 14, 10, 2, 12, 10, 8,
+4, 8, 6, 6, 28, 2, 4, 12, 14, 16, 8, 30, 16, 18, 2, 10, 18, 6, 32, 4,
+18, 6, 2, 12, 10, 18, 2, 6, 10, 14, 18, 28, 6, 8, 16, 2, 4, 20, 10, 8,
+18, 10, 2, 10, 8, 4, 6, 12, 6, 20, 4, 2, 6, 4, 20, 10, 26, 18, 10, 2,
+18, 6, 16, 14, 4, 26, 4, 14, 10, 12, 14, 6, 6, 4, 14, 10, 2, 30, 18, 22, 2 };
 
 

@@ -9,17 +9,17 @@
 #define NOTHROW
 
 //Program
-cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl, void *n_nl);
+cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl, void *n_nl); /// возведение в степень в куде
 
 /********************************************/
 //Necessary macros
 //every two bytes content 65536 values
-#define MAGIC_VALUE 65536
-  
-#define PURGEVARS_L(X) (void)0
+#define MAGIC_VALUE 65536 /// думаю, знаю ответ, но что это?
+
+#define PURGEVARS_L(X) (void)0 // 
 #define ISPURGED_L(X) (void)0
 #define Assert(a) (void)0
-
+/// „то делает набор дефайнов?
 #define CUDA_LT_L(a_l,b_l) \
     (cuda_cmp_l ((a_l), (b_l)) == -1)        /* a_l < b_l        */
 
@@ -49,22 +49,22 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 
 
 #define CUDA_GTZ_L(a_l) \
-    (cuda_cmp_l ((a_l), nul_l) == 1)         /* a_l > 0          */
+    (cuda_cmp_l ((a_l), cuda_nul_l) == 1)         /* a_l > 0          */
 
 #define cuda_gtz_l(a_l) \
-    (cuda_cmp_l ((a_l), nul_l) == 1)         /* a_l > 0          */
+    (cuda_cmp_l ((a_l), cuda_nul_l) == 1)         /* a_l > 0          */
 
 #define CUDA_EQZ_L(a_l) \
-    (cuda_equ_l ((a_l), nul_l) == 1)         /* a_l == 0         */
+    (cuda_equ_l ((a_l), cuda_nul_l) == 1)         /* a_l == 0         */
 
 #define cuda_eqz_l(a_l) \
-    (cuda_equ_l ((a_l), nul_l) == 1)         /* a_l == 0         */
+    (cuda_equ_l ((a_l), cuda_nul_l) == 1)         /* a_l == 0         */
 
 #define CUDA_EQONE_L(a_l) \
-    (cuda_equ_l ((a_l), one_l) == 1)         /* a_l == 1         */
+    (cuda_equ_l ((a_l), cuda_one_l) == 1)         /* a_l == 1         */
 
 #define cuda_eqone_l(a_l) \
-    (cuda_equ_l ((a_l), one_l) == 1)         /* a_l == 1         */
+    (cuda_equ_l ((a_l), cuda_one_l) == 1)         /* a_l == 1         */
 
 /* Set CLINT-variables to values 0, 1, 2 resp. */
 #define CUDA_SETZERO_L(n_l)\
@@ -92,7 +92,7 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 class CUDALINT
 {
 public:
-	CUDA_CALLABLE_MEMBER CUDALINT(void);
+	CUDA_CALLABLE_MEMBER CUDALINT(void); /// _device_ _host_
 	CUDA_CALLABLE_MEMBER CUDALINT(clint*);
 	CUDA_CALLABLE_MEMBER CUDALINT(int i);
 	CUDA_CALLABLE_MEMBER CUDALINT(unsigned short us);

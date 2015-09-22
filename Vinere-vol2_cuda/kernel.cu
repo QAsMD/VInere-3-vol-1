@@ -2,14 +2,15 @@
 
 
 /* CLINT-Constant Values */
+/// зачем? 
 __device__ clint __FLINT_API_DATA
-nul_l[] = { 0, 0, 0, 0, 0 };
+cuda_nul_l[] = { 0, 0, 0, 0, 0 };
 __device__ clint __FLINT_API_DATA
-one_l[] = { 1, 1, 0, 0, 0 };
+cuda_one_l[] = { 1, 1, 0, 0, 0 };
 __device__ clint __FLINT_API_DATA
-two_l[] = { 1, 2, 0, 0, 0 };
+cuda_two_l[] = { 1, 2, 0, 0, 0 };
 /******************************************************************************/
-
+/// что это?
 __device__ static int twotab[] =
 { 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0,
 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
@@ -48,14 +49,13 @@ __global__ void addKernel(short *sM2, short *sLC, short *sD, short *sN)
 	clint* n_nl = (clint*)sN;
 
 
-
 	//CUDALINT M2 = CUDALINT(m2_nl);
 	CUDALINT LC = CUDALINT(lc_nl);
 	CUDALINT D = CUDALINT(d_nl);
 	CUDALINT partD = CUDALINT();
-	cuda_partcpy_l(partD.n_l, D.n_l,i);
+	cuda_partcpy_l(partD.n_l, D.n_l, i);
 	CUDALINT N = CUDALINT(n_nl);
-	
+
 	CUDALINT M2 = cuda_mexp(LC, D, N);
 
 	cuda_mmul_l(M2.n_l, m2_nl, (clint*)sM2, N.n_l);
@@ -66,44 +66,46 @@ __global__ void addKernel(short *sM2, short *sLC, short *sD, short *sN)
 // Helper function for using CUDA to add vectors in parallel.
 cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl, void *n_nl)
 {
-    //int *dev_a = 0;
-    //int *dev_b = 0;
-    //int *dev_c = 0;
+
+	//int *dev_a = 0;
+	//int *dev_b = 0;
+	//int *dev_c = 0;
 
 	//******************************************************//
 	void *m2_dev_arr = 0;
 	void *lc_dev_arr = 0;
 	void *d_dev_arr = 0;
 	void *n_dev_arr = 0;
+	unsigned int *p_size = &size;
 	//******************************************************//
 
-    cudaError_t cudaStatus;
+	cudaError_t cudaStatus;
 
-    // Choose which GPU to run on, change this on a multi-GPU system.
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
+	// Choose which GPU to run on, change this on a multi-GPU system.
+	cudaStatus = cudaSetDevice(0);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+		goto Error;
+	}
 
-    //// Allocate GPU buffers for three vectors (two input, one output).
-    //cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "cudaMalloc failed!");
-    //    goto Error;
-    //}
+	//// Allocate GPU buffers for three vectors (two input, one output).
+	//cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
+	//if (cudaStatus != cudaSuccess) {
+	//    fprintf(stderr, "cudaMalloc failed!");
+	//    goto Error;
+	//}
 
-    //cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "cudaMalloc failed!");
-    //    goto Error;
-    //}
+	//cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
+	//if (cudaStatus != cudaSuccess) {
+	//    fprintf(stderr, "cudaMalloc failed!");
+	//    goto Error;
+	//}
 
-    //cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "cudaMalloc failed!");
-    //    goto Error;
-    //}
+	//cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
+	//if (cudaStatus != cudaSuccess) {
+	//    fprintf(stderr, "cudaMalloc failed!");
+	//    goto Error;
+	//}
 
 	//******************************************************//
 	size_t m2_num_size = 2 * ((short)(*((short*)m2_nl))) + sizeof(short);
@@ -111,7 +113,14 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 	size_t d_num_size = 2 * ((short)(*((short*)d_nl))) + sizeof(short);
 	size_t n_num_size = 2 * ((short)(*((short*)n_nl))) + sizeof(short);
 
-/// cudaMalloc
+	/// cudaMalloc
+	//cudaStatus = cudaMalloc((void**)(&p_size), sizeof(unsigned int));
+	//if (cudaStatus != cudaSuccess) {
+	//	fprintf(stderr, "cudaMalloc failed!");
+	//	goto Error;
+	//}
+
+	/// зачем объ€вл€ть дл€ адресов и указателей отдельно?
 	cudaStatus = cudaMalloc((void**)(&m2_dev_arr), n_num_size);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMalloc failed!");
@@ -133,8 +142,8 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 		fprintf(stderr, "cudaMalloc failed!");
 		goto Error;
 	}
-/// 
-/// cudaMemset
+	/// 
+	/// cudaMemset
 	cudaStatus = cudaMemset((void*)(m2_dev_arr), 0, n_num_size);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemset failed!");
@@ -155,8 +164,13 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 		fprintf(stderr, "cudaMemset failed!");
 		goto Error;
 	}
-///
-///	cudaMemcpy
+	///
+	///	cudaMemcpy
+	//cudaStatus = cudaMemcpy(p_size, &size, sizeof(unsigned int), cudaMemcpyHostToDevice);
+	//if (cudaStatus != cudaSuccess) {
+	//	fprintf(stderr, "cudaMemcpy failed!");
+	//	goto Error;
+	//}
 	cudaStatus = cudaMemcpy(m2_dev_arr, m2_nl, m2_num_size, cudaMemcpyHostToDevice);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemcpy failed!");
@@ -179,58 +193,58 @@ cudaError_t mexpWithCuda(unsigned int size, void *m2_nl, void *lc_nl, void *d_nl
 	}
 	//******************************************************//
 
-    //// Copy input vectors from host memory to GPU buffers.
-    //cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "cudaMemcpy failed!");
-    //    goto Error;
-    //}
+	//// Copy input vectors from host memory to GPU buffers.
+	//cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
+	//if (cudaStatus != cudaSuccess) {
+	//    fprintf(stderr, "cudaMemcpy failed!");
+	//    goto Error;
+	//}
 
-    //cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "cudaMemcpy failed!");
-    //    goto Error;
-    //}
+	//cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
+	//if (cudaStatus != cudaSuccess) {
+	//    fprintf(stderr, "cudaMemcpy failed!");
+	//    goto Error;
+	//}
 
 
-    // Launch a kernel on the GPU with one thread for each element.
-	addKernel << <1, size>> >((short*)m2_dev_arr, (short*)lc_dev_arr, (short*)d_dev_arr, (short*)n_dev_arr);
+	// Launch a kernel on the GPU with one thread for each element.
+	addKernel << <1, size >> >((short*)m2_dev_arr, (short*)lc_dev_arr, (short*)d_dev_arr, (short*)n_dev_arr);
 
-    // Check for any errors launching the kernel
+	// Check for any errors launching the kernel
 	cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-        goto Error;
-    }
-    
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
-        goto Error;
-    }
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+		goto Error;
+	}
 
-    // Copy output vector from GPU buffer to host memory.
+	// cudaDeviceSynchronize waits for the kernel to finish, and returns
+	// any errors encountered during the launch.
+	cudaStatus = cudaDeviceSynchronize();
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
+		goto Error;
+	}
+
+	// Copy output vector from GPU buffer to host memory.
 	size_t m2_out_num_size = 2 * ((short)(*((short*)n_nl))) + sizeof(short);
 	cudaStatus = cudaMemcpy(m2_nl, m2_dev_arr, m2_out_num_size, cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMemcpy failed!");
+		goto Error;
+	}
 
 
 
 Error:
-    //cudaFree(dev_c);
-    //cudaFree(dev_a);
-    //cudaFree(dev_b);
+	//cudaFree(dev_c);
+	//cudaFree(dev_a);
+	//cudaFree(dev_b);
 	cudaFree(m2_dev_arr);
 	cudaFree(lc_dev_arr);
 	cudaFree(d_dev_arr);
 	cudaFree(n_dev_arr);
-    
-    return cudaStatus;
+
+	return cudaStatus;
 }
 
 ///
@@ -826,7 +840,7 @@ cuda_mexpkm_l(CLINT bas_l, CLINT exp_l, CLINT p_l, CLINT m_l)
 		}
 	}
 
-	cuda_mulmon_l(acc_l, one_l, md_l, mprime, logB_r, p_l);
+	cuda_mulmon_l(acc_l, cuda_one_l, md_l, mprime, logB_r, p_l);
 
 	free(aptr_l);
 	if (ptr_l != NULL)

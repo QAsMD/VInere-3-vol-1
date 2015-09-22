@@ -1,7 +1,7 @@
 #pragma once
 #include "main.h"
 
-#define DBG_PRINT
+//#define DBG_PRINT
 using namespace std;
 
 ERROR_CODE Generalized_Wiener_Attack(
@@ -61,7 +61,7 @@ ERROR_CODE Generalized_Wiener_Attack(
 		cout << "Numerator : " << potential_K[i].decstr() << endl;
 		cout << "Divisor : " << potential_D[i].decstr() << endl;
 #endif
-///Exponation
+		///Exponation
 		LINT M2 = LINT(1);
 		void* m2_nl = M2.n_l;
 		void* lc_nl = LC.n_l;
@@ -70,6 +70,7 @@ ERROR_CODE Generalized_Wiener_Attack(
 		size_t arraySize = (short)(*((short*)d_nl));
 		cudaError_t cudaStatus = mexpWithCuda(arraySize, m2_nl, lc_nl, d_nl, n_nl);
 		M2 = LINT((clint*)m2_nl);
+		cout << "M2: " << M2.hexstr() << endl;
 		//LINT M2 = mexp(LC, potential_D[i], N);
 
 		// cudaDeviceReset must be called before exiting in order for profiling and
@@ -213,7 +214,7 @@ int main()
 			FILE.close();
 #endif
 		}
-			break;
+		break;
 		case '2':
 		{
 			string line_E;
@@ -260,12 +261,12 @@ int main()
 				}
 			}
 		}
-			break;
+		break;
 		case '3':
 		{
 			goto clean0;
 		}
-			break;
+		break;
 		default:
 			cout << "Invalid choice specified. Re-enter your choice" << endl;
 		}
